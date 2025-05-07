@@ -1,17 +1,18 @@
 ###############################################################################
 #  home/dev.nix — Rob’s Home-Manager profile (Ubuntu 24, Intel Iris 6100)
-#  • GUI apps via nix on Ubuntu
-#  • Alacritty wrapped with nixGLIntel and a working launcher + icon
+#  • Electron apps wrapped with --no-sandbox
+#  • JetBrains IDEs run natively
+#  • Alacritty launched through nixGLIntel
+#  • Launcher + icon installed in user theme; one working icon, no duplicates
 ###############################################################################
 { config, pkgs, lib, ... }:
 
 let
-  # Absolute path to the Nix CLI so GNOME doesn’t depend on $PATH
+  # ─────────────────── helpers ──────────────────────────────────────────────
+  # absolute path to the Nix CLI so GNOME doesn’t depend on $PATH
   nixBin = "${pkgs.nix}/bin/nix";
 
-  # ── helpers ────────────────────────────────────────────────────────────────
-
-  # Wrap an Electron app with --no-sandbox
+  # wrap an Electron app with --no-sandbox
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
       exec ${pkg}/bin/${exe} --no-sandbox "$@"
@@ -23,9 +24,11 @@ let
          ${pkgs.alacritty}/bin/alacritty "$@"
   '';
 
-  # Icon shipped inside the Alacritty package
-  alacrittyIcon =
+  # icons from the Alacritty package
+  alacrittyIcon512 =
     "${pkgs.alacritty}/share/icons/hicolor/512x512/apps/Alacritty.png";
+  alacrittyIcon128 =
+    "${pkgs.alacritty}/share/icons/hicolor/128x128/apps/Alacritty.png";
 in
 {
   ##########################  REQUIRED identifiers  ##########################
@@ -36,17 +39,16 @@ in
   ##########################  Desktop integration  ###########################
   targets.genericLinux.enable = true;
 
-  # 1) Install a launcher that points to the wrapper
+  # 1) launcher that calls the wrapper
   home.activation.installAlacrittyDesktop =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       apps="$HOME/.local/share/applications"
       mkdir -p "$apps"
 
-      # Remove old launchers pointing to the store binary
+      # remove old launchers that call the store binary
       find "$apps" -maxdepth 1 -type f -name 'alacritty*.desktop' \
            -exec grep -q '/nix/store/.*alacritty' {} \; -delete || true
 
-      # Write our launcher (Icon=alacritty — picks user-theme icon)
       cat > "$apps/alacritty.desktop" <<EOF
 [Desktop Entry]
 Name=Alacritty
@@ -61,14 +63,16 @@ EOF
       ${pkgs.desktop-file-utils}/bin/update-desktop-database "$apps" || true
     '';
 
-  # 2) Copy icon into the user icon theme & refresh cache
+  # 2) copy icon (512 px + 128 px) into user theme and refresh cache
   home.activation.installAlacrittyIcon =
     lib.hm.dag.entryAfter [ "installAlacrittyDesktop" ] ''
-      iconDir="$HOME/.local/share/icons/hicolor/512x512/apps"
-      mkdir -p "$iconDir"
-      cp -f ${alacrittyIcon} "$iconDir/alacritty.png"
-      ${pkgs.gtk3}/bin/gtk-update-icon-cache \
-        "$HOME/.local/share/icons/hicolor" || true
+      theme="$HOME/.local/share/icons/hicolor"
+      mkdir -p "$theme/512x512/apps" "$theme/128x128/apps"
+
+      cp -f ${alacrittyIcon512} "$theme/512x512/apps/alacritty.png"
+      cp -f ${alacrittyIcon128} "$theme/128x128/apps/alacritty.png"
+
+      ${pkgs.gtk3}/bin/gtk-update-icon-cache "$theme" || true
     '';
 
   ##########################  Packages  ######################################
@@ -88,30 +92,26 @@ EOF
 
     # GUI apps
     emacs29-pgtk
-    alacrittyWrapped
+    alacrittyWrapped                   # wrapper binary
     google-chrome
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
   ##########################  Shell / tools  #################################
-  programs.zsh = {
-    enable            = true;
-    oh-my-zsh.enable  = true;
-    oh-my-zsh.theme   = "agnoster";
-  };
+  programs.zsh.enable            = true;
+  programs.zsh.oh-my-zsh.enable  = true;
+  programs.zsh.oh-my-zsh.theme   = "agnoster";
 
-  programs.tmux = {
-    enable       = true;
-    extraConfig  = ''
-      set -g mouse on
-      set -g history-limit 100000
-    '';
-  };
+  programs.tmux.enable = true;
+  programs.tmux.extraConfig = ''
+    set -g mouse on
+    set -g history-limit 100000
+  '';
 
   programs.git = {
-    enable     = true;
-    userName   = "Rob";
-    userEmail  = "rob@example.com";
+    enable    = true;
+    userName  = "Rob";
+    userEmail = "rob@example.com";
   };
 
   home.shellAliases = {
@@ -133,9 +133,11 @@ EOF
   ##########################  Cloudflared tunnel  ############################
   systemd.user.services.cloudflared = {
     Unit.Description = "Cloudflare Tunnel (user scope)";
-    Service.ExecStart =
-      "${pkgs.cloudflared}/bin/cloudflared tunnel run --cred-file %h/.cloudflared/tunnel.json";
-    Service.Restart  = "on-failure";
+    Service = {
+      ExecStart =
+        "${pkgs.cloudflared}/bin/cloudflared tunnel run --cred-file %h/.cloudflared/tunnel.json";
+      Restart = "on-failure";
+    };
     Install.WantedBy = [ "default.target" ];
   };
 
