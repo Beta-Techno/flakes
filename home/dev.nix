@@ -1,53 +1,47 @@
--- home/dev.nix ------------------------------------------------------------
-{ pkgs, lib, config, ... }:
-
 ###############################################################################
 #  Rob’s Home-Manager module  – Ubuntu 24 · Intel Iris 6100
-#  • Electron apps wrapped with --no-sandbox
-#  • JetBrains IDEs run natively
-#  • Alacritty launched through nixGLIntel
-#  • Single launcher icon that works (uses absolute /nix/store path to `nix`)
 ###############################################################################
+{ config, pkgs, ... }:
 
 let
-  # ── absolute path to the Nix CLI (so GNOME launcher doesn’t need $PATH) ──
+  # absolute path to `nix` binary so GNOME doesn't need $PATH
   nixBin = "${pkgs.nix}/bin/nix";
 
-  # ── helper: wrap an Electron app with --no-sandbox ────────────────────────
+  # wrap Electron apps with --no-sandbox
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
       exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
 
-  # ── helper: Alacritty wrapper → nixGLIntel ───────────────────────────────
+  # Alacritty wrapper → nixGLIntel
   alacrittyWrapped = pkgs.writeShellScriptBin "alacritty" ''
     exec ${nixBin} run --impure github:guibou/nixGL#nixGLIntel -- \
          ${pkgs.alacritty}/bin/alacritty "$@"
   '';
 
-  # Icon for the launcher
   alacrittyIcon =
     "${pkgs.alacritty}/share/icons/hicolor/512x512/apps/Alacritty.png";
 in
 {
-  ##########################  REQUIRED identifiers  ##########################
+  ## Mandatory identifiers
   home.username      = "rob";
   home.homeDirectory = "/home/rob";
   home.stateVersion  = "24.05";
 
-  ##########################  Desktop integration  ###########################
+  ## Ensure ~/.nix-profile is visible to GNOME
   targets.genericLinux.enable = true;
 
+  ## Install a launcher that calls the wrapper, remove stale ones
   home.activation.installAlacrittyDesktop =
-    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    pkgs.writeShellScript "installAlacrittyDesktop" ''
+      set -eu
       apps="$HOME/.local/share/applications"
       mkdir -p "$apps"
 
-      # Remove any old launchers that call the store binary
+      # remove old launchers that call /nix/store/…/alacritty
       find "$apps" -maxdepth 1 -type f -name 'alacritty*.desktop' \
            -exec grep -q '/nix/store/.*alacritty' {} \; -delete || true
 
-      # Install our launcher that calls the wrapper directly
       cat > "$apps/alacritty.desktop" <<EOF
 [Desktop Entry]
 Name=Alacritty
@@ -62,7 +56,7 @@ EOF
       ${pkgs.desktop-file-utils}/bin/update-desktop-database "$apps" || true
     '';
 
-  ##########################  Packages  ######################################
+  ## Packages
   home.packages = with pkgs; [
     # CLI tools
     tmux git ripgrep fd bat fzf jq htop inetutils
@@ -79,12 +73,12 @@ EOF
 
     # GUI apps
     emacs29-pgtk
-    alacrittyWrapped                 # wrapper binary
+    alacrittyWrapped
     google-chrome
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
-  ##########################  Shell / tools  #################################
+  ## Shell / Git / Tmux (unchanged)
   programs.zsh.enable            = true;
   programs.zsh.oh-my-zsh.enable  = true;
   programs.zsh.oh-my-zsh.theme   = "agnoster";
@@ -102,14 +96,12 @@ EOF
   };
 
   home.shellAliases = {
-    k   = "kubectl";
-    dcu = "docker compose up -d";
-    dcd = "docker compose down";
+    k = "kubectl"; dcu = "docker compose up -d"; dcd = "docker compose down";
   };
 
   fonts.fontconfig.enable = true;
 
-  ##########################  Ghostty terminfo  ##############################
+  ## Ghostty terminfo
   home.file."terminfo/ghostty.terminfo".source = ../terminfo/ghostty.terminfo;
   home.activation.installGhosttyTerminfo =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -117,7 +109,7 @@ EOF
       tic -x -o "$HOME/.terminfo" ${../terminfo/ghostty.terminfo}
     '';
 
-  ##########################  Cloudflared ####################################
+  ## Cloudflared service
   systemd.user.services.cloudflared = {
     Unit.Description = "Cloudflare Tunnel (user scope)";
     Service.ExecStart =
