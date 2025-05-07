@@ -1,68 +1,40 @@
+# =============================
+#  home/dev.nix
+# =============================
 { pkgs, ... }:
-
-/* =====================================================================
-   Home‑Manager configuration for user "rob" — STABLE 24.05 ONLY
-   ---------------------------------------------------------------------
-   • All GUI apps, CLI tools, fonts, themes, and dot‑files live here.
-   • This file is imported by flake.nix → homeConfigurations.rob.
-   • After editing, run:  home-manager switch  (or the bootstrap helper).
-   ===================================================================== */
-
 {
-  # ------------------------------------------------------------------
-  # Core metadata — adjust if your username or $HOME differs
-  # ------------------------------------------------------------------
+  # -------------------------------------------------------------
+  # Core user metadata
+  # -------------------------------------------------------------
   home.username      = "rob";
   home.homeDirectory = "/home/rob";
+  home.stateVersion  = "24.05";   # DO NOT change until you upgrade nixpkgs
 
-  # Keep in sync with your current Nixpkgs release when upgrading.
-  home.stateVersion  = "24.05";
-
-  # ------------------------------------------------------------------
-  # Packages (GUI + CLI) installed into ~/.local/state/nix/profile/bin
-  # ------------------------------------------------------------------
+  # -------------------------------------------------------------
+  # Packages (CLI + fonts)
+  # -------------------------------------------------------------
   home.packages = with pkgs; [
-    /* ===== GUI applications ===== */
-    # Editors / IDEs ---------------------------------------------------
-    vscode                      # Visual Studio Code (unfree)
-    emacs29-pgtk                # Native‑comp Emacs; adjust build if needed
-    neovim                      # For quick edits + LazyVim config
-    
-    # JetBrains IDEs (bundled JBR)
-    jetbrains.datagrip
-    jetbrains.rider
+    # CLI utilities
+    tmux git ripgrep fd bat fzf jq htop inetutils
 
-    # Terminals --------------------------------------------------------
-    ghostty                     # GPU‑accelerated terminal (early release)
-    alacritty
-
-    # Browsers & helpers ---------------------------------------------
-    google-chrome               # Unfree; enable allowUnfree in flake
-    postman                     # API client
-
-    # Docker client (daemon runs via distro service or rootless setup)
-    docker-client
-
-    /* ===== CLI toolchain ===== */
-    git                         # Version control
-    inetutils                   # Provides `ifconfig`
-    tmux                        # Terminal multiplexer
-    ripgrep fd bat fzf          # Modern command‑line swiss‑army knives
-    jq                          # JSON query
-    gh                          # GitHub CLI
-    htop                        # Process viewer
-    nerdfonts                   # Fonts
+    # Fonts (JetBrainsMono Nerd Font + others)
+    (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
-  # ------------------------------------------------------------------
-  # Program‑specific modules (dot‑files as code)
-  # ------------------------------------------------------------------
+  # -------------------------------------------------------------
+  # Z‑shell with Oh‑My‑Zsh
+  # -------------------------------------------------------------
   programs.zsh = {
     enable = true;
-    oh-my-zsh.enable = true;
-    oh-my-zsh.theme  = "agnoster";
+    oh-my-zsh = {
+      enable = true;
+      theme  = "agnoster";
+    };
   };
 
+  # -------------------------------------------------------------
+  # Tmux configuration
+  # -------------------------------------------------------------
   programs.tmux = {
     enable = true;
     extraConfig = ''
@@ -71,44 +43,44 @@
     '';
   };
 
+  # -------------------------------------------------------------
+  # Git defaults
+  # -------------------------------------------------------------
   programs.git = {
-    enable = true;
-    userName  = "Nick D'Amico";
-    userEmail = "nick@example.com";  # ← update
-    extraConfig = {
-      pull.rebase = true;
-    };
+    enable    = true;
+    userName  = "Rob";
+    userEmail = "rob@example.com";
   };
 
-  # ------------------------------------------------------------------
-  # User‑mode systemd services (example: cloudflared tunnel)
-  # ------------------------------------------------------------------
-  systemd.user.services.cloudflared = {
-    Unit = {
-      Description = "Cloudflare Tunnel (user scope)";
-      After = [ "network-online.target" ];
-    };
-    Service = {
-      ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel run --cred-file %h/.cloudflared/tunnel.json";
-      Restart = "on-failure";
-    };
-    Install = { WantedBy = [ "default.target" ]; };
-  };
-
-  # ------------------------------------------------------------------
-  # Aliases & shell customisations
-  # ------------------------------------------------------------------
+  # -------------------------------------------------------------
+  # Handy aliases
+  # -------------------------------------------------------------
   home.shellAliases = {
-    k = "kubectl";
+    k   = "kubectl";
     dcu = "docker compose up -d";
     dcd = "docker compose down";
   };
 
-  # ------------------------------------------------------------------
-  # Fonts, themes, etc. (examples; optional)
-  # ------------------------------------------------------------------
+  # -------------------------------------------------------------
+  # Fontconfig so the Nerd Font is picked up by GUI apps
+  # -------------------------------------------------------------
   fonts.fontconfig.enable = true;
-  home.packages = with pkgs; (self: self.home.packages) ++ [
-    nerdfonts
-  ];
+
+  # -------------------------------------------------------------
+  # User‑level systemd service example: Cloudflare Tunnel
+  # -------------------------------------------------------------
+  systemd.user.services.cloudflared = {
+    Unit = {
+      Description = "Cloudflare Tunnel (user scope)";
+      After       = [ "network-online.target" ];
+    };
+    Service = {
+      ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel run --cred-file %h/.cloudflared/tunnel.json";
+      Restart   = "on-failure";
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
+
+  # Let Home‑Manager manage itself so upgrades are declarative
+  programs.home-manager.enable = true;
 }
