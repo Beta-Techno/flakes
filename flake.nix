@@ -1,5 +1,5 @@
 # =============================
-#  flake.nix
+#  flake.nix  — clean, single‑system + bootstrap helper
 # =============================
 {
   description = "Rob's declarative workstation (stable 24.05)";
@@ -15,32 +15,25 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = inputs@{ self, nixpkgs, home-manager, flake-utils, ... }:
+  outputs = { self, nixpkgs, home-manager, flake-utils, ... }:
     let
-      # Primary system you’re on right now. Home-Manager only needs one.
-      defaultSystem = builtins.currentSystem;
-      defaultPkgs   = import nixpkgs { inherit defaultSystem; config.allowUnfree = true; };
+      # Use the system we are evaluating on (falls back to x86_64‑linux if undefined)
+      hostSystem = builtins.getEnv "NIX_SYSTEM" or null;
+      mySystem   = if hostSystem != null && hostSystem != "" then hostSystem else "x86_64-linux";
+      pkgs       = import nixpkgs { system = mySystem; config.allowUnfree = true; };
     in
     {
-      # -----------------------------------------------------------
-      # Home‑Manager entry searched by `home-manager switch --flake .#rob`
-      # -----------------------------------------------------------
+      # Home‑Manager config that `home-manager switch --flake .#rob` expects
       homeConfigurations.rob = home-manager.lib.homeManagerConfiguration {
-        pkgs    = defaultPkgs;
+        inherit pkgs;
         modules = [ ./home/dev.nix ];
       };
-
-      # -----------------------------------------------------------
-      # Extra: bootstrap script available for *all* common systems
-      # -----------------------------------------------------------
     } // flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = import nixpkgs { inherit system; config.allowUnfree = true; };
-      in {
+      let pkgs = import nixpkgs { inherit system; config.allowUnfree = true; }; in
+      {
         packages.bootstrap = pkgs.writeShellScriptBin "bootstrap" ''
           set -euo pipefail
-          echo "▶  Applying Home‑Manager configuration for user rob"
-          nix run github:nix-community/home-manager/release-24.05 --extra-experimental-features 'nix-command flakes' -- --flake ${self.url or ""}#rob
+          nix run github:nix-community/home-manager/release-24.05 --extra-experimental-features 'nix-command flakes' -- --flake ${self.url or "."}#rob
         '';
       });
 }
