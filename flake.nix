@@ -1,6 +1,3 @@
-# =============================
-#  flake.nix — stable 24.05
-# =============================
 {
   description = "Rob's workstation flake (24.05)";
 
@@ -17,14 +14,8 @@
 
   outputs = { self, nixpkgs, home-manager, flake-utils, ... }:
   let
-    # Primary architecture for this workstation
     system = "x86_64-linux";
-
-    # Common package set (allowing unfree for JetBrains, Chrome, etc.)
-    pkgs = import nixpkgs {
-      inherit system;
-      config.allowUnfree = true;
-    };
+    pkgs   = import nixpkgs { inherit system; config.allowUnfree = true; };
   in
   {
     ###########################################

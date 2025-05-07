@@ -1,6 +1,3 @@
-# =============================
-#  home/dev.nix — packages & terminfo
-# =============================
 { pkgs, lib, ... }:
 {
   home.username      = "rob";
@@ -15,7 +12,6 @@
 
     # --- GUI apps ---
     vscode                        # VS Code
-    zed-editor                    # Zed
     emacs29-pgtk                  # GUI Emacs (pgtk build)
     ghostty                       # Terminal ­(GPU-rendered)
     alacritty                     # Terminal
@@ -25,8 +21,7 @@
     postman                       # API client
     docker-desktop                # Docker Desktop for Linux
 
-    # NOTE: Cursor AI editor is not in nixpkgs yet.
-    #       We can add it via an overlay/AppImage later.
+    # (zed-editor removed — not available on 24.05)
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
