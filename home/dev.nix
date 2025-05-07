@@ -53,6 +53,19 @@
   fonts.fontconfig.enable = true;
 
   # -----------------------------------------------------------
+  # Ghostty terminfo — compile at activation time (robust, offline)
+  # -----------------------------------------------------------
+  # 1. Source file lives one directory up from home/ (../terminfo)
+  home.file."terminfo/ghostty.terminfo".source = ../terminfo/ghostty.terminfo;
+
+  # 2. Compile into ~/.terminfo on every switch so xterm-ghostty is found
+  home.activation.installGhosttyTerminfo = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    mkdir -p "$HOME/.terminfo"
+    tic -x -o "$HOME/.terminfo" ${../terminfo/ghostty.terminfo}
+  '';
+
+
+  # -----------------------------------------------------------
   # Ghostty terminfo — compile at activation time (robust, no 404)
   # -----------------------------------------------------------
   # 1.  Store source in flake (text file committed in ./terminfo)
