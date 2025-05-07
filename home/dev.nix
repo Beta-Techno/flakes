@@ -1,11 +1,14 @@
-{ pkgs, lib, ... }:
+{ pkgs, unstable, lib, ... }:
 
 ###############################################################################
 #  Rob’s Home-Manager module – Ubuntu desktop
+#  * Electron apps wrapped with --no-sandbox
+#  * JetBrains IDEs run natively
+#  * Alacritty uses alacritty-fhs from unstable → fixes GL/Wayland crash
 ###############################################################################
 
 let
-  # Electron apps that need --no-sandbox
+  # Electron apps
   vscode     = pkgs.vscode;
   postmanPkg = pkgs.postman;
 
@@ -13,13 +16,9 @@ let
     pkgs.writeShellScriptBin exe ''
       exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
-
-  # nixGL wrapper for Alacritty
-  nixGLWrap = pkgs.writeShellScriptBin "alacritty" ''
-    exec nixGL ${pkgs.alacritty}/bin/alacritty "$@"
-  '';
 in
 {
+  # Make ~/.nix-profile visible to GNOME/KDE
   targets.genericLinux.enable = true;
 
   home.username      = "rob";
@@ -32,7 +31,7 @@ in
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
-    ## Electron wrappers (+ originals low-prio)
+    ## Electron (wrappers)
     (wrapElectron vscode     "code")
     (wrapElectron postmanPkg "postman")
     (lib.lowPrio vscode) (lib.lowPrio postmanPkg)
@@ -43,18 +42,16 @@ in
 
     ## GUI apps
     emacs29-pgtk
-    nixgl.auto.nixGLDefault      # GL shim (Intel/AMD/NVIDIA autodetect)
-    nixGLWrap                    # ‘alacritty’ wrapper that calls nixGL
-    (lib.lowPrio pkgs.alacritty) # real binary, avoids file-name clash
+    unstable.alacritty-fhs     # ← FHS build from unstable, works on Ubuntu
     google-chrome
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
   # ------------ Shell & tools -----------------
   programs.zsh = {
-    enable            = true;
-    oh-my-zsh.enable  = true;
-    oh-my-zsh.theme   = "agnoster";
+    enable           = true;
+    oh-my-zsh.enable = true;
+    oh-my-zsh.theme  = "agnoster";
   };
 
   programs.tmux = {

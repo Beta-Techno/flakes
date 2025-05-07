@@ -2,34 +2,40 @@
   description = "Rob's workstation flake (24.05)";
 
   inputs = {
-    nixpkgs.url       = "github:NixOS/nixpkgs/nixos-24.05";
-    home-manager.url  = "github:nix-community/home-manager/release-24.05";
-    flake-utils.url   = "github:numtide/flake-utils";
-    nixgl.url         = "github:nix-community/nixGL";     # <─ NEW
+    # Stable base (24.05)
+    nixpkgs.url      = "github:NixOS/nixpkgs/nixos-24.05";
+
+    # Latest channel just to grab alacritty-fhs (not in 24.05)
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+    home-manager.url = "github:nix-community/home-manager/release-24.05";
+    flake-utils.url  = "github:numtide/flake-utils";
 
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, flake-utils, nixgl, ... }:
+  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, flake-utils, ... }:
   let
-    system = "x86_64-linux";
-    pkgs   = import nixpkgs {
-      inherit system;
-      config.allowUnfree = true;
-      overlays = [
-        # expose nixGL packages inside pkgs
-        nixgl.overlay
-      ];
-    };
+    system        = "x86_64-linux";
+    pkgs          = import nixpkgs          { inherit system; config.allowUnfree = true; };
+    unstablePkgs  = import nixpkgs-unstable { inherit system; config.allowUnfree = true; };
   in
   {
+    ##################################
+    ## Home-Manager entry “rob”
+    ##################################
     homeConfigurations.rob =
       home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
+        # pass unstablePkgs into modules
+        extraSpecialArgs = { unstable = unstablePkgs; };
         modules = [ ./home/dev.nix ];
       };
   }
   //
+  ###########################################
+  ## Convenience ‘nix run .#bootstrap’
+  ###########################################
   flake-utils.lib.eachDefaultSystem (sys:
     let p = import nixpkgs { system = sys; config.allowUnfree = true; };
     in {
