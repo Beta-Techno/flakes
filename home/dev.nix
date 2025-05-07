@@ -2,6 +2,10 @@
 
 ###############################################################################
 #  Rob’s Home-Manager module  (Ubuntu client)
+#  • Electron apps wrapped with --no-sandbox
+#  • JetBrains IDEs run natively
+#  • Alacritty runs through nixGLMesa (fixes GL/Wayland crash)
+#  • targets.genericLinux exposes ~/.nix-profile to GNOME/KDE launchers
 ###############################################################################
 
 let
@@ -11,14 +15,17 @@ let
       exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
 
-  # ── Helper: Alacritty via nixGL (GPU auto-detect) ───────────────
-  #     nix run --impure github:guibou/nixGL -- nixGL <real-binary>
+  # ── Helper: Alacritty via nixGLMesa ─────────────────────────────
+  #     nix run --impure github:guibou/nixGL -- nixGLMesa <binary>
   alacrittyWrapped = pkgs.writeShellScriptBin "alacritty" ''
-    exec nix run --impure github:guibou/nixGL -- nixGL \
+    exec nix run --impure github:guibou/nixGL -- nixGLMesa \
          ${pkgs.alacritty}/bin/alacritty "$@"
   '';
 in
 {
+  ########################################
+  ## Desktop integration
+  ########################################
   targets.genericLinux.enable = true;
 
   home.username      = "rob";
@@ -29,23 +36,24 @@ in
   ## Packages
   ########################################
   home.packages = with pkgs; [
-    # CLI
+    # --- CLI tools ---
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
-    # Electron (wrapped)
+    # --- Electron apps (wrapped) ---
     (wrapElectron pkgs.vscode  "code")
     (wrapElectron pkgs.postman "postman")
-    (lib.lowPrio pkgs.vscode) (lib.lowPrio pkgs.postman)
+    (lib.lowPrio pkgs.vscode)  # originals kept low-priority to avoid clash
+    (lib.lowPrio pkgs.postman)
 
-    # JetBrains IDEs
+    # --- JetBrains IDEs ---
     jetbrains.datagrip
     jetbrains.rider
 
-    # GUI apps
+    # --- GUI apps ---
     emacs29-pgtk
     alacrittyWrapped
-    (lib.lowPrio pkgs.alacritty)
+    (lib.lowPrio pkgs.alacritty)   # original binary, desktop entry
     google-chrome
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
@@ -54,16 +62,18 @@ in
   ## Shell, Git, Tmux
   ########################################
   programs.zsh = {
-    enable            = true;
-    oh-my-zsh.enable  = true;
-    oh-my-zsh.theme   = "agnoster";
+    enable           = true;
+    oh-my-zsh.enable = true;
+    oh-my-zsh.theme  = "agnoster";
   };
 
-  programs.tmux.enable = true;
-  programs.tmux.extraConfig = ''
-    set -g mouse on
-    set -g history-limit 100000
-  '';
+  programs.tmux = {
+    enable       = true;
+    extraConfig  = ''
+      set -g mouse on
+      set -g history-limit 100000
+    '';
+  };
 
   programs.git = {
     enable     = true;
@@ -101,5 +111,8 @@ in
     Install.WantedBy = [ "default.target" ];
   };
 
+  ########################################
+  ## Let Home-Manager manage itself
+  ########################################
   programs.home-manager.enable = true;
 }
