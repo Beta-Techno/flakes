@@ -1,5 +1,24 @@
 { pkgs, lib, ... }:
+
+###############################################################################
+#  Rob’s Home-Manager module
+#  • Adds GUI apps (Code, JetBrains, Chrome, Postman, Emacs GTK…)
+#  • Makes them visible in Ubuntu’s launcher via targets.genericLinux
+#  • Wraps Electron apps with --no-sandbox (works around /nix nosuid mount)
+###############################################################################
+
+let
+  # Helper: create a tiny wrapper "<name>" that calls the real binary with
+  # --no-sandbox so it works on non-NixOS systems where /nix is mounted nosuid.
+  wrapElectron = appPkg: name:
+    pkgs.writeShellScriptBin name ''
+      exec ${appPkg}/bin/${name} --no-sandbox "$@"
+    '';
+in
 {
+  ## Export PATH / XDG_DATA_DIRS early via systemd → desktop search works
+  targets.genericLinux.enable = true;
+
   home.username      = "rob";
   home.homeDirectory = "/home/rob";
   home.stateVersion  = "24.05";
@@ -10,17 +29,21 @@
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
-    # --- GUI apps ---
-    vscode                        # VS Code
-    emacs29-pgtk                  # GUI Emacs (pgtk build)
-    alacritty                     # Terminal
-    jetbrains.datagrip            # JetBrains DataGrip
-    jetbrains.rider               # JetBrains Rider
-    google-chrome                 # Chrome browser
-    postman                       # API client
-    # docker-desktop removed — not in 24.05
-
+    # --- GUI apps (original packages) ---
+    vscode
+    emacs29-pgtk
+    alacritty
+    jetbrains.datagrip
+    jetbrains.rider
+    google-chrome
+    postman
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+
+    # --- Electron wrappers (shadow originals in PATH) ---
+    (wrapElectron vscode              "code")
+    (wrapElectron postman             "postman")
+    (wrapElectron jetbrains.datagrip  "datagrip")
+    (wrapElectron jetbrains.rider     "rider")
   ];
 
   # ------------ Shell & tools  ----------------
