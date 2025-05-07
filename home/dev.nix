@@ -1,5 +1,5 @@
 ###############################################################################
-#  home/dev.nix — Rob’s Home-Manager profile  (Ubuntu 24 · Intel Iris 6100)
+#  home/dev.nix — Rob's Home-Manager profile  (Ubuntu 24 · Intel Iris 6100)
 ###############################################################################
 { config, pkgs, lib, ... }:
 
@@ -158,6 +158,11 @@ EOF
       dash-max-icon-size = 32;   # px
       dock-position      = "LEFT";
       autohide           = false;
+    };
+
+    # Tell GNOME to prefer dark variants everywhere
+    "org/gnome/desktop/interface" = {
+      color-scheme = "prefer-dark";   # 'default' | 'prefer-dark'
     };
   };
 }
