@@ -1,96 +1,100 @@
 { pkgs, lib, ... }:
 
 ###############################################################################
-#  Rob’s Home-Manager module  – Ubuntu laptop (Intel Iris 6100)
+#  Rob’s Home-Manager module  (Ubuntu laptop, Intel Iris 6100)
 ###############################################################################
 
 let
-  # ---------- helpers -------------------------------------------------------
-
-  # Wrap an Electron app with --no-sandbox
+  ### helpers #################################################################
+  # Electron wrapper
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
       exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
 
-  # Wrap Alacritty so it runs through nixGLIntel (Mesa stack)
+  # Alacritty wrapper → nixGLIntel
   alacrittyWrapped = pkgs.writeShellScriptBin "alacritty" ''
     exec nix run --impure github:guibou/nixGL#nixGLIntel -- \
          ${pkgs.alacritty}/bin/alacritty "$@"
   '';
 
-  # Absolute icon for our custom desktop entry
   alacrittyIcon = "${pkgs.alacritty}/share/icons/hicolor/512x512/apps/Alacritty.png";
 in
 {
-  ##########  Desktop integration  ###########################################
   targets.genericLinux.enable = true;
 
-  # Custom .desktop file that points to the wrapper; shadows the original.
-  xdg.desktopEntries.alacritty = {
-    name  = "Alacritty";
-    exec  = "${alacrittyWrapped}/bin/alacritty";
-    icon  = alacrittyIcon;
-    type  = "Application";
-    categories = [ "System" "TerminalEmulator" ];
-    terminal   = false;
-  };
-
-  ##########  Basic home info  ################################################
   home.username      = "rob";
   home.homeDirectory = "/home/rob";
   home.stateVersion  = "24.05";
 
-  ##########  Packages  #######################################################
+  ###################### fresh .desktop entry #################################
+  xdg.desktopEntries.alacritty = {
+    name        = "Alacritty";
+    genericName = "Terminal";
+    exec        = "${alacrittyWrapped}/bin/alacritty";
+    icon        = alacrittyIcon;
+    type        = "Application";
+    categories  = [ "System" "TerminalEmulator" ];
+    terminal    = false;
+  };
+
+  ### remove stale launchers & refresh cache each switch ######################
+  home.activation.fixAlacrittyDesktop = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    apps="$HOME/.local/share/applications"
+    mkdir -p "$apps"
+
+    # delete any old Alacritty launchers linking into the store
+    find "$apps" -maxdepth 1 -type f -name 'alacritty*.desktop' \
+         -exec grep -q "$HOME/.nix-profile" {} \; -o -delete
+
+    # copy the freshly generated desktop file
+    cp -f "${config.xdg.desktopEntries.alacritty.desktopFile}" "$apps/alacritty.desktop"
+
+    # update MIME/desktop cache so GNOME picks it up immediately
+    ${pkgs.desktop-file-utils}/bin/update-desktop-database "$apps" || true
+  '';
+
+  ###################### packages #############################################
   home.packages = with pkgs; [
-    # CLI tools
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
-    # Electron apps (wrapped)
     (wrapElectron pkgs.vscode  "code")
     (wrapElectron pkgs.postman "postman")
     (lib.lowPrio pkgs.vscode) (lib.lowPrio pkgs.postman)
 
-    # JetBrains IDEs
-    jetbrains.datagrip
-    jetbrains.rider
-
-    # GUI apps
+    jetbrains.datagrip jetbrains.rider
     emacs29-pgtk
-    alacrittyWrapped           # ← wrapper binary
+    alacrittyWrapped
+    (lib.lowPrio pkgs.alacritty)
     google-chrome
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
-  ##########  Shell, Git, Tmux  ###############################################
-  programs.zsh = {
-    enable           = true;
-    oh-my-zsh.enable = true;
-    oh-my-zsh.theme  = "agnoster";
-  };
+  ###################### shell / misc (unchanged) #############################
+  programs.zsh.enable = true;
+  programs.zsh.oh-my-zsh.enable = true;
+  programs.zsh.oh-my-zsh.theme = "agnoster";
 
-  programs.tmux.enable      = true;
+  programs.tmux.enable = true;
   programs.tmux.extraConfig = ''
     set -g mouse on
     set -g history-limit 100000
   '';
 
-  programs.git = {
-    enable     = true;
-    userName   = "Rob";
-    userEmail  = "rob@example.com";
-  };
+  programs.git.enable    = true;
+  programs.git.userName  = "Rob";
+  programs.git.userEmail = "rob@example.com";
 
   home.shellAliases = {
-    k   = "kubectl";
+    k = "kubectl";
     dcu = "docker compose up -d";
     dcd = "docker compose down";
   };
 
   fonts.fontconfig.enable = true;
 
-  ##########  Ghostty terminfo  ##############################################
+  ### ghostty terminfo / cloudflared service blocks unchanged … ###############
   home.file."terminfo/ghostty.terminfo".source = ../terminfo/ghostty.terminfo;
   home.activation.installGhosttyTerminfo =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -98,12 +102,11 @@ in
       tic -x -o "$HOME/.terminfo" ${../terminfo/ghostty.terminfo}
     '';
 
-  ##########  Cloudflared tunnel (user scope)  ###############################
   systemd.user.services.cloudflared = {
     Unit.Description = "Cloudflare Tunnel (user scope)";
     Service.ExecStart =
       "${pkgs.cloudflared}/bin/cloudflared tunnel run --cred-file %h/.cloudflared/tunnel.json";
-    Service.Restart  = "on-failure";
+    Service.Restart = "on-failure";
     Install.WantedBy = [ "default.target" ];
   };
 
