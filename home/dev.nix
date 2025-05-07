@@ -1,43 +1,45 @@
-###############################################################################
-#  home/dev.nix — Rob’s Home-Manager profile (Ubuntu 24, Intel Iris 6100)
-###############################################################################
 { config, pkgs, lib, ... }:
 
+################################################################################
+#  Rob’s Home-Manager profile – Ubuntu 24 / Intel Iris 6100
+#  · Alacritty via nixGLIntel with working launcher & icons
+#  · Electron apps wrapped with --no-sandbox
+#  · JetBrains IDEs and other GUI apps
+################################################################################
+
 let
-  ### helpers #################################################################
+  nixBin = "${pkgs.nix}/bin/nix";   # absolute path for Exec=
 
-  nixBin = "${pkgs.nix}/bin/nix";          # absolute Nix CLI path
-
-  # Wrap Electron app with --no-sandbox
+  # ---------- helpers -------------------------------------------------------
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
       exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
 
-  # Alacritty wrapper → nixGLIntel
   alacrittyWrapped = pkgs.writeShellScriptBin "alacritty" ''
     exec ${nixBin} run --impure github:guibou/nixGL#nixGLIntel -- \
          ${pkgs.alacritty}/bin/alacritty "$@"
   '';
+
+  icons512 = "${pkgs.alacritty}/share/icons/hicolor/512x512/apps/Alacritty.png";
+  icons128 = "${pkgs.alacritty}/share/icons/hicolor/128x128/apps/Alacritty.png";
 in
 {
-  ##################### Required identifiers ##################################
+  ##########################  Essentials  ####################################
   home.username      = "rob";
   home.homeDirectory = "/home/rob";
   home.stateVersion  = "24.05";
-
-  ##################### Desktop integration ###################################
   targets.genericLinux.enable = true;
 
-  # 1️⃣  Launcher pointing to the wrapper
-  home.activation.installAlacrittyDesktop =
+  ##########################  Launcher + icons ###############################
+  home.activation.installAlacrittyLauncher =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       apps="$HOME/.local/share/applications"
       mkdir -p "$apps"
 
-      # remove old launchers that point to the store binary
+      # wipe stock launchers that call the store binary
       find "$apps" -maxdepth 1 -type f -name 'alacritty*.desktop' \
-           -exec grep -q '/nix/store/.*alacritty' {} \; -delete || true
+        -exec grep -q '/nix/store/.*alacritty' {} \; -delete || true
 
       cat > "$apps/alacritty.desktop" <<EOF
 [Desktop Entry]
@@ -49,46 +51,44 @@ Type=Application
 Categories=System;TerminalEmulator;
 Terminal=false
 EOF
+
       ${pkgs.desktop-file-utils}/bin/update-desktop-database "$apps" || true
     '';
 
-  # 2️⃣  Install all icons from the Alacritty package into the user theme
-  home.activation.installAlacrittyIcon =
-    lib.hm.dag.entryAfter [ "installAlacrittyDesktop" ] ''
+  home.activation.installAlacrittyIcons =
+    lib.hm.dag.entryAfter [ "installAlacrittyLauncher" ] ''
       theme="$HOME/.local/share/icons/hicolor"
-      for icon in ${pkgs.alacritty}/share/icons/hicolor/*/apps/Alacritty.*; do
-        sizeDir="$(dirname "$(dirname "$icon")")"          # e.g. 512x512 or scalable
-        baseSize="$(basename "$sizeDir")"
-        dest="$theme/$baseSize/apps"
-        mkdir -p "$dest"
-        cp -f "$icon" "$dest/alacritty.${icon##*.}"
-      done
+      mkdir -p "$theme/512x512/apps" "$theme/128x128/apps"
+
+      cp -f ${icons512} "$theme/512x512/apps/alacritty.png"
+      cp -f ${icons128} "$theme/128x128/apps/alacritty.png"
+
       ${pkgs.gtk3}/bin/gtk-update-icon-cache "$theme" || true
     '';
 
-  ##################### Packages ##############################################
+  ##########################  Packages  ######################################
   home.packages = with pkgs; [
-    # CLI tools
+    ## CLI
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
-    # Electron apps (wrapped)
+    ## Electron (wrapped)
     (wrapElectron pkgs.vscode  "code")
     (wrapElectron pkgs.postman "postman")
     (lib.lowPrio pkgs.vscode) (lib.lowPrio pkgs.postman)
 
-    # JetBrains
+    ## JetBrains IDEs
     jetbrains.datagrip
     jetbrains.rider
 
-    # GUI
+    ## GUI
     emacs29-pgtk
-    alacrittyWrapped                 # wrapper binary
+    alacrittyWrapped
     google-chrome
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
-  ##################### Shell / tools #########################################
+  ##########################  Shell / tools  #################################
   programs.zsh.enable            = true;
   programs.zsh.oh-my-zsh.enable  = true;
   programs.zsh.oh-my-zsh.theme   = "agnoster";
@@ -106,14 +106,14 @@ EOF
   };
 
   home.shellAliases = {
-    k   = "kubectl";
+    k = "kubectl";
     dcu = "docker compose up -d";
     dcd = "docker compose down";
   };
 
   fonts.fontconfig.enable = true;
 
-  ##################### Ghostty terminfo ######################################
+  ##########################  Ghostty terminfo  ##############################
   home.file."terminfo/ghostty.terminfo".source = ../terminfo/ghostty.terminfo;
   home.activation.installGhosttyTerminfo =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -121,7 +121,7 @@ EOF
       tic -x -o "$HOME/.terminfo" ${../terminfo/ghostty.terminfo}
     '';
 
-  ##################### Cloudflared tunnel ####################################
+  ##########################  Cloudflared ####################################
   systemd.user.services.cloudflared = {
     Unit.Description = "Cloudflare Tunnel (user scope)";
     Service.ExecStart =
