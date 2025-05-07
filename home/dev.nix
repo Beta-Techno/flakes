@@ -4,38 +4,32 @@
 { config, pkgs, lib, ... }:
 
 let
-  # absolute path to the Nix CLI so GNOME doesn’t need $PATH
   nixBin = "${pkgs.nix}/bin/nix";
 
-  # wrap an Electron app with --no-sandbox
+  # helpers
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
       exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
 
-  # Alacritty → nixGLIntel
   alacrittyWrapped = pkgs.writeShellScriptBin "alacritty" ''
     exec ${nixBin} run --impure github:guibou/nixGL#nixGLIntel -- \
          ${pkgs.alacritty}/bin/alacritty "$@"
   '';
 in
 {
-  ############################  mandatory opts  ##############################
+  # mandatory identifiers
   home.username      = "rob";
   home.homeDirectory = "/home/rob";
   home.stateVersion  = "24.05";
+  targets.genericLinux.enable = true;
 
-  targets.genericLinux.enable = true;   # let GNOME see ~/.nix-profile
-
-  ############################  launcher + icons  ############################
-  ## 1. launcher pointing to the wrapper
+  # 1️⃣ launcher
   home.activation.installAlacrittyLauncher =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       set -eu
       apps="$HOME/.local/share/applications"
       mkdir -p "$apps"
-
-      # remove old launchers that call the store binary
       find "$apps" -maxdepth 1 -name 'alacritty*.desktop' \
         -exec grep -q '/nix/store/.*alacritty' {} \; -delete || true
 
@@ -52,47 +46,39 @@ EOF
       ${pkgs.desktop-file-utils}/bin/update-desktop-database "$apps" || true
     '';
 
-  ## 2. copy every shipped icon (PNG & SVG) -> user theme, rename to lower-case
+  # 2️⃣ icons (all sizes), rename to lower-case, escape $ for bash
   home.activation.installAlacrittyIcons =
     lib.hm.dag.entryAfter [ "installAlacrittyLauncher" ] ''
       set -eu
       theme="$HOME/.local/share/icons/hicolor"
       shopt -s nullglob
       for file in ${pkgs.alacritty}/share/icons/hicolor/*/apps/*; do
-        rel="${file#*/hicolor/}"                   # e.g. 512x512/apps/Alacritty.png
-        sizeDir="${rel%%/*}"                       # 512x512  or  scalable
+        rel="\${file#*/hicolor/}"           # 512x512/apps/Alacritty.png
+        sizeDir="\${rel%%/*}"               # 512x512  or  scalable
         dest="$theme/$sizeDir/apps"
         mkdir -p "$dest"
-        cp -f "$file" "$dest/alacritty.${file##*.}"
+        cp -f "$file" "$dest/alacritty.\${file##*.}"
       done
-      ${pkgs.gtk3}/bin/gtk-update-icon-cache "$theme" || true
+    '' + ''
+      ${pkgs.gtk3}/bin/gtk-update-icon-cache \
+        "$HOME/.local/share/icons/hicolor" || true
     '';
 
-  ############################  packages #####################################
+  # packages (unchanged)
   home.packages = with pkgs; [
-    # CLI tools
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
-
-    # Electron apps (wrapped)
     (wrapElectron pkgs.vscode  "code")
     (wrapElectron pkgs.postman "postman")
-    (lib.lowPrio pkgs.vscode)  (lib.lowPrio pkgs.postman)
-
-    # JetBrains IDEs
-    jetbrains.datagrip
-    jetbrains.rider
-
-    # GUI
+    (lib.lowPrio pkgs.vscode) (lib.lowPrio pkgs.postman)
+    jetbrains.datagrip jetbrains.rider
     emacs29-pgtk
     alacrittyWrapped
     google-chrome
-
-    # fonts
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
-  ############################  shell / tools ################################
+  # shell / tools (same as before)
   programs.zsh.enable            = true;
   programs.zsh.oh-my-zsh.enable  = true;
   programs.zsh.oh-my-zsh.theme   = "agnoster";
@@ -109,15 +95,10 @@ EOF
     userEmail = "rob@example.com";
   };
 
-  home.shellAliases = {
-    k   = "kubectl";
-    dcu = "docker compose up -d";
-    dcd = "docker compose down";
-  };
-
+  home.shellAliases = { k="kubectl"; dcu="docker compose up -d"; dcd="docker compose down"; };
   fonts.fontconfig.enable = true;
 
-  ############################  ghostty terminfo #############################
+  # ghostty terminfo
   home.file."terminfo/ghostty.terminfo".source = ../terminfo/ghostty.terminfo;
   home.activation.installGhosttyTerminfo =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -125,9 +106,9 @@ EOF
       tic -x -o "$HOME/.terminfo" ${../terminfo/ghostty.terminfo}
     '';
 
-  ############################  cloudflared ##################################
+  # cloudflared
   systemd.user.services.cloudflared = {
-    Unit.Description = "Cloudflare Tunnel (user scope)";
+    Unit.Description = "Cloudflare Tunnel (user)"
     Service.ExecStart =
       "${pkgs.cloudflared}/bin/cloudflared tunnel run --cred-file %h/.cloudflared/tunnel.json";
     Service.Restart  = "on-failure";
