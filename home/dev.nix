@@ -1,44 +1,46 @@
+###############################################################################
+#  home/dev.nix — Rob’s Home-Manager profile  (Ubuntu 24 · Intel Iris 6100)
+#  ────────────────────────────────────────────────────────────────────────────
+#  • Alacritty runs through nixGLIntel and has a working launcher + icon
+#  • Electron apps are wrapped with --no-sandbox
+#  • JetBrains IDEs, Chrome, Emacs, CLI tools, etc.
+###############################################################################
 { config, pkgs, lib, ... }:
 
-################################################################################
-#  Rob’s Home-Manager profile – Ubuntu 24 / Intel Iris 6100
-#  · Alacritty via nixGLIntel with working launcher & icons
-#  · Electron apps wrapped with --no-sandbox
-#  · JetBrains IDEs and other GUI apps
-################################################################################
-
 let
-  nixBin = "${pkgs.nix}/bin/nix";   # absolute path for Exec=
+  # Absolute path to the Nix CLI (so GNOME launcher doesn’t rely on $PATH)
+  nixBin = "${pkgs.nix}/bin/nix";
 
-  # ---------- helpers -------------------------------------------------------
+  # Helper: wrap an Electron app with --no-sandbox
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
       exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
 
+  # Wrapper: Alacritty → nixGLIntel
   alacrittyWrapped = pkgs.writeShellScriptBin "alacritty" ''
     exec ${nixBin} run --impure github:guibou/nixGL#nixGLIntel -- \
          ${pkgs.alacritty}/bin/alacritty "$@"
   '';
-
-  icons512 = "${pkgs.alacritty}/share/icons/hicolor/512x512/apps/Alacritty.png";
-  icons128 = "${pkgs.alacritty}/share/icons/hicolor/128x128/apps/Alacritty.png";
 in
 {
-  ##########################  Essentials  ####################################
+  ############################  Required opts  ################################
   home.username      = "rob";
   home.homeDirectory = "/home/rob";
   home.stateVersion  = "24.05";
-  targets.genericLinux.enable = true;
 
-  ##########################  Launcher + icons ###############################
+  targets.genericLinux.enable = true;   # expose ~/.nix-profile to GNOME
+
+  ############################  Launcher & icons  #############################
+  # 1️⃣  Install user-scope launcher that points to the wrapper
   home.activation.installAlacrittyLauncher =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      set -eu
       apps="$HOME/.local/share/applications"
       mkdir -p "$apps"
 
-      # wipe stock launchers that call the store binary
-      find "$apps" -maxdepth 1 -type f -name 'alacritty*.desktop' \
+      # Remove old launchers that call the store binary
+      find "$apps" -maxdepth 1 -name 'alacritty*.desktop' \
         -exec grep -q '/nix/store/.*alacritty' {} \; -delete || true
 
       cat > "$apps/alacritty.desktop" <<EOF
@@ -51,28 +53,31 @@ Type=Application
 Categories=System;TerminalEmulator;
 Terminal=false
 EOF
-
       ${pkgs.desktop-file-utils}/bin/update-desktop-database "$apps" || true
     '';
 
+  # 2️⃣  Copy every shipped icon into user theme under the name “alacritty”
   home.activation.installAlacrittyIcons =
     lib.hm.dag.entryAfter [ "installAlacrittyLauncher" ] ''
+      set -eu
       theme="$HOME/.local/share/icons/hicolor"
-      mkdir -p "$theme/512x512/apps" "$theme/128x128/apps"
-
-      cp -f ${icons512} "$theme/512x512/apps/alacritty.png"
-      cp -f ${icons128} "$theme/128x128/apps/alacritty.png"
-
+      shopt -s nullglob
+      for file in ${pkgs.alacritty}/share/icons/hicolor/*/apps/*; do
+        rel="$(echo "$file" | sed -E 's|.*?/hicolor/([^/]+/apps)/.*|\1|')"   # e.g. 512x512/apps
+        destDir="$theme/$rel"
+        mkdir -p "$destDir"
+        cp -f "$file" "$destDir/alacritty.${file##*.}"
+      done
       ${pkgs.gtk3}/bin/gtk-update-icon-cache "$theme" || true
     '';
 
-  ##########################  Packages  ######################################
+  ############################  Packages  #####################################
   home.packages = with pkgs; [
-    ## CLI
+    ## CLI tools
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
-    ## Electron (wrapped)
+    ## Electron GUI (wrapped)
     (wrapElectron pkgs.vscode  "code")
     (wrapElectron pkgs.postman "postman")
     (lib.lowPrio pkgs.vscode) (lib.lowPrio pkgs.postman)
@@ -81,14 +86,16 @@ EOF
     jetbrains.datagrip
     jetbrains.rider
 
-    ## GUI
+    ## Other GUI apps
     emacs29-pgtk
     alacrittyWrapped
     google-chrome
+
+    ## Fonts
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
-  ##########################  Shell / tools  #################################
+  ############################  Shell / tools  ################################
   programs.zsh.enable            = true;
   programs.zsh.oh-my-zsh.enable  = true;
   programs.zsh.oh-my-zsh.theme   = "agnoster";
@@ -106,14 +113,14 @@ EOF
   };
 
   home.shellAliases = {
-    k = "kubectl";
+    k   = "kubectl";
     dcu = "docker compose up -d";
     dcd = "docker compose down";
   };
 
   fonts.fontconfig.enable = true;
 
-  ##########################  Ghostty terminfo  ##############################
+  ############################  Ghostty terminfo  #############################
   home.file."terminfo/ghostty.terminfo".source = ../terminfo/ghostty.terminfo;
   home.activation.installGhosttyTerminfo =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -121,12 +128,14 @@ EOF
       tic -x -o "$HOME/.terminfo" ${../terminfo/ghostty.terminfo}
     '';
 
-  ##########################  Cloudflared ####################################
+  ############################  Cloudflared tunnel  ###########################
   systemd.user.services.cloudflared = {
     Unit.Description = "Cloudflare Tunnel (user scope)";
-    Service.ExecStart =
-      "${pkgs.cloudflared}/bin/cloudflared tunnel run --cred-file %h/.cloudflared/tunnel.json";
-    Service.Restart  = "on-failure";
+    Service = {
+      ExecStart =
+        "${pkgs.cloudflared}/bin/cloudflared tunnel run --cred-file %h/.cloudflared/tunnel.json";
+      Restart = "on-failure";
+    };
     Install.WantedBy = [ "default.target" ];
   };
 
