@@ -1,32 +1,44 @@
+###############################################################################
+#  home/dev.nix — Rob’s Home-Manager profile  (Ubuntu 24 · Intel Iris 6100)
+###############################################################################
 { config, pkgs, lib, ... }:
 
 let
+  # absolute path to the Nix CLI so GNOME doesn’t need $PATH
   nixBin = "${pkgs.nix}/bin/nix";
 
+  # wrap an Electron app with --no-sandbox
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
       exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
 
+  # Alacritty → nixGLIntel
   alacrittyWrapped = pkgs.writeShellScriptBin "alacritty" ''
     exec ${nixBin} run --impure github:guibou/nixGL#nixGLIntel -- \
          ${pkgs.alacritty}/bin/alacritty "$@"
   '';
 in
 {
-  # ── required identifiers ────────────────────────────────────────────────
+  ############################  mandatory opts  ##############################
   home.username      = "rob";
   home.homeDirectory = "/home/rob";
   home.stateVersion  = "24.05";
-  targets.genericLinux.enable = true;
 
-  # ── launcher pointing to wrapper ─────────────────────────────────────────
+  targets.genericLinux.enable = true;   # let GNOME see ~/.nix-profile
+
+  ############################  launcher + icons  ############################
+  ## 1. launcher pointing to the wrapper
   home.activation.installAlacrittyLauncher =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      set -eu
       apps="$HOME/.local/share/applications"
       mkdir -p "$apps"
+
+      # remove old launchers that call the store binary
       find "$apps" -maxdepth 1 -name 'alacritty*.desktop' \
         -exec grep -q '/nix/store/.*alacritty' {} \; -delete || true
+
       cat > "$apps/alacritty.desktop" <<EOF
 [Desktop Entry]
 Name=Alacritty
@@ -40,36 +52,47 @@ EOF
       ${pkgs.desktop-file-utils}/bin/update-desktop-database "$apps" || true
     '';
 
-  # ── copy all icons, rename to lower-case, refresh cache ──────────────────
+  ## 2. copy every shipped icon (PNG & SVG) -> user theme, rename to lower-case
   home.activation.installAlacrittyIcons =
     lib.hm.dag.entryAfter [ "installAlacrittyLauncher" ] ''
+      set -eu
       theme="$HOME/.local/share/icons/hicolor"
       shopt -s nullglob
       for file in ${pkgs.alacritty}/share/icons/hicolor/*/apps/*; do
-        rel="$(echo "$file" | sed -E 's|.*?/hicolor/([^/]+/apps)/.*|\1|')"
-        destDir="$theme/$rel"
-        mkdir -p "$destDir"
-        cp -f "$file" "$destDir/alacritty.${file##*.}"
+        rel="${file#*/hicolor/}"                   # e.g. 512x512/apps/Alacritty.png
+        sizeDir="${rel%%/*}"                       # 512x512  or  scalable
+        dest="$theme/$sizeDir/apps"
+        mkdir -p "$dest"
+        cp -f "$file" "$dest/alacritty.${file##*.}"
       done
-    '' + ''
-      ${pkgs.gtk3}/bin/gtk-update-icon-cache "$HOME/.local/share/icons/hicolor" || true
+      ${pkgs.gtk3}/bin/gtk-update-icon-cache "$theme" || true
     '';
 
-  # ── packages (unchanged) ────────────────────────────────────────────────
+  ############################  packages #####################################
   home.packages = with pkgs; [
+    # CLI tools
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
+
+    # Electron apps (wrapped)
     (wrapElectron pkgs.vscode  "code")
     (wrapElectron pkgs.postman "postman")
-    (lib.lowPrio pkgs.vscode) (lib.lowPrio pkgs.postman)
-    jetbrains.datagrip jetbrains.rider
+    (lib.lowPrio pkgs.vscode)  (lib.lowPrio pkgs.postman)
+
+    # JetBrains IDEs
+    jetbrains.datagrip
+    jetbrains.rider
+
+    # GUI
     emacs29-pgtk
     alacrittyWrapped
     google-chrome
+
+    # fonts
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
-  # ── shell / tools / extras (same as before) ──────────────────────────────
+  ############################  shell / tools ################################
   programs.zsh.enable            = true;
   programs.zsh.oh-my-zsh.enable  = true;
   programs.zsh.oh-my-zsh.theme   = "agnoster";
@@ -94,6 +117,7 @@ EOF
 
   fonts.fontconfig.enable = true;
 
+  ############################  ghostty terminfo #############################
   home.file."terminfo/ghostty.terminfo".source = ../terminfo/ghostty.terminfo;
   home.activation.installGhosttyTerminfo =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -101,6 +125,7 @@ EOF
       tic -x -o "$HOME/.terminfo" ${../terminfo/ghostty.terminfo}
     '';
 
+  ############################  cloudflared ##################################
   systemd.user.services.cloudflared = {
     Unit.Description = "Cloudflare Tunnel (user scope)";
     Service.ExecStart =
