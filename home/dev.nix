@@ -1,7 +1,7 @@
 # =============================
-#  home/dev.nix  — incremental package rollout
+#  home/dev.nix — incremental package rollout
 # =============================
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
   home.username      = "rob";
   home.homeDirectory = "/home/rob";
@@ -53,12 +53,16 @@
   fonts.fontconfig.enable = true;
 
   # -----------------------------------------------------------
-  # Ghostty terminfo so programs recognise $TERM=xterm-ghostty
+  # Ghostty terminfo — compile at activation time (robust, no 404)
   # -----------------------------------------------------------
-  home.file.".terminfo/x/xterm-ghostty".source = builtins.fetchurl {
-    url    = "https://raw.githubusercontent.com/ghostty-org/ghostty/main/data/xterm-ghostty.terminfo";
-    sha256 = "sha256-4OmAqRmwYj1R7zoqU3i++PtFAVwsfl5b7/5uPT1Y99U=";
-  };
+  # 1.  Store source in flake (text file committed in ./terminfo)
+  home.file."terminfo/xterm-ghostty.terminfo".source = ./terminfo/xterm-ghostty.terminfo;
+
+  # 2.  Compile it into ~/.terminfo on every switch
+  home.activation.installGhosttyTerminfo = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    mkdir -p "$HOME/.terminfo"
+    tic -x -o "$HOME/.terminfo" ${./terminfo/xterm-ghostty.terminfo}
+  '';
 
   # -----------------------------------------------------------
   # Services

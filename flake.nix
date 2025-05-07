@@ -17,7 +17,7 @@
 
   outputs = { self, nixpkgs, home-manager, flake-utils, ... }:
     let
-      system = "x86_64-linux";  # adjust for other hosts if needed
+      system = "x86_64-linux";
       pkgs   = import nixpkgs { inherit system; config.allowUnfree = true; };
     in
     {
@@ -30,7 +30,7 @@
       {
         packages.bootstrap = p.writeShellScriptBin "bootstrap" ''
           set -euo pipefail
-          nix run github:nix-community/home-manager/release-24.05 --extra-experimental-features 'nix-command flakes' -- --flake ${self.url or "."}#rob
+          nix run github:nix-community/home-manager/release-24.05 --extra-experimental-features 'nix-command flakes' -- --flake ${self.url or ""}#rob
         '';
       });
 }
