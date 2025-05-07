@@ -1,66 +1,68 @@
-{ pkgs, unstable, lib, ... }:
-
-###############################################################################
-#  Rob’s Home-Manager module – Ubuntu desktop
-#  * Electron apps wrapped with --no-sandbox
-#  * JetBrains IDEs run natively
-#  * Alacritty uses alacritty-fhs from unstable → fixes GL/Wayland crash
-###############################################################################
+{ pkgs, lib, ... }:
 
 let
-  # Electron apps
-  vscode     = pkgs.vscode;
-  postmanPkg = pkgs.postman;
-
+  #############################################################################
+  # Helpers
+  #############################################################################
+  # Wrap an Electron app with --no-sandbox
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
       exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
+
+  # Wrap Alacritty so it runs through nixGL (auto-detects GPU)
+  alacrittyWrapped = pkgs.writeShellScriptBin "alacritty" ''
+    exec nix run --impure github:guibou/nixGL --command nixGL "${
+      pkgs.alacritty
+    }/bin/alacritty" "$@"
+  '';
 in
 {
-  # Make ~/.nix-profile visible to GNOME/KDE
   targets.genericLinux.enable = true;
 
   home.username      = "rob";
   home.homeDirectory = "/home/rob";
   home.stateVersion  = "24.05";
 
-  # ------------ Packages ----------------------
+  #############################################################################
+  # Packages
+  #############################################################################
   home.packages = with pkgs; [
-    ## CLI tools
+    # CLI
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
-    ## Electron (wrappers)
-    (wrapElectron vscode     "code")
-    (wrapElectron postmanPkg "postman")
-    (lib.lowPrio vscode) (lib.lowPrio postmanPkg)
+    # Electron (wrapped)
+    (wrapElectron pkgs.vscode   "code")
+    (wrapElectron pkgs.postman  "postman")
+    (lib.lowPrio pkgs.vscode) (lib.lowPrio pkgs.postman)
 
-    ## JetBrains IDEs
+    # JetBrains IDEs
     jetbrains.datagrip
     jetbrains.rider
 
-    ## GUI apps
+    # GUI apps
     emacs29-pgtk
-    unstable.alacritty-fhs     # ← FHS build from unstable, works on Ubuntu
+    alacrittyWrapped         # ← our nixGL wrapper
+    (lib.lowPrio pkgs.alacritty)
     google-chrome
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
-  # ------------ Shell & tools -----------------
+  #############################################################################
+  # Shell, Git, Tmux
+  #############################################################################
   programs.zsh = {
-    enable           = true;
-    oh-my-zsh.enable = true;
-    oh-my-zsh.theme  = "agnoster";
+    enable            = true;
+    oh-my-zsh.enable  = true;
+    oh-my-zsh.theme   = "agnoster";
   };
 
-  programs.tmux = {
-    enable       = true;
-    extraConfig  = ''
-      set -g mouse on
-      set -g history-limit 100000
-    '';
-  };
+  programs.tmux.enable = true;
+  programs.tmux.extraConfig = ''
+    set -g mouse on
+    set -g history-limit 100000
+  '';
 
   programs.git = {
     enable    = true;
@@ -76,7 +78,9 @@ in
 
   fonts.fontconfig.enable = true;
 
-  # ------------ Ghostty terminfo --------------
+  #############################################################################
+  # Ghostty terminfo
+  #############################################################################
   home.file."terminfo/ghostty.terminfo".source = ../terminfo/ghostty.terminfo;
   home.activation.installGhosttyTerminfo =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -84,14 +88,14 @@ in
       tic -x -o "$HOME/.terminfo" ${../terminfo/ghostty.terminfo}
     '';
 
-  # ------------ Cloudflared tunnel ------------
+  #############################################################################
+  # Cloudflared tunnel (user-scoped)
+  #############################################################################
   systemd.user.services.cloudflared = {
     Unit.Description = "Cloudflare Tunnel (user scope)";
-    Service = {
-      ExecStart =
-        "${pkgs.cloudflared}/bin/cloudflared tunnel run --cred-file %h/.cloudflared/tunnel.json";
-      Restart = "on-failure";
-    };
+    Service.ExecStart =
+      "${pkgs.cloudflared}/bin/cloudflared tunnel run --cred-file %h/.cloudflared/tunnel.json";
+    Service.Restart  = "on-failure";
     Install.WantedBy = [ "default.target" ];
   };
 
