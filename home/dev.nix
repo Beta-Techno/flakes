@@ -21,6 +21,12 @@ let
          ${pkgs.alacritty}/bin/alacritty "$@"
   '';
 
+
+  # ── Chrome wrapper: provide the short name ────────────────────────────────
+  chromeWrapped = pkgs.writeShellScriptBin "google-chrome" ''
+    exec ${pkgs.google-chrome}/bin/google-chrome-stable --no-sandbox "$@"
+  '';
+
   # ── Only icon shipped by Alacritty in current nixpkgs ──────────────────────
   alacrittySvg =
     "${pkgs.alacritty}/share/icons/hicolor/scalable/apps/Alacritty.svg";
