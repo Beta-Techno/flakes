@@ -53,14 +53,12 @@
 
   fonts.fontconfig.enable = true;
 
-  # ──────────────────────────────────────────────────────────
+    # ──────────────────────────────────────────────────────────
   # Ghostty terminfo so programs recognise $TERM=xterm-ghostty
   # ──────────────────────────────────────────────────────────
-  # ── Ghostty terminfo (correct path) ───────────────────────────
   home.file.".terminfo/x/xterm-ghostty".source =
     builtins.fetchurl {
       url = "https://raw.githubusercontent.com/ghostty-org/ghostty/main/data/xterm-ghostty.terminfo";
-      # sha256 generated with: nix hash url <url>
       sha256 = "sha256-4OmAqRmwYj1R7zoqU3i++PtFAVwsfl5b7/5uPT1Y99U=";
     };
       sha256 = "sha256-Pjg9My54wWk2c5O2qAi6qkQyB+Hovk4p6YclM+FGgsc=";
