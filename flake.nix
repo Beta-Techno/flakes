@@ -1,5 +1,5 @@
 # =============================
-#  flake.nix — minimal & robust
+#  flake.nix — fixed for stable Nix (< builtins.currentSystem)
 # =============================
 {
   description = "Rob's declarative workstation (stable 24.05)";
@@ -17,18 +17,16 @@
 
   outputs = { self, nixpkgs, home-manager, flake-utils, ... }:
     let
-      system = builtins.currentSystem;
+      # Hard‑code for now; adjust if you evaluate on a different architecture
+      system = "x86_64-linux";
       pkgs   = import nixpkgs { inherit system; config.allowUnfree = true; };
     in
     {
-      # Home‑Manager configuration (used by `home-manager switch --flake .#rob`)
       homeConfigurations.rob = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [ ./home/dev.nix ];
       };
-    }
-    # Bootstrap helper for all common systems
-    // flake-utils.lib.eachDefaultSystem (sys:
+    } // flake-utils.lib.eachDefaultSystem (sys:
       let p = import nixpkgs { system = sys; config.allowUnfree = true; }; in {
         packages.bootstrap = p.writeShellScriptBin "bootstrap" ''
           set -euo pipefail
