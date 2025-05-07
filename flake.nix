@@ -5,7 +5,8 @@
     nixpkgs.url       = "github:NixOS/nixpkgs/nixos-24.05";
     home-manager.url  = "github:nix-community/home-manager/release-24.05";
     flake-utils.url   = "github:numtide/flake-utils";
-    # <- **NO nixGL overlay here**, so no currentTime issues
+    # no nixGL overlay needed (wrapper pulls it at runtime)
+
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
