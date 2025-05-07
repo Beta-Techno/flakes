@@ -9,16 +9,15 @@
 
   # -----------------------------------------------------------
   # Packages — PHASE 1: core dev + network tools
-  # We'll add GUI apps, JetBrains, etc. in later phases.
   # -----------------------------------------------------------
   home.packages = with pkgs; [
-    # ── CLI fundamentals ─────────────────────────────
+    # CLI fundamentals
     tmux git ripgrep fd bat fzf jq htop inetutils
 
-    # ── Dev / build chain ────────────────────────────
+    # Dev / build chain
     neovim nodejs_20 docker-compose kubectl
 
-    # ── Fonts ────────────────────────────────────────
+    # Fonts
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
@@ -53,18 +52,13 @@
 
   fonts.fontconfig.enable = true;
 
-    # ──────────────────────────────────────────────────────────
+  # -----------------------------------------------------------
   # Ghostty terminfo so programs recognise $TERM=xterm-ghostty
-  # ──────────────────────────────────────────────────────────
-    # ──────────────────────────────────────────────────────────
-  # Ghostty terminfo so programs recognise $TERM=xterm-ghostty
-  # ──────────────────────────────────────────────────────────
+  # -----------------------------------------------------------
   home.file.".terminfo/x/xterm-ghostty".source = builtins.fetchurl {
     url    = "https://raw.githubusercontent.com/ghostty-org/ghostty/main/data/xterm-ghostty.terminfo";
     sha256 = "sha256-4OmAqRmwYj1R7zoqU3i++PtFAVwsfl5b7/5uPT1Y99U=";
-  }; = "sha256-Pjg9My54wWk2c5O2qAi6qkQyB+Hovk4p6YclM+FGgsc=";
-    };
-
+  };
 
   # -----------------------------------------------------------
   # Services
