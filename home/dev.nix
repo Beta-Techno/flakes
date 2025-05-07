@@ -1,11 +1,11 @@
-{ pkgs, lib, config, ... }:
+{ config, pkgs, lib, ... }:
 
 ###############################################################################
-#  Rob’s Home-Manager module – Ubuntu 24 · Intel Iris 6100 (nixGLIntel)
+#  Rob’s Home-Manager module  – Ubuntu 24 · Intel Iris 6100
 ###############################################################################
 
 let
-  # ---------- helpers -------------------------------------------------------
+  # ── helpers ────────────────────────────────────────────────────────────────
 
   # Wrap Electron apps with --no-sandbox
   wrapElectron = pkg: exe:
@@ -19,15 +19,17 @@ let
          ${pkgs.alacritty}/bin/alacritty "$@"
   '';
 
-  # Icon path
+  # Icon used in our custom launcher
   alacrittyIcon =
     "${pkgs.alacritty}/share/icons/hicolor/512x512/apps/Alacritty.png";
 in
 {
-  ##############################  REQUIRED  ##################################
-  home.stateVersion = "24.05";
+  ##########################  REQUIRED identifiers  ##########################
+  home.username      = "rob";
+  home.homeDirectory = "/home/rob";
+  home.stateVersion  = "24.05";
 
-  ##############################  Desktop ####################################
+  ##########################  Desktop integration  ###########################
   targets.genericLinux.enable = true;
 
   home.activation.installAlacrittyDesktop =
@@ -35,11 +37,11 @@ in
       apps="$HOME/.local/share/applications"
       mkdir -p "$apps"
 
-      # Remove any old launchers that point to the store binary
+      # Remove any old launchers that call the store binary
       find "$apps" -maxdepth 1 -type f -name 'alacritty*.desktop' \
            -exec grep -q '/nix/store/.*alacritty' {} \; -delete || true
 
-      # Write our launcher that calls the wrapper directly
+      # Install our wrapper-based launcher
       cat > "$apps/alacritty.desktop" <<EOF
 [Desktop Entry]
 Name=Alacritty
@@ -51,36 +53,35 @@ Categories=System;TerminalEmulator;
 Terminal=false
 EOF
 
-      # Update cache so GNOME sees it immediately
       ${pkgs.desktop-file-utils}/bin/update-desktop-database "$apps" || true
     '';
 
-  ##############################  Packages ###################################
+  ##########################  Packages  ######################################
   home.packages = with pkgs; [
-    # CLI
+    # CLI tools
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
-    # Electron (wrapped)
+    # Electron apps (wrapped)
     (wrapElectron pkgs.vscode  "code")
     (wrapElectron pkgs.postman "postman")
-    (lib.lowPrio pkgs.vscode)  (lib.lowPrio pkgs.postman)
+    (lib.lowPrio pkgs.vscode) (lib.lowPrio pkgs.postman)
 
-    # JetBrains
+    # JetBrains IDEs
     jetbrains.datagrip
     jetbrains.rider
 
-    # GUI
+    # GUI apps
     emacs29-pgtk
     alacrittyWrapped
     google-chrome
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
-  ##############################  Shell / tools ##############################
-  programs.zsh.enable            = true;
-  programs.zsh.oh-my-zsh.enable  = true;
-  programs.zsh.oh-my-zsh.theme   = "agnoster";
+  ##########################  Shell / tools  #################################
+  programs.zsh.enable           = true;
+  programs.zsh.oh-my-zsh.enable = true;
+  programs.zsh.oh-my-zsh.theme  = "agnoster";
 
   programs.tmux.enable = true;
   programs.tmux.extraConfig = ''
@@ -97,7 +98,7 @@ EOF
   home.shellAliases = { k = "kubectl"; dcu = "docker compose up -d"; dcd = "docker compose down"; };
   fonts.fontconfig.enable = true;
 
-  ##############################  Ghostty terminfo ###########################
+  ##########################  Ghostty terminfo  ##############################
   home.file."terminfo/ghostty.terminfo".source = ../terminfo/ghostty.terminfo;
   home.activation.installGhosttyTerminfo =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -105,7 +106,7 @@ EOF
       tic -x -o "$HOME/.terminfo" ${../terminfo/ghostty.terminfo}
     '';
 
-  ##############################  Cloudflared ################################
+  ##########################  Cloudflared ####################################
   systemd.user.services.cloudflared = {
     Unit.Description = "Cloudflare Tunnel (user scope)";
     Service.ExecStart =
