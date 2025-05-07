@@ -1,15 +1,11 @@
 { pkgs, lib, ... }:
 
 ###############################################################################
-#  Rob’s Home-Manager module (Ubuntu client)
-#  * Electron apps wrapped with --no-sandbox
-#  * JetBrains IDEs run natively
-#  * Alacritty uses the FHS build → no GL / Wayland issues
-#  * targets.genericLinux exposes ~/.nix-profile to the desktop environment
+#  Rob’s Home-Manager module – Ubuntu desktop
 ###############################################################################
 
 let
-  # Electron apps that need the flag
+  # Electron apps that need --no-sandbox
   vscode     = pkgs.vscode;
   postmanPkg = pkgs.postman;
 
@@ -17,9 +13,13 @@ let
     pkgs.writeShellScriptBin exe ''
       exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
+
+  # nixGL wrapper for Alacritty
+  nixGLWrap = pkgs.writeShellScriptBin "alacritty" ''
+    exec nixGL ${pkgs.alacritty}/bin/alacritty "$@"
+  '';
 in
 {
-  ## Expose PATH / XDG_DATA_DIRS early (desktop launcher integration)
   targets.genericLinux.enable = true;
 
   home.username      = "rob";
@@ -28,23 +28,24 @@ in
 
   # ------------ Packages ----------------------
   home.packages = with pkgs; [
-    # --- CLI tools ---
+    ## CLI tools
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
-    # --- Electron (wrapped) ---
+    ## Electron wrappers (+ originals low-prio)
     (wrapElectron vscode     "code")
     (wrapElectron postmanPkg "postman")
-    (lib.lowPrio vscode)
-    (lib.lowPrio postmanPkg)
+    (lib.lowPrio vscode) (lib.lowPrio postmanPkg)
 
-    # --- JetBrains IDEs ---
+    ## JetBrains IDEs
     jetbrains.datagrip
     jetbrains.rider
 
-    # --- GUI apps ---
+    ## GUI apps
     emacs29-pgtk
-    alacritty-fhs                  # FHS build solves GL / Wayland mismatch
+    nixgl.auto.nixGLDefault      # GL shim (Intel/AMD/NVIDIA autodetect)
+    nixGLWrap                    # ‘alacritty’ wrapper that calls nixGL
+    (lib.lowPrio pkgs.alacritty) # real binary, avoids file-name clash
     google-chrome
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
@@ -97,6 +98,5 @@ in
     Install.WantedBy = [ "default.target" ];
   };
 
-  # Let Home-Manager manage itself
   programs.home-manager.enable = true;
 }

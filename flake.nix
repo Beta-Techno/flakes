@@ -5,32 +5,33 @@
     nixpkgs.url       = "github:NixOS/nixpkgs/nixos-24.05";
     home-manager.url  = "github:nix-community/home-manager/release-24.05";
     flake-utils.url   = "github:numtide/flake-utils";
+    nixgl.url         = "github:nix-community/nixGL";     # <─ NEW
 
-    # home-manager tracks the same nixpkgs revision
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, flake-utils, ... }:
+  outputs = { self, nixpkgs, home-manager, flake-utils, nixgl, ... }:
   let
     system = "x86_64-linux";
-    pkgs   = import nixpkgs { inherit system; config.allowUnfree = true; };
+    pkgs   = import nixpkgs {
+      inherit system;
+      config.allowUnfree = true;
+      overlays = [
+        # expose nixGL packages inside pkgs
+        nixgl.overlay
+      ];
+    };
   in
   {
-    ##############################
-    ## Home-Manager entry “rob” ##
-    ##############################
-    homeConfigurations.rob = home-manager.lib.homeManagerConfiguration {
-      inherit pkgs;
-      modules = [ ./home/dev.nix ];
-    };
+    homeConfigurations.rob =
+      home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
+        modules = [ ./home/dev.nix ];
+      };
   }
   //
-  ############################################
-  ## Convenience bootstrap: nix run .#bootstrap
-  ############################################
   flake-utils.lib.eachDefaultSystem (sys:
-    let
-      p = import nixpkgs { system = sys; config.allowUnfree = true; };
+    let p = import nixpkgs { system = sys; config.allowUnfree = true; };
     in {
       packages.bootstrap = p.writeShellScriptBin "bootstrap" ''
         set -euo pipefail
