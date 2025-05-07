@@ -66,6 +66,9 @@
         homeConfigurations.rob = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [ ./home/dev.nix ];
+          extraSpecialArgs = {
+            inherit pkgs;
+          };
         };
       });
 }
