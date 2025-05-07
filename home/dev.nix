@@ -16,11 +16,10 @@ let
     '';
 
   # ── Chrome wrapper (uses installed SUID helper) ────────────────
+    # ── Chrome wrapper (uses SUID helper via --sandbox-executable flag) ───────────
   chromeWrapped = pkgs.writeShellScriptBin "google-chrome" ''
-    # Tell Chromium where the root‑owned helper lives so it can activate
-    # the full SUID + seccomp sandbox stack.
-    export CHROME_DEVEL_SANDBOX=/usr/local/bin/chrome-sandbox
-    exec ${pkgs.google-chrome}/bin/google-chrome-stable "$@"
+    exec ${pkgs.google-chrome}/bin/google-chrome-stable \
+         --sandbox-executable=/usr/local/bin/chrome-sandbox "$@"
   '';
 
   # ── Alacritty wrapper (runs through nixGLIntel) ────────────────────────────
