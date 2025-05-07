@@ -7,10 +7,26 @@
   home.homeDirectory = "/home/rob";
   home.stateVersion  = "24.05";
 
-  # ------------ Packages (phase‑1) ------------
+  # ------------ Packages (CLI + GUI) ----------
   home.packages = with pkgs; [
+    # --- CLI tools ---
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
+
+    # --- GUI apps ---
+    vscode                        # VS Code
+    zed-editor                    # Zed
+    emacs29-pgtk                  # GUI Emacs (pgtk build)
+    ghostty                       # Terminal ­(GPU-rendered)
+    alacritty                     # Terminal
+    jetbrains.datagrip            # JetBrains DataGrip
+    jetbrains.rider               # JetBrains Rider
+    google-chrome                 # Chrome browser
+    postman                       # API client
+    docker-desktop                # Docker Desktop for Linux
+
+    # NOTE: Cursor AI editor is not in nixpkgs yet.
+    #       We can add it via an overlay/AppImage later.
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
@@ -60,6 +76,6 @@
     Install.WantedBy = [ "default.target" ];
   };
 
-  # Let Home‑Manager manage itself
+  # Let Home-Manager manage itself
   programs.home-manager.enable = true;
 }
