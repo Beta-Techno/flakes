@@ -15,10 +15,12 @@ let
       exec ${pkg}/bin/${exe} --disable-setuid-sandbox "$@"
     '';
 
-  # ── Chrome wrapper (namespace sandbox, no SUID helper required) ────────────
+  # ── Chrome wrapper (uses installed SUID helper) ────────────────
   chromeWrapped = pkgs.writeShellScriptBin "google-chrome" ''
-    exec ${pkgs.google-chrome}/bin/google-chrome-stable \
-         --disable-setuid-sandbox "$@"
+    # Tell Chromium where the root‑owned helper lives so it can activate
+    # the full SUID + seccomp sandbox stack.
+    export CHROME_DEVEL_SANDBOX=/usr/local/bin/chrome-sandbox
+    exec ${pkgs.google-chrome}/bin/google-chrome-stable "$@"
   '';
 
   # ── Alacritty wrapper (runs through nixGLIntel) ────────────────────────────
