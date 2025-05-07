@@ -15,16 +15,15 @@ let
       exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
 
+  # ── Chrome wrapper ────────────────────────────────────────────────────────
+  chromeWrapped = pkgs.writeShellScriptBin "google-chrome" ''
+    exec ${pkgs.google-chrome}/bin/google-chrome-stable --no-sandbox "$@"
+  '';
+
   # ── Alacritty wrapper → nixGLIntel ─────────────────────────────────────────
   alacrittyWrapped = pkgs.writeShellScriptBin "alacritty" ''
     exec ${nixBin} run --impure github:guibou/nixGL#nixGLIntel -- \
          ${pkgs.alacritty}/bin/alacritty "$@"
-  '';
-
-
-  # ── Chrome wrapper: provide the short name ────────────────────────────────
-  chromeWrapped = pkgs.writeShellScriptBin "google-chrome" ''
-    exec ${pkgs.google-chrome}/bin/google-chrome-stable --no-sandbox "$@"
   '';
 
   # ── Only icon shipped by Alacritty in current nixpkgs ──────────────────────
@@ -90,7 +89,8 @@ EOF
     # Other GUI apps
     emacs29-pgtk
     alacrittyWrapped
-    google-chrome
+    chromeWrapped
+    (lib.lowPrio pkgs.google-chrome)  # original package, low-prio to avoid clash
 
     # Fonts
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
