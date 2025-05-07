@@ -1,66 +1,65 @@
 ###############################################################################
-#  home/dev.nix — Rob’s Home-Manager profile  (Ubuntu 24 · Intel Iris 6100)
+#  home/dev.nix — Rob’s Home-Manager profile  ▪ Ubuntu 24 ▪ Intel Iris 6100
 ###############################################################################
 { config, pkgs, lib, ... }:
 
 ################################################################################
-# ─────────────── Helpers ──────────────────────────────────────────────────────
+# Helpers
 ################################################################################
-
 let
   nixBin = "${pkgs.nix}/bin/nix";
 
-  # 1.  Wrap Electron apps with --no-sandbox
+  # Wrap Electron apps with --no-sandbox
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
       exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
 
-  # 2.  Alacritty wrapper → nixGLIntel
+  # Alacritty → nixGLIntel
   alacrittyWrapped = pkgs.writeShellScriptBin "alacritty" ''
     exec ${nixBin} run --impure github:guibou/nixGL#nixGLIntel -- \
          ${pkgs.alacritty}/bin/alacritty "$@"
   '';
 
-  # 3.  Stand-alone shell app that copies every icon & renames it to “alacritty.*”
-  copyAlacrittyIcons = pkgs.writeShellApplication rec {
+  # Shell script that copies every icon & renames it to lower-case “alacritty.*”
+  copyAlacrittyIcons = pkgs.writeShellApplication {
     name = "copy-alacritty-icons";
     runtimeInputs = [ pkgs.gtk3 ];
     text = ''
       set -eu
       theme="$HOME/.local/share/icons/hicolor"
-      shopt -s nullglob
-      for file in ${pkgs.alacritty}/share/icons/hicolor/*/apps/*; do
-        rel="${file#*/hicolor/}"            # 512x512/apps/Alacritty.png
-        dir="${rel%%/*}"                    # 512x512  or  scalable
-        dest="$theme/$dir/apps"
+      find ${pkgs.alacritty}/share/icons/hicolor -type f -name '*[Aa]lacritty.*' |
+      while read -r file; do
+        # extract the size directory (e.g. 512x512 or scalable)
+        size="$(echo "$file" | sed -E 's|.*/hicolor/([^/]+)/apps/.*|\1|')"
+        dest="$theme/$size/apps"
         mkdir -p "$dest"
-        cp -f "$file" "$dest/alacritty.${file##*.}"
+        # get extension (png, svg, etc.) without using ${…}
+        ext="$(echo "$file" | sed -E 's|.*\.||')"
+        cp -f "$file" "$dest/alacritty.$ext"
       done
       gtk-update-icon-cache "$theme" || true
     '';
   };
 in
 ################################################################################
-# ─────────────── Home-Manager configuration ───────────────────────────────────
+# Home-Manager configuration
 ################################################################################
 {
-  # ── REQUIRED identifiers ───────────────────────────────────────────────────
+  ########################  Required identifiers  #############################
   home.username      = "rob";
   home.homeDirectory = "/home/rob";
   home.stateVersion  = "24.05";
 
-  # Expose ~/.nix-profile to XDG variables so GNOME sees the apps/icons
-  targets.genericLinux.enable = true;
+  targets.genericLinux.enable = true;   # expose ~/.nix-profile to GNOME
 
-  # ── 1. Launcher that points to the wrapper ─────────────────────────────────
+  ########################  1. Launcher  ######################################
   home.activation.installAlacrittyLauncher =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       set -eu
       apps="$HOME/.local/share/applications"
       mkdir -p "$apps"
-
-      # Remove any old launchers pointing into /nix/store
+      # remove stale launchers that point into /nix/store
       find "$apps" -maxdepth 1 -name 'alacritty*.desktop' \
         -exec grep -q '/nix/store/.*alacritty' {} \; -delete || true
 
@@ -77,39 +76,39 @@ EOF
       ${pkgs.desktop-file-utils}/bin/update-desktop-database "$apps" || true
     '';
 
-  # ── 2. Copy icons via the helper script ────────────────────────────────────
+  ########################  2. Icons  #########################################
   home.activation.installAlacrittyIcons =
     lib.hm.dag.entryAfter [ "installAlacrittyLauncher" ] ''
       ${copyAlacrittyIcons}/bin/copy-alacritty-icons
     '';
 
-  # ── Packages ───────────────────────────────────────────────────────────────
+  ########################  Packages  #########################################
   home.packages = with pkgs; [
-    # CLI
+    ## CLI tools
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
-    # GUI – Electron (wrapped)
+    ## Electron apps (wrapped)
     (wrapElectron pkgs.vscode  "code")
     (wrapElectron pkgs.postman "postman")
     (lib.lowPrio pkgs.vscode) (lib.lowPrio pkgs.postman)
 
-    # JetBrains IDEs
+    ## JetBrains IDEs
     jetbrains.datagrip jetbrains.rider
 
-    # Other GUI apps
+    ## Other GUI apps
     emacs29-pgtk
     alacrittyWrapped
     google-chrome
 
-    # Fonts
+    ## Fonts
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
-  # ── Shell / tools ──────────────────────────────────────────────────────────
-  programs.zsh.enable           = true;
-  programs.zsh.oh-my-zsh.enable = true;
-  programs.zsh.oh-my-zsh.theme  = "agnoster";
+  ########################  Shell / tools  ####################################
+  programs.zsh.enable            = true;
+  programs.zsh.oh-my-zsh.enable  = true;
+  programs.zsh.oh-my-zsh.theme   = "agnoster";
 
   programs.tmux.enable = true;
   programs.tmux.extraConfig = ''
@@ -131,7 +130,7 @@ EOF
 
   fonts.fontconfig.enable = true;
 
-  # ── Ghostty terminfo ───────────────────────────────────────────────────────
+  ########################  Ghostty terminfo  #################################
   home.file."terminfo/ghostty.terminfo".source = ../terminfo/ghostty.terminfo;
   home.activation.installGhosttyTerminfo =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -139,7 +138,7 @@ EOF
       tic -x -o "$HOME/.terminfo" ${../terminfo/ghostty.terminfo}
     '';
 
-  # ── cloudflared tunnel (user scope) ────────────────────────────────────────
+  ########################  Cloudflared tunnel  ###############################
   systemd.user.services.cloudflared = {
     Unit.Description = "Cloudflare Tunnel (user scope)";
     Service.ExecStart =
