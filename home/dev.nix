@@ -1,58 +1,69 @@
 { pkgs, lib, ... }:
 
-############################################
-# Rob’s Home-Manager module for Ubuntu
-############################################
 let
-  # Original GUI packages
+  # Original Electron packages
   vsCode     = pkgs.vscode;
   postmanPkg = pkgs.postman;
   dataGrip   = pkgs.jetbrains.datagrip;
   riderPkg   = pkgs.jetbrains.rider;
 
-  # Wrap an Electron binary with --no-sandbox.
-  wrapElectron = appPkg: exeName:
-    pkgs.writeShellScriptBin exeName ''
-      exec ${appPkg}/bin/${exeName} --no-sandbox "$@"
+  # Wrapper generator (adds --no-sandbox)
+  wrapElectron = pkg: exe:
+    pkgs.writeShellScriptBin exe ''
+      exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
 in
 {
-  ## Export PATH / XDG_DATA_DIRS early so GNOME sees .desktop files
   targets.genericLinux.enable = true;
 
   home.username      = "rob";
   home.homeDirectory = "/home/rob";
   home.stateVersion  = "24.05";
 
-  # ------------ Packages (CLI + GUI) ----------
+  ######################################
+  ## Packages
+  ######################################
   home.packages = with pkgs; [
-    # --- CLI tools ---
+    # CLI
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
-    # --- Wrappers (take precedence in PATH) ---
+    # GUI wrappers (first in $PATH)
     (wrapElectron vsCode     "code")
     (wrapElectron postmanPkg "postman")
     (wrapElectron dataGrip   "datagrip")
     (wrapElectron riderPkg   "rider")
 
-    # --- Original GUI apps, but low priority so /bin collision is skipped ---
-    (lib.lowPrio vsCode)
-    (lib.lowPrio postmanPkg)
-    (lib.lowPrio dataGrip)
-    (lib.lowPrio riderPkg)
-    emacs29-pgtk
-    alacritty
-    google-chrome
+    # GUI originals (low-priority to avoid /bin clashes)
+    (lib.lowPrio vsCode) (lib.lowPrio postmanPkg)
+    (lib.lowPrio dataGrip) (lib.lowPrio riderPkg)
+
+    emacs29-pgtk alacritty google-chrome
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
-  # ------------ Shell & tools  ----------------
-  programs.zsh = {
-    enable = true;
-    oh-my-zsh.enable = true;
-    oh-my-zsh.theme  = "agnoster";
-  };
+  ######################################
+  ## Desktop-file symlinks & database
+  ######################################
+  home.activation.linkDesktopEntries =
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      dest="$HOME/.local/share/applications/home-manager"
+      rm -rf "$dest"
+      mkdir -p "$dest"
+      for f in "$HOME/.nix-profile/share/applications"/*.desktop; do
+        ln -sf "$f" "$dest/$(basename "$f")"
+      done
+      # rebuild MIME cache where GNOME can write
+      ${pkgs.desktop-file-utils}/bin/update-desktop-database \
+        "$HOME/.local/share/applications"
+    '';
+
+  ######################################
+  ## Shell, git, tmux … (unchanged)
+  ######################################
+  programs.zsh.enable           = true;
+  programs.zsh.oh-my-zsh.enable = true;
+  programs.zsh.oh-my-zsh.theme  = "agnoster";
 
   programs.tmux = {
     enable = true;
@@ -69,14 +80,14 @@ in
   };
 
   home.shellAliases = {
-    k   = "kubectl";
+    k = "kubectl";
     dcu = "docker compose up -d";
     dcd = "docker compose down";
   };
 
   fonts.fontconfig.enable = true;
 
-  # ------------ Ghostty terminfo --------------
+  # Ghostty terminfo
   home.file."terminfo/ghostty.terminfo".source = ../terminfo/ghostty.terminfo;
   home.activation.installGhosttyTerminfo =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -84,12 +95,13 @@ in
       tic -x -o "$HOME/.terminfo" ${../terminfo/ghostty.terminfo}
     '';
 
-  # ------------ Services ----------------------
+  # Cloudflared user service
   systemd.user.services.cloudflared = {
     Unit.Description = "Cloudflare Tunnel (user scope)";
     Service = {
-      ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel run --cred-file %h/.cloudflared/tunnel.json";
-      Restart   = "on-failure";
+      ExecStart =
+        "${pkgs.cloudflared}/bin/cloudflared tunnel run --cred-file %h/.cloudflared/tunnel.json";
+      Restart = "on-failure";
     };
     Install.WantedBy = [ "default.target" ];
   };

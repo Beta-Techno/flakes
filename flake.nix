@@ -1,5 +1,4 @@
-{
-  description = "Rob's workstation flake (24.05)";
+{ description = "Rob's workstation flake (24.05)";
 
   inputs = {
     nixpkgs.url       = "github:NixOS/nixpkgs/nixos-24.05";
@@ -15,9 +14,11 @@
     pkgs   = import nixpkgs { inherit system; config.allowUnfree = true; };
   in
   {
-    homeConfigurations.rob = home-manager.lib.homeManagerConfiguration {
-      inherit pkgs; modules = [ ./home/dev.nix ];
-    };
+    homeConfigurations.rob =
+      home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
+        modules = [ ./home/dev.nix ];
+      };
   }
   //
   flake-utils.lib.eachDefaultSystem (sys:
