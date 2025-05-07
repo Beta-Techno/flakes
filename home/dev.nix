@@ -1,24 +1,23 @@
 { pkgs, lib, ... }:
 
-###############################################################################
-#  Rob’s Home-Manager module
-###############################################################################
-
+############################################
+# Rob’s Home-Manager module for Ubuntu
+############################################
 let
+  # Original GUI packages
   vsCode     = pkgs.vscode;
   postmanPkg = pkgs.postman;
   dataGrip   = pkgs.jetbrains.datagrip;
   riderPkg   = pkgs.jetbrains.rider;
 
-  # Helper: wrap an Electron app with --no-sandbox while keeping
-  # the real package in the closure (but NOT symlinked → no collision).
-  wrapElectron = appPkg: name:
-    pkgs.writeShellScriptBin name ''
-      exec ${appPkg}/bin/${name} --no-sandbox "$@"
+  # Wrap an Electron binary with --no-sandbox.
+  wrapElectron = appPkg: exeName:
+    pkgs.writeShellScriptBin exeName ''
+      exec ${appPkg}/bin/${exeName} --no-sandbox "$@"
     '';
 in
 {
-  ## Make PATH / XDG_DATA_DIRS available to the desktop early
+  ## Export PATH / XDG_DATA_DIRS early so GNOME sees .desktop files
   targets.genericLinux.enable = true;
 
   home.username      = "rob";
@@ -31,13 +30,17 @@ in
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
-    # --- GUI binaries wrapped (only wrapper links appear) ---
+    # --- Wrappers (take precedence in PATH) ---
     (wrapElectron vsCode     "code")
     (wrapElectron postmanPkg "postman")
     (wrapElectron dataGrip   "datagrip")
     (wrapElectron riderPkg   "rider")
 
-    # --- Other GUI apps that don't need wrapping ---
+    # --- Original GUI apps, but low priority so /bin collision is skipped ---
+    (lib.lowPrio vsCode)
+    (lib.lowPrio postmanPkg)
+    (lib.lowPrio dataGrip)
+    (lib.lowPrio riderPkg)
     emacs29-pgtk
     alacritty
     google-chrome
@@ -75,10 +78,11 @@ in
 
   # ------------ Ghostty terminfo --------------
   home.file."terminfo/ghostty.terminfo".source = ../terminfo/ghostty.terminfo;
-  home.activation.installGhosttyTerminfo = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    mkdir -p "$HOME/.terminfo"
-    tic -x -o "$HOME/.terminfo" ${../terminfo/ghostty.terminfo}
-  '';
+  home.activation.installGhosttyTerminfo =
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      mkdir -p "$HOME/.terminfo"
+      tic -x -o "$HOME/.terminfo" ${../terminfo/ghostty.terminfo}
+    '';
 
   # ------------ Services ----------------------
   systemd.user.services.cloudflared = {
@@ -90,6 +94,5 @@ in
     Install.WantedBy = [ "default.target" ];
   };
 
-  # Let Home-Manager manage itself
   programs.home-manager.enable = true;
 }

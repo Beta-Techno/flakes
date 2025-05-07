@@ -2,14 +2,11 @@
   description = "Rob's workstation flake (24.05)";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    nixpkgs.url       = "github:NixOS/nixpkgs/nixos-24.05";
+    home-manager.url  = "github:nix-community/home-manager/release-24.05";
+    flake-utils.url   = "github:numtide/flake-utils";
 
-    home-manager = {
-      url = "github:nix-community/home-manager/release-24.05";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    flake-utils.url = "github:numtide/flake-utils";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = { self, nixpkgs, home-manager, flake-utils, ... }:
@@ -19,12 +16,10 @@
   in
   {
     homeConfigurations.rob = home-manager.lib.homeManagerConfiguration {
-      inherit pkgs;
-      modules = [ ./home/dev.nix ];
+      inherit pkgs; modules = [ ./home/dev.nix ];
     };
   }
   //
-  # Bootstrap helper (nix run .#bootstrap)
   flake-utils.lib.eachDefaultSystem (sys:
     let p = import nixpkgs { system = sys; config.allowUnfree = true; };
     in {
