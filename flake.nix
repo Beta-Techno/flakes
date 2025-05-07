@@ -18,18 +18,13 @@
     pkgs   = import nixpkgs { inherit system; config.allowUnfree = true; };
   in
   {
-    ###########################################
-    # Home-Manager configuration for “rob”
-    ###########################################
     homeConfigurations.rob = home-manager.lib.homeManagerConfiguration {
       inherit pkgs;
       modules = [ ./home/dev.nix ];
     };
   }
   //
-  #############################################
   # Bootstrap helper (nix run .#bootstrap)
-  #############################################
   flake-utils.lib.eachDefaultSystem (sys:
     let p = import nixpkgs { system = sys; config.allowUnfree = true; };
     in {

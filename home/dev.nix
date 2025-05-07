@@ -2,21 +2,23 @@
 
 ###############################################################################
 #  Rob’s Home-Manager module
-#  • Adds GUI apps (Code, JetBrains, Chrome, Postman, Emacs GTK…)
-#  • Makes them visible in Ubuntu’s launcher via targets.genericLinux
-#  • Wraps Electron apps with --no-sandbox (works around /nix nosuid mount)
 ###############################################################################
 
 let
-  # Helper: create a tiny wrapper "<name>" that calls the real binary with
-  # --no-sandbox so it works on non-NixOS systems where /nix is mounted nosuid.
+  vsCode     = pkgs.vscode;
+  postmanPkg = pkgs.postman;
+  dataGrip   = pkgs.jetbrains.datagrip;
+  riderPkg   = pkgs.jetbrains.rider;
+
+  # Helper: wrap an Electron app with --no-sandbox while keeping
+  # the real package in the closure (but NOT symlinked → no collision).
   wrapElectron = appPkg: name:
     pkgs.writeShellScriptBin name ''
       exec ${appPkg}/bin/${name} --no-sandbox "$@"
     '';
 in
 {
-  ## Export PATH / XDG_DATA_DIRS early via systemd → desktop search works
+  ## Make PATH / XDG_DATA_DIRS available to the desktop early
   targets.genericLinux.enable = true;
 
   home.username      = "rob";
@@ -29,21 +31,17 @@ in
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
-    # --- GUI apps (original packages) ---
-    vscode
+    # --- GUI binaries wrapped (only wrapper links appear) ---
+    (wrapElectron vsCode     "code")
+    (wrapElectron postmanPkg "postman")
+    (wrapElectron dataGrip   "datagrip")
+    (wrapElectron riderPkg   "rider")
+
+    # --- Other GUI apps that don't need wrapping ---
     emacs29-pgtk
     alacritty
-    jetbrains.datagrip
-    jetbrains.rider
     google-chrome
-    postman
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-
-    # --- Electron wrappers (shadow originals in PATH) ---
-    (wrapElectron vscode              "code")
-    (wrapElectron postman             "postman")
-    (wrapElectron jetbrains.datagrip  "datagrip")
-    (wrapElectron jetbrains.rider     "rider")
   ];
 
   # ------------ Shell & tools  ----------------
