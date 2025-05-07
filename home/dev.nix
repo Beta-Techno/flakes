@@ -1,52 +1,55 @@
 { pkgs, lib, ... }:
 
 ###############################################################################
-#  Rob’s Home-Manager module  — clean & minimal
+#  Rob’s Home-Manager module (Ubuntu client)
+#  * Electron apps wrapped with --no-sandbox
+#  * JetBrains IDEs run natively
+#  * Alacritty uses the FHS build → no GL / Wayland issues
+#  * targets.genericLinux exposes ~/.nix-profile to the desktop environment
 ###############################################################################
 
 let
-  # Electron apps that need --no-sandbox
+  # Electron apps that need the flag
   vscode     = pkgs.vscode;
   postmanPkg = pkgs.postman;
 
-  # Wrapper generator: adds --no-sandbox flag
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
       exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
 in
 {
-  ## Make ~/.nix-profile visible to GNOME/KDE sessions
+  ## Expose PATH / XDG_DATA_DIRS early (desktop launcher integration)
   targets.genericLinux.enable = true;
 
   home.username      = "rob";
   home.homeDirectory = "/home/rob";
   home.stateVersion  = "24.05";
 
-  # ------------ Packages (CLI + GUI) ----------
+  # ------------ Packages ----------------------
   home.packages = with pkgs; [
     # --- CLI tools ---
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
-    # --- Electron wrappers (shadow originals) ---
+    # --- Electron (wrapped) ---
     (wrapElectron vscode     "code")
     (wrapElectron postmanPkg "postman")
-    (lib.lowPrio vscode)     # original package, low-prio to avoid collision
+    (lib.lowPrio vscode)
     (lib.lowPrio postmanPkg)
 
-    # --- JetBrains IDEs (Java, no wrapper needed) ---
+    # --- JetBrains IDEs ---
     jetbrains.datagrip
     jetbrains.rider
 
-    # --- Other GUI apps ---
+    # --- GUI apps ---
     emacs29-pgtk
-    alacritty
+    alacritty-fhs                  # FHS build solves GL / Wayland mismatch
     google-chrome
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
-  # ------------ Shell & tools  ----------------
+  # ------------ Shell & tools -----------------
   programs.zsh = {
     enable            = true;
     oh-my-zsh.enable  = true;
@@ -62,9 +65,9 @@ in
   };
 
   programs.git = {
-    enable     = true;
-    userName   = "Rob";
-    userEmail  = "rob@example.com";
+    enable    = true;
+    userName  = "Rob";
+    userEmail = "rob@example.com";
   };
 
   home.shellAliases = {
@@ -83,7 +86,7 @@ in
       tic -x -o "$HOME/.terminfo" ${../terminfo/ghostty.terminfo}
     '';
 
-  # ------------ Cloudflared tunnel service ----
+  # ------------ Cloudflared tunnel ------------
   systemd.user.services.cloudflared = {
     Unit.Description = "Cloudflare Tunnel (user scope)";
     Service = {

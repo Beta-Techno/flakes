@@ -6,6 +6,7 @@
     home-manager.url  = "github:nix-community/home-manager/release-24.05";
     flake-utils.url   = "github:numtide/flake-utils";
 
+    # home-manager tracks the same nixpkgs revision
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
@@ -15,13 +16,21 @@
     pkgs   = import nixpkgs { inherit system; config.allowUnfree = true; };
   in
   {
+    ##############################
+    ## Home-Manager entry “rob” ##
+    ##############################
     homeConfigurations.rob = home-manager.lib.homeManagerConfiguration {
-      inherit pkgs; modules = [ ./home/dev.nix ];
+      inherit pkgs;
+      modules = [ ./home/dev.nix ];
     };
   }
   //
+  ############################################
+  ## Convenience bootstrap: nix run .#bootstrap
+  ############################################
   flake-utils.lib.eachDefaultSystem (sys:
-    let p = import nixpkgs { system = sys; config.allowUnfree = true; };
+    let
+      p = import nixpkgs { system = sys; config.allowUnfree = true; };
     in {
       packages.bootstrap = p.writeShellScriptBin "bootstrap" ''
         set -euo pipefail
