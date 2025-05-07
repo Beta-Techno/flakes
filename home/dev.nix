@@ -1,5 +1,5 @@
 ###############################################################################
-#  home/dev.nix — Rob’s Home-Manager profile  (Ubuntu 24 · Intel Iris 6100)
+#  home/dev.nix — Rob's Home-Manager profile  (Ubuntu 24 · Intel Iris 6100)
 ###############################################################################
 { config, pkgs, lib, ... }:
 
@@ -132,4 +132,31 @@ EOF
   };
 
   programs.home-manager.enable = true;
+
+  ##############################  Dock / sidebar  ##############################
+  programs.dconf.enable = true;
+
+  dconf.settings = {
+    # Ordered list of favorites (Dash-to-Dock reads this key)
+    "org/gnome/shell" = {
+      favorite-apps = [
+        "org.gnome.Nautilus.desktop"     # Files
+        "alacritty.desktop"              # Alacritty (our launcher)
+        "org.gnome.Terminal.desktop"     # GNOME Terminal
+        "emacs.desktop"                  # Emacs GUI
+        "google-chrome.desktop"          # Chrome
+        "code.desktop"                   # VS Code
+        "jetbrains-rider.desktop"        # Rider
+        "jetbrains-datagrip.desktop"     # DataGrip
+        "postman.desktop"                # Postman
+      ];
+    };
+
+    # Optional: tweak Dash-to-Dock behaviour (keep LEFT, change size if you like)
+    "org/gnome/shell/extensions/dash-to-dock" = {
+      dash-max-icon-size = 32;   # px  (feel free to enlarge)
+      dock-position      = "LEFT";
+      autohide           = false;
+    };
+  };
 }
