@@ -22,7 +22,6 @@
   # Packages (GUI + CLI) installed into ~/.local/state/nix/profile/bin
   # ------------------------------------------------------------------
   home.packages = with pkgs; [
-
     /* ===== GUI applications ===== */
     # Editors / IDEs ---------------------------------------------------
     vscode                      # Visual Studio Code (unfree)
@@ -52,6 +51,7 @@
     jq                          # JSON query
     gh                          # GitHub CLI
     htop                        # Process viewer
+    nerdfonts                   # Fonts
   ];
 
   # ------------------------------------------------------------------
