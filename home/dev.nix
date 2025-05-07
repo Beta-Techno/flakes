@@ -147,8 +147,8 @@ EOF
         "emacs.desktop"               # Emacs GUI
         "google-chrome.desktop"       # Chrome
         "code.desktop"                # VS Code
-        "jetbrains-rider.desktop"     # Rider
-        "jetbrains-datagrip.desktop"  # DataGrip
+        "rider.desktop"               # Rider (nixpkgs name)
+        "datagrip.desktop"            # DataGrip (nixpkgs name)
         "postman.desktop"             # Postman
       ];
     };
