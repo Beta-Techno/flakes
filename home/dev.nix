@@ -1,23 +1,27 @@
 ###############################################################################
-#  home/dev.nix — Rob’s Home-Manager profile (Ubuntu 24 · Intel Iris 6100)
+#  home/dev.nix — Rob’s Home‑Manager profile  (Ubuntu 24 · Intel Iris 6100)
 ###############################################################################
 { config, pkgs, lib, ... }:
 
+################################################################################
+# Helpers
+################################################################################
 let
   nixBin = "${pkgs.nix}/bin/nix";
 
-  # Electron wrapper
+  # ── Common Electron wrapper (keeps namespace sandbox) ──────────────────────
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
-      exec ${pkg}/bin/${exe} --no-sandbox "$@"
+      exec ${pkg}/bin/${exe} --disable-setuid-sandbox "$@"
     '';
 
-  # Chrome wrapper – short name, adds --no-sandbox
+  # ── Chrome wrapper (namespace sandbox, no SUID helper required) ────────────
   chromeWrapped = pkgs.writeShellScriptBin "google-chrome" ''
-    exec ${pkgs.google-chrome}/bin/google-chrome-stable --no-sandbox "$@"
+    exec ${pkgs.google-chrome}/bin/google-chrome-stable \
+         --disable-setuid-sandbox "$@"
   '';
 
-  # Alacritty wrapper (nixGLIntel)
+  # ── Alacritty wrapper (runs through nixGLIntel) ────────────────────────────
   alacrittyWrapped = pkgs.writeShellScriptBin "alacritty" ''
     exec ${nixBin} run --impure github:guibou/nixGL#nixGLIntel -- \
          ${pkgs.alacritty}/bin/alacritty "$@"
@@ -26,14 +30,17 @@ let
   alacrittySvg =
     "${pkgs.alacritty}/share/icons/hicolor/scalable/apps/Alacritty.svg";
 in
+################################################################################
+# Configuration
+################################################################################
 {
-  ##############################  Basics  #####################################
+  ############################  Basics  #######################################
   home.username      = "rob";
   home.homeDirectory = "/home/rob";
   home.stateVersion  = "24.05";
   targets.genericLinux.enable = true;
 
-  ##############################  Chrome launcher #############################
+  ############################  Chrome launcher  ##############################
   home.activation.installChromeLauncher =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       set -eu
@@ -51,7 +58,7 @@ EOF
       ${pkgs.desktop-file-utils}/bin/update-desktop-database "$apps" || true
     '';
 
-  ##############################  Alacritty launcher/icon #####################
+  ############################  Alacritty launcher/icon  ######################
   home.activation.installAlacrittyLauncher =
     lib.hm.dag.entryAfter [ "installChromeLauncher" ] ''
       apps="$HOME/.local/share/applications"
@@ -76,16 +83,17 @@ EOF
       ${pkgs.gtk3}/bin/gtk-update-icon-cache "$HOME/.local/share/icons/hicolor" || true
     '';
 
-  ##############################  Packages  ###################################
+  ############################  Packages  #####################################
   home.packages = with pkgs; [
     # CLI
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
-    # Electron GUI (wrapped)
+    # Electron GUI (sandbox preserved)
     (wrapElectron pkgs.vscode  "code")
     (wrapElectron pkgs.postman "postman")
-    (lib.lowPrio pkgs.vscode) (lib.lowPrio pkgs.postman)
+    (lib.lowPrio pkgs.vscode)   # icons / resources
+    (lib.lowPrio pkgs.postman)
 
     # JetBrains
     jetbrains.datagrip
@@ -101,7 +109,7 @@ EOF
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
-  ##############################  Shell / tools  ##############################
+  ############################  Shell / tools  ################################
   programs.zsh.enable           = true;
   programs.zsh.oh-my-zsh.enable = true;
   programs.zsh.oh-my-zsh.theme  = "agnoster";
@@ -119,12 +127,14 @@ EOF
   };
 
   home.shellAliases = {
-    k="kubectl"; dcu="docker compose up -d"; dcd="docker compose down";
+    k   = "kubectl";
+    dcu = "docker compose up -d";
+    dcd = "docker compose down";
   };
 
   fonts.fontconfig.enable = true;
 
-  ##############################  Ghostty terminfo  ###########################
+  ############################  Ghostty terminfo  #############################
   home.file."terminfo/ghostty.terminfo".source = ../terminfo/ghostty.terminfo;
   home.activation.installGhosttyTerminfo =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -132,7 +142,7 @@ EOF
       tic -x -o "$HOME/.terminfo" ${../terminfo/ghostty.terminfo}
     '';
 
-  ##############################  Cloudflared  ################################
+  ############################  Cloudflared  ##################################
   systemd.user.services.cloudflared = {
     Unit.Description = "Cloudflare Tunnel (user scope)";
     Service.ExecStart =
@@ -143,7 +153,7 @@ EOF
 
   programs.home-manager.enable = true;
 
-  ##############################  Dock / sidebar  #############################
+  ############################  Dock / sidebar  ###############################
   dconf.enable = true;
   dconf.settings = {
     "org/gnome/shell" = {
