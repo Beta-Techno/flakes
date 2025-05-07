@@ -56,25 +56,6 @@
   # Ghostty terminfo — compile at activation time (robust, no 404)
   # -----------------------------------------------------------
   # 1.  Store source in flake (text file committed in ./terminfo)
-  home.file."terminfo/xterm-ghostty.terminfo".source = ./terminfo/xterm-ghostty.terminfo;
-
-  # 2.  Compile it into ~/.terminfo on every switch
-  home.activation.installGhosttyTerminfo = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    mkdir -p "$HOME/.terminfo"
-    tic -x -o "$HOME/.terminfo" ${./terminfo/xterm-ghostty.terminfo}
-  '';
-
-  # -----------------------------------------------------------
-  # Services
-  # -----------------------------------------------------------
-  systemd.user.services.cloudflared = {
-    Unit.Description = "Cloudflare Tunnel (user scope)";
-    Service = {
-      ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel run --cred-file %h/.cloudflared/tunnel.json";
-      Restart   = "on-failure";
-    };
-    Install.WantedBy = [ "default.target" ];
-  };
-
-  programs.home-manager.enable = true;
+    # dev.nix lives in ./home, terminfo file is one level up
+    home.file."terminfo/ghostty.terminfo".source = ../terminfo/ghostty.terminfo;
 }
