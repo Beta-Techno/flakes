@@ -20,6 +20,20 @@ in
   home.homeDirectory = "/home/rob";
   home.stateVersion  = "24.05";
 
+
+
+  xdg.desktopEntries.alacritty = {
+    name  = "Alacritty";
+    exec  = "alacritty";           # wrapper is in $PATH
+    icon  = "Alacritty";           # uses the icon already shipped
+    type  = "Application";
+    categories = [ "System" "TerminalEmulator" ];
+    terminal   = false;
+  };
+
+
+
+
   home.packages = with pkgs; [
     # CLI
     tmux git ripgrep fd bat fzf jq htop inetutils
