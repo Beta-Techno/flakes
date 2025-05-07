@@ -1,25 +1,31 @@
-{ config, pkgs, lib, ... }:
+-- home/dev.nix ------------------------------------------------------------
+{ pkgs, lib, config, ... }:
 
 ###############################################################################
 #  Rob’s Home-Manager module  – Ubuntu 24 · Intel Iris 6100
+#  • Electron apps wrapped with --no-sandbox
+#  • JetBrains IDEs run natively
+#  • Alacritty launched through nixGLIntel
+#  • Single launcher icon that works (uses absolute /nix/store path to `nix`)
 ###############################################################################
 
 let
-  # ── helpers ────────────────────────────────────────────────────────────────
+  # ── absolute path to the Nix CLI (so GNOME launcher doesn’t need $PATH) ──
+  nixBin = "${pkgs.nix}/bin/nix";
 
-  # Wrap Electron apps with --no-sandbox
+  # ── helper: wrap an Electron app with --no-sandbox ────────────────────────
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
       exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
 
-  # Wrap Alacritty so it runs through nixGLIntel
+  # ── helper: Alacritty wrapper → nixGLIntel ───────────────────────────────
   alacrittyWrapped = pkgs.writeShellScriptBin "alacritty" ''
-    exec nix run --impure github:guibou/nixGL#nixGLIntel -- \
+    exec ${nixBin} run --impure github:guibou/nixGL#nixGLIntel -- \
          ${pkgs.alacritty}/bin/alacritty "$@"
   '';
 
-  # Icon used in our custom launcher
+  # Icon for the launcher
   alacrittyIcon =
     "${pkgs.alacritty}/share/icons/hicolor/512x512/apps/Alacritty.png";
 in
@@ -41,7 +47,7 @@ in
       find "$apps" -maxdepth 1 -type f -name 'alacritty*.desktop' \
            -exec grep -q '/nix/store/.*alacritty' {} \; -delete || true
 
-      # Install our wrapper-based launcher
+      # Install our launcher that calls the wrapper directly
       cat > "$apps/alacritty.desktop" <<EOF
 [Desktop Entry]
 Name=Alacritty
@@ -62,7 +68,7 @@ EOF
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
-    # Electron apps (wrapped)
+    # Electron (wrapped)
     (wrapElectron pkgs.vscode  "code")
     (wrapElectron pkgs.postman "postman")
     (lib.lowPrio pkgs.vscode) (lib.lowPrio pkgs.postman)
@@ -73,15 +79,15 @@ EOF
 
     # GUI apps
     emacs29-pgtk
-    alacrittyWrapped
+    alacrittyWrapped                 # wrapper binary
     google-chrome
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
   ##########################  Shell / tools  #################################
-  programs.zsh.enable           = true;
-  programs.zsh.oh-my-zsh.enable = true;
-  programs.zsh.oh-my-zsh.theme  = "agnoster";
+  programs.zsh.enable            = true;
+  programs.zsh.oh-my-zsh.enable  = true;
+  programs.zsh.oh-my-zsh.theme   = "agnoster";
 
   programs.tmux.enable = true;
   programs.tmux.extraConfig = ''
@@ -95,7 +101,12 @@ EOF
     userEmail = "rob@example.com";
   };
 
-  home.shellAliases = { k = "kubectl"; dcu = "docker compose up -d"; dcd = "docker compose down"; };
+  home.shellAliases = {
+    k   = "kubectl";
+    dcu = "docker compose up -d";
+    dcd = "docker compose down";
+  };
+
   fonts.fontconfig.enable = true;
 
   ##########################  Ghostty terminfo  ##############################
