@@ -1,19 +1,18 @@
 ###############################################################################
 #  Rob’s Home-Manager module  – Ubuntu 24 · Intel Iris 6100
 ###############################################################################
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 let
-  # absolute path to `nix` binary so GNOME doesn't need $PATH
+  # Absolute path to Nix CLI so GNOME doesn’t rely on $PATH
   nixBin = "${pkgs.nix}/bin/nix";
 
-  # wrap Electron apps with --no-sandbox
+  # ---- helpers -------------------------------------------------------------
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
       exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
 
-  # Alacritty wrapper → nixGLIntel
   alacrittyWrapped = pkgs.writeShellScriptBin "alacritty" ''
     exec ${nixBin} run --impure github:guibou/nixGL#nixGLIntel -- \
          ${pkgs.alacritty}/bin/alacritty "$@"
@@ -23,22 +22,20 @@ let
     "${pkgs.alacritty}/share/icons/hicolor/512x512/apps/Alacritty.png";
 in
 {
-  ## Mandatory identifiers
+  ##################### Required identifiers #################################
   home.username      = "rob";
   home.homeDirectory = "/home/rob";
   home.stateVersion  = "24.05";
 
-  ## Ensure ~/.nix-profile is visible to GNOME
+  ##################### Desktop integration ##################################
   targets.genericLinux.enable = true;
 
-  ## Install a launcher that calls the wrapper, remove stale ones
   home.activation.installAlacrittyDesktop =
-    pkgs.writeShellScript "installAlacrittyDesktop" ''
-      set -eu
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       apps="$HOME/.local/share/applications"
       mkdir -p "$apps"
 
-      # remove old launchers that call /nix/store/…/alacritty
+      # remove any launchers that call the store binary
       find "$apps" -maxdepth 1 -type f -name 'alacritty*.desktop' \
            -exec grep -q '/nix/store/.*alacritty' {} \; -delete || true
 
@@ -56,13 +53,13 @@ EOF
       ${pkgs.desktop-file-utils}/bin/update-desktop-database "$apps" || true
     '';
 
-  ## Packages
+  ##################### Packages #############################################
   home.packages = with pkgs; [
     # CLI tools
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
-    # Electron (wrapped)
+    # Electron apps (wrapped)
     (wrapElectron pkgs.vscode  "code")
     (wrapElectron pkgs.postman "postman")
     (lib.lowPrio pkgs.vscode) (lib.lowPrio pkgs.postman)
@@ -78,7 +75,7 @@ EOF
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
-  ## Shell / Git / Tmux (unchanged)
+  ##################### Shell / tools ########################################
   programs.zsh.enable            = true;
   programs.zsh.oh-my-zsh.enable  = true;
   programs.zsh.oh-my-zsh.theme   = "agnoster";
@@ -96,12 +93,14 @@ EOF
   };
 
   home.shellAliases = {
-    k = "kubectl"; dcu = "docker compose up -d"; dcd = "docker compose down";
+    k = "kubectl";
+    dcu = "docker compose up -d";
+    dcd = "docker compose down";
   };
 
   fonts.fontconfig.enable = true;
 
-  ## Ghostty terminfo
+  ##################### Ghostty terminfo #####################################
   home.file."terminfo/ghostty.terminfo".source = ../terminfo/ghostty.terminfo;
   home.activation.installGhosttyTerminfo =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -109,12 +108,14 @@ EOF
       tic -x -o "$HOME/.terminfo" ${../terminfo/ghostty.terminfo}
     '';
 
-  ## Cloudflared service
+  ##################### Cloudflared tunnel ###################################
   systemd.user.services.cloudflared = {
     Unit.Description = "Cloudflare Tunnel (user scope)";
-    Service.ExecStart =
-      "${pkgs.cloudflared}/bin/cloudflared tunnel run --cred-file %h/.cloudflared/tunnel.json";
-    Service.Restart  = "on-failure";
+    Service = {
+      ExecStart =
+        "${pkgs.cloudflared}/bin/cloudflared tunnel run --cred-file %h/.cloudflared/tunnel.json";
+      Restart = "on-failure";
+    };
     Install.WantedBy = [ "default.target" ];
   };
 
