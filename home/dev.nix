@@ -1,23 +1,22 @@
 { pkgs, lib, ... }:
 
 ###############################################################################
-#  rob’s Home-Manager module – minimal & working
+#  Rob’s Home-Manager module  — clean & minimal
 ###############################################################################
 
 let
-  # === Electron packages that need --no-sandbox wrappers ===
-  vscode      = pkgs.vscode;
-  postmanPkg  = pkgs.postman;
-  dataGrip    = pkgs.jetbrains.datagrip;
-  riderPkg    = pkgs.jetbrains.rider;
+  # Electron apps that need --no-sandbox
+  vscode     = pkgs.vscode;
+  postmanPkg = pkgs.postman;
 
+  # Wrapper generator: adds --no-sandbox flag
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
       exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
 in
 {
-  # Make PATH & XDG_DATA_DIRS available to GNOME/KDE early
+  ## Make ~/.nix-profile visible to GNOME/KDE sessions
   targets.genericLinux.enable = true;
 
   home.username      = "rob";
@@ -26,22 +25,21 @@ in
 
   # ------------ Packages (CLI + GUI) ----------
   home.packages = with pkgs; [
-    # CLI tools
+    # --- CLI tools ---
     tmux git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
-    # Wrappers (shadow originals, launch with --no-sandbox)
+    # --- Electron wrappers (shadow originals) ---
     (wrapElectron vscode     "code")
     (wrapElectron postmanPkg "postman")
-    (wrapElectron dataGrip   "datagrip")
-    (wrapElectron riderPkg   "rider")
-
-    # Original GUI apps, low priority so file-name clashes disappear
-    (lib.lowPrio vscode)
+    (lib.lowPrio vscode)     # original package, low-prio to avoid collision
     (lib.lowPrio postmanPkg)
-    (lib.lowPrio dataGrip)
-    (lib.lowPrio riderPkg)
 
+    # --- JetBrains IDEs (Java, no wrapper needed) ---
+    jetbrains.datagrip
+    jetbrains.rider
+
+    # --- Other GUI apps ---
     emacs29-pgtk
     alacritty
     google-chrome
@@ -50,23 +48,23 @@ in
 
   # ------------ Shell & tools  ----------------
   programs.zsh = {
-    enable = true;
-    oh-my-zsh.enable = true;
-    oh-my-zsh.theme  = "agnoster";
+    enable            = true;
+    oh-my-zsh.enable  = true;
+    oh-my-zsh.theme   = "agnoster";
   };
 
   programs.tmux = {
-    enable = true;
-    extraConfig = ''
+    enable       = true;
+    extraConfig  = ''
       set -g mouse on
       set -g history-limit 100000
     '';
   };
 
   programs.git = {
-    enable    = true;
-    userName  = "Rob";
-    userEmail = "rob@example.com";
+    enable     = true;
+    userName   = "Rob";
+    userEmail  = "rob@example.com";
   };
 
   home.shellAliases = {
@@ -96,5 +94,6 @@ in
     Install.WantedBy = [ "default.target" ];
   };
 
+  # Let Home-Manager manage itself
   programs.home-manager.enable = true;
 }
