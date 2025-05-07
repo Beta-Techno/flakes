@@ -13,7 +13,6 @@
     # --- GUI apps ---
     vscode                        # VS Code
     emacs29-pgtk                  # GUI Emacs (pgtk build)
-    ghostty                       # Terminal ­(GPU-rendered)
     alacritty                     # Terminal
     jetbrains.datagrip            # JetBrains DataGrip
     jetbrains.rider               # JetBrains Rider
@@ -21,7 +20,7 @@
     postman                       # API client
     docker-desktop                # Docker Desktop for Linux
 
-    # (zed-editor removed — not available on 24.05)
+    # (ghostty removed — not in 24.05; can add via overlay later)
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
