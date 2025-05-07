@@ -1,8 +1,8 @@
 # =============================
-#  flake.nix — fixed for stable Nix (< builtins.currentSystem)
+#  flake.nix — stable 24.05
 # =============================
 {
-  description = "Rob's declarative workstation (stable 24.05)";
+  description = "Rob's workstation flake (24.05)";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
@@ -17,7 +17,6 @@
 
   outputs = { self, nixpkgs, home-manager, flake-utils, ... }:
     let
-      # Hard‑code for now; adjust if you evaluate on a different architecture
       system = "x86_64-linux";
       pkgs   = import nixpkgs { inherit system; config.allowUnfree = true; };
     in

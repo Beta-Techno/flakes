@@ -1,5 +1,5 @@
 # =============================
-#  home/dev.nix  — single source of truth
+#  home/dev.nix  — incremental package rollout
 # =============================
 { pkgs, ... }:
 {
@@ -7,11 +7,24 @@
   home.homeDirectory = "/home/rob";
   home.stateVersion  = "24.05";
 
+  # -----------------------------------------------------------
+  # Packages — PHASE 1: core dev + network tools
+  # We'll add GUI apps, JetBrains, etc. in later phases.
+  # -----------------------------------------------------------
   home.packages = with pkgs; [
+    # ── CLI fundamentals ─────────────────────────────
     tmux git ripgrep fd bat fzf jq htop inetutils
+
+    # ── Dev / build chain ────────────────────────────
+    neovim nodejs_20 docker-compose kubectl
+
+    # ── Fonts ────────────────────────────────────────
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
+  # -----------------------------------------------------------
+  # Shell & editor tooling
+  # -----------------------------------------------------------
   programs.zsh = {
     enable = true;
     oh-my-zsh.enable = true;
@@ -40,6 +53,9 @@
 
   fonts.fontconfig.enable = true;
 
+  # -----------------------------------------------------------
+  # Services
+  # -----------------------------------------------------------
   systemd.user.services.cloudflared = {
     Unit.Description = "Cloudflare Tunnel (user scope)";
     Service = {
