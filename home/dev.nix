@@ -1,5 +1,5 @@
 ###############################################################################
-#  home/dev.nix — Rob's Home-Manager profile  (Ubuntu 24 · Intel Iris 6100)
+#  home/dev.nix — Rob’s Home-Manager profile  (Ubuntu 24 · Intel Iris 6100)
 ###############################################################################
 { config, pkgs, lib, ... }:
 
@@ -9,19 +9,19 @@
 let
   nixBin = "${pkgs.nix}/bin/nix";
 
-  # Electron wrapper
+  # ── Electron wrapper ───────────────────────────────────────────────────────
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
       exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
 
-  # Alacritty wrapper → nixGLIntel
+  # ── Alacritty wrapper → nixGLIntel ─────────────────────────────────────────
   alacrittyWrapped = pkgs.writeShellScriptBin "alacritty" ''
     exec ${nixBin} run --impure github:guibou/nixGL#nixGLIntel -- \
          ${pkgs.alacritty}/bin/alacritty "$@"
   '';
 
-  # Only icon shipped by Alacritty in current nixpkgs
+  # ── Only icon shipped by Alacritty in current nixpkgs ──────────────────────
   alacrittySvg =
     "${pkgs.alacritty}/share/icons/hicolor/scalable/apps/Alacritty.svg";
 in
@@ -78,7 +78,8 @@ EOF
     (lib.lowPrio pkgs.vscode) (lib.lowPrio pkgs.postman)
 
     # JetBrains IDEs
-    jetbrains.datagrip jetbrains.rider
+    jetbrains.datagrip
+    jetbrains.rider
 
     # Other GUI apps
     emacs29-pgtk
@@ -133,28 +134,28 @@ EOF
 
   programs.home-manager.enable = true;
 
-  ##############################  Dock / sidebar  ##############################
-  programs.dconf.enable = true;
+  ##############################  Dock / sidebar  #############################
+  dconf.enable = true;
 
   dconf.settings = {
     # Ordered list of favorites (Dash-to-Dock reads this key)
     "org/gnome/shell" = {
       favorite-apps = [
-        "org.gnome.Nautilus.desktop"     # Files
-        "alacritty.desktop"              # Alacritty (our launcher)
-        "org.gnome.Terminal.desktop"     # GNOME Terminal
-        "emacs.desktop"                  # Emacs GUI
-        "google-chrome.desktop"          # Chrome
-        "code.desktop"                   # VS Code
-        "jetbrains-rider.desktop"        # Rider
-        "jetbrains-datagrip.desktop"     # DataGrip
-        "postman.desktop"                # Postman
+        "org.gnome.Nautilus.desktop"  # Files
+        "alacritty.desktop"           # Alacritty (our launcher)
+        "org.gnome.Terminal.desktop"  # GNOME Terminal
+        "emacs.desktop"               # Emacs GUI
+        "google-chrome.desktop"       # Chrome
+        "code.desktop"                # VS Code
+        "jetbrains-rider.desktop"     # Rider
+        "jetbrains-datagrip.desktop"  # DataGrip
+        "postman.desktop"             # Postman
       ];
     };
 
-    # Optional: tweak Dash-to-Dock behaviour (keep LEFT, change size if you like)
+    # Dash-to-Dock tweaks (left position is Ubuntu default)
     "org/gnome/shell/extensions/dash-to-dock" = {
-      dash-max-icon-size = 32;   # px  (feel free to enlarge)
+      dash-max-icon-size = 32;   # px
       dock-position      = "LEFT";
       autohide           = false;
     };
