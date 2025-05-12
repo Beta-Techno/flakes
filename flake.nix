@@ -76,9 +76,16 @@
           fi
 
           echo "Applying configuration for $MACHINE..."
+          # Create a local copy of the flake
+          if [ ! -d "$HOME/.config/nixpkgs" ]; then
+            git clone https://github.com/Beta-Techno/flakes.git "$HOME/.config/nixpkgs"
+          fi
+
+          # Apply configuration from local copy
+          cd "$HOME/.config/nixpkgs"
           nix run github:nix-community/home-manager/release-24.05 \
             --extra-experimental-features 'nix-command flakes' -- \
-            switch --flake ${self.url or "."}#$MACHINE
+            switch --flake .#$MACHINE
         '';
       };
     });
