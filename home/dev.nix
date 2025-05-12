@@ -1,5 +1,5 @@
 ###############################################################################
-#  home/dev.nix — Rob’s Home‑Manager profile  (Ubuntu 24 · Intel Iris 6100)
+#  home/dev.nix — Rob's Home‑Manager profile  (Ubuntu 24 · Intel Iris 6100)
 ###############################################################################
 { config, pkgs, lib, ... }:
 
@@ -36,10 +36,7 @@ in
 ################################################################################
 {
   ############################  Basics  #######################################
-  home.username      = "rob";
-  home.homeDirectory = "/home/rob";
   home.stateVersion  = "24.05";
-  targets.genericLinux.enable = true;
 
   ############################  Chrome launcher  ##############################
   home.activation.installChromeLauncher =
