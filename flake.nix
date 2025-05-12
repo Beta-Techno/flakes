@@ -66,7 +66,7 @@
           fi
 
           # Detect machine type
-          MACHINE=$(nix run github:Beta-Techno/flakes#detect-machine)
+          MACHINE=$(nix run github:Beta-Techno/flakes#detect-machine --no-write-lock-file)
           if [ "$MACHINE" = "unknown" ]; then
             echo "Unknown machine type. Please specify manually:"
             echo "1) MacBook Air (2014)"
@@ -87,5 +87,11 @@
             switch --no-write-lock-file --flake github:Beta-Techno/flakes#$MACHINE
         '';
       };
+      # Add default package
+      defaultPackage = pkgs.writeShellScriptBin "default" ''
+        echo "Please run one of the following commands:"
+        echo "  nix run github:Beta-Techno/flakes#bootstrap"
+        echo "  nix run github:Beta-Techno/flakes#detect-machine"
+      '';
     });
 }
