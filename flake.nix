@@ -58,28 +58,12 @@
             bash ./init.sh
           fi
 
-          # Detect machine type
-          MACHINE=$(nix run .#detect-machine)
-          
-          if [ "$MACHINE" = "unknown" ]; then
-            echo "Unknown machine type. Please specify manually:"
-            echo "1) MacBook Air (2014)"
-            echo "2) MacBook Pro 13\" (2015)"
-            read -p "Choose (1/2): " choice
-            case $choice in
-              1) MACHINE="macbook-air" ;;
-              2) MACHINE="macbook-pro" ;;
-              *) echo "Invalid choice"; exit 1 ;;
-            esac
-          else
-            echo "Detected $MACHINE"
-          fi
-
-          echo "Applying configuration for $MACHINE..."
+          echo "Applying configuration..."
           # Run directly from GitHub with --no-write-lock-file
+          # Nix will automatically detect the correct machine configuration
           nix run github:nix-community/home-manager/release-24.05 \
             --extra-experimental-features 'nix-command flakes' -- \
-            switch --no-write-lock-file --flake github:Beta-Techno/flakes#$MACHINE
+            switch --no-write-lock-file --flake github:Beta-Techno/flakes
         '';
       };
     });
