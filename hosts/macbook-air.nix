@@ -12,8 +12,7 @@
   # Air-specific performance tweaks
   dconf.settings = {
     "org/gnome/shell/extensions/dash-to-dock" = {
-      # Air-specific dock settings
-      dash-max-icon-size = 24;  # Smaller icons for Air's lower resolution
+      dash-max-icon-size = lib.mkForce 24;  # Smaller icons for Air's lower resolution
     };
   };
 } 

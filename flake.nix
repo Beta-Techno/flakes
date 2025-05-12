@@ -9,23 +9,28 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, flake-utils, ... }:
+  outputs = { self, nixpkgs, home-manager, flake-utils, ... }@inputs:
   let
     system = "x86_64-linux";
-    pkgs = import nixpkgs { inherit system; config.allowUnfree = true; };
+    pkgsFor = system: import nixpkgs { inherit system; config.allowUnfree = true; };
+    
+    mkHM = { system, username ? builtins.getEnv "USER" }:
+      home-manager.lib.homeManagerConfiguration {
+        pkgs = pkgsFor system;
+        modules = [
+          ./modules/common.nix
+          ./hosts/${system}.nix
+          {
+            home.username = username;
+            home.homeDirectory = "/home/${username}";
+          }
+        ];
+      };
   in
   {
     homeConfigurations = {
-      # MacBook Pro 13" (2015)
-      macbook-pro = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
-        modules = [ ./hosts/macbook-pro.nix ];
-      };
-      # MacBook Air (2014)
-      macbook-air = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
-        modules = [ ./hosts/macbook-air.nix ];
-      };
+      "${builtins.getEnv "USER"}@macbook-pro" = mkHM { system = "macbook-pro"; };
+      "${builtins.getEnv "USER"}@macbook-air" = mkHM { system = "macbook-air"; };
     };
 
     packages.${system} = {
@@ -52,16 +57,7 @@
         fi
 
         # Detect machine type
-        MACHINE=$(${pkgs.writeShellScriptBin "detect-machine" ''
-          set -euo pipefail
-          if lscpu | grep -q "Intel(R) Core(TM) i7-4650U"; then
-            echo "macbook-air"
-          elif lscpu | grep -q "Intel(R) Core(TM) i5-5257U"; then
-            echo "macbook-pro"
-          else
-            echo "unknown"
-          fi
-        ''}/bin/detect-machine)
+        MACHINE=$(${pkgs.detect-machine}/bin/detect-machine)
         
         if [ "$MACHINE" = "unknown" ]; then
           echo "Unknown machine type. Please specify manually:"
@@ -80,7 +76,7 @@
         echo "Applying configuration for $MACHINE..."
         nix run github:nix-community/home-manager/release-24.05 \
           --extra-experimental-features 'nix-command flakes' -- \
-          switch --no-write-lock-file --flake .#$MACHINE
+          switch --no-write-lock-file --flake .#"${USER}@$MACHINE"
       '';
 
       # Default package
