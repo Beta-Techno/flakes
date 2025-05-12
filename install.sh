@@ -34,7 +34,7 @@ echo "→ Installing Home Manager..."
 nix run github:nix-community/home-manager/release-24.05 -- init --switch
 
 echo "→ Applying configuration..."
-nix run github:Beta-Techno/flakes#bootstrap
+nix run github:Beta-Techno/flakes#bootstrap --no-write-lock-file
 
 echo "✓ Installation complete!"
 echo "Please:"
