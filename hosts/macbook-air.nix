@@ -4,9 +4,6 @@
   imports = [ ../modules/common.nix ];
 
   ############################  Machine Specific  #############################
-  home.username      = "rob";
-  home.homeDirectory = "/home/rob";
-
   # MacBook Air (2014) - Intel HD 5000 specific settings
   home.packages = with pkgs; [
     # Add any Air-specific packages here

@@ -4,9 +4,6 @@
   imports = [ ../modules/common.nix ];
 
   ############################  Machine Specific  #############################
-  home.username      = "rob";
-  home.homeDirectory = "/home/rob";
-
   # MacBook Pro 13" (2015) - Intel Iris 6100 specific settings
   home.packages = with pkgs; [
     # Add any Pro-specific packages here
