@@ -156,9 +156,8 @@ EOF
       ];
     };
     "org/gnome/shell/extensions/dash-to-dock" = {
-      dash-max-icon-size = 32;
-      dock-position      = "LEFT";
-      autohide           = false;
+      dock-position = "LEFT";
+      autohide      = false;
     };
     "org/gnome/desktop/interface" = { color-scheme = "prefer-dark"; };
   };
