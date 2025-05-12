@@ -66,7 +66,27 @@
           fi
 
           # Detect machine type
-          MACHINE=$(nix run github:Beta-Techno/flakes#detect-machine --no-write-lock-file)
+          MACHINE=$(${pkgs.writeShellScriptBin "detect-machine" ''
+            set -euo pipefail
+            if [[ "$OSTYPE" == "darwin"* ]]; then
+              if sysctl -n machdep.cpu.brand_string | grep -q "Intel(R) Core(TM) i7-4650U"; then
+                echo "macbook-air"
+              elif sysctl -n machdep.cpu.brand_string | grep -q "Intel(R) Core(TM) i5-5257U"; then
+                echo "macbook-pro"
+              else
+                echo "unknown"
+              fi
+            else
+              if lscpu | grep -q "Intel(R) Core(TM) i7-4650U"; then
+                echo "macbook-air"
+              elif lscpu | grep -q "Intel(R) Core(TM) i5-5257U"; then
+                echo "macbook-pro"
+              else
+                echo "unknown"
+              fi
+            fi
+          ''}/bin/detect-machine)
+          
           if [ "$MACHINE" = "unknown" ]; then
             echo "Unknown machine type. Please specify manually:"
             echo "1) MacBook Air (2014)"
@@ -84,7 +104,7 @@
           echo "Applying configuration for $MACHINE..."
           nix run github:nix-community/home-manager/release-24.05 \
             --extra-experimental-features 'nix-command flakes' -- \
-            switch --no-write-lock-file --flake github:Beta-Techno/flakes#$MACHINE
+            switch --no-write-lock-file --flake .#$MACHINE
         '';
       };
       # Add default package
