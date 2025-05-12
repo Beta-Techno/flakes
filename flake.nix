@@ -85,7 +85,7 @@
           cd "$HOME/.config/nixpkgs"
           nix run github:nix-community/home-manager/release-24.05 \
             --extra-experimental-features 'nix-command flakes' -- \
-            switch --flake .#$MACHINE
+            switch --flake .#$MACHINE --no-write-lock-file
         '';
       };
     });
