@@ -13,6 +13,7 @@
   let
     system = "x86_64-linux";
     pkgsFor = system: import nixpkgs { inherit system; config.allowUnfree = true; };
+    pkgs = pkgsFor system;
     
     mkHM = { system, username ? builtins.getEnv "USER" }:
       home-manager.lib.homeManagerConfiguration {
