@@ -12,42 +12,51 @@
 
   outputs = { self, nixpkgs, home-manager, flake-utils, ... }:
   let
-    system = "x86_64-linux";
-    pkgs   = import nixpkgs { inherit system; config.allowUnfree = true; };
+    supportedSystems = [ "x86_64-linux" "x86_64-darwin" "aarch64-darwin" ];
   in
   {
     homeConfigurations = {
       # MacBook Pro 13" (2015)
       macbook-pro = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
+        pkgs = import nixpkgs { system = "x86_64-darwin"; config.allowUnfree = true; };
         modules = [ ./hosts/macbook-pro.nix ];
       };
       # MacBook Air (2014)
       macbook-air = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
+        pkgs = import nixpkgs { system = "x86_64-darwin"; config.allowUnfree = true; };
         modules = [ ./hosts/macbook-air.nix ];
       };
     };
   }
   //
-  flake-utils.lib.eachDefaultSystem (sys:
-    let p = import nixpkgs { system = sys; config.allowUnfree = true; };
+  flake-utils.lib.eachSystem supportedSystems (system:
+    let pkgs = import nixpkgs { inherit system; config.allowUnfree = true; };
     in {
       packages = {
         # Machine detection script
-        detect-machine = p.writeShellScriptBin "detect-machine" ''
+        detect-machine = pkgs.writeShellScriptBin "detect-machine" ''
           set -euo pipefail
-          if lscpu | grep -q "Intel(R) Core(TM) i7-4650U"; then
-            echo "macbook-air"
-          elif lscpu | grep -q "Intel(R) Core(TM) i5-5257U"; then
-            echo "macbook-pro"
+          if [[ "$OSTYPE" == "darwin"* ]]; then
+            if sysctl -n machdep.cpu.brand_string | grep -q "Intel(R) Core(TM) i7-4650U"; then
+              echo "macbook-air"
+            elif sysctl -n machdep.cpu.brand_string | grep -q "Intel(R) Core(TM) i5-5257U"; then
+              echo "macbook-pro"
+            else
+              echo "unknown"
+            fi
           else
-            echo "unknown"
+            if lscpu | grep -q "Intel(R) Core(TM) i7-4650U"; then
+              echo "macbook-air"
+            elif lscpu | grep -q "Intel(R) Core(TM) i5-5257U"; then
+              echo "macbook-pro"
+            else
+              echo "unknown"
+            fi
           fi
         '';
 
         # Bootstrap script
-        bootstrap = p.writeShellScriptBin "bootstrap" ''
+        bootstrap = pkgs.writeShellScriptBin "bootstrap" ''
           set -euo pipefail
 
           # Run init script first
