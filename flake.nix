@@ -76,16 +76,10 @@
           fi
 
           echo "Applying configuration for $MACHINE..."
-          # Create a local copy of the flake
-          if [ ! -d "$HOME/.config/nixpkgs" ]; then
-            git clone https://github.com/Beta-Techno/flakes.git "$HOME/.config/nixpkgs"
-          fi
-
-          # Apply configuration from local copy
-          cd "$HOME/.config/nixpkgs"
+          # Run directly from GitHub with --no-write-lock-file
           nix run github:nix-community/home-manager/release-24.05 \
             --extra-experimental-features 'nix-command flakes' -- \
-            switch --flake .#$MACHINE --no-write-lock-file
+            switch --no-write-lock-file --flake github:Beta-Techno/flakes#$MACHINE
         '';
       };
     });

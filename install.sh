@@ -39,5 +39,4 @@ nix run github:Beta-Techno/flakes#bootstrap
 echo "✓ Installation complete!"
 echo "Please:"
 echo "1. Restart your terminal"
-echo "2. Run 'home-manager switch' to apply the configuration"
-echo "3. Log out and back in for all changes to take effect" 
+echo "2. Log out and back in for all changes to take effect" 
