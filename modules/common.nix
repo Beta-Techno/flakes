@@ -33,6 +33,10 @@ in
 {
   ############################  Basics  #######################################
   home.stateVersion  = "24.05";
+  
+  # User configuration
+  home.username = builtins.getEnv "USER";
+  home.homeDirectory = "/home/${builtins.getEnv "USER"}";
 
   ############################  Chrome launcher  ##############################
   home.activation.installChromeLauncher =
