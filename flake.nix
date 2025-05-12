@@ -37,8 +37,6 @@
         # Machine detection script
         detect-machine = p.writeShellScriptBin "detect-machine" ''
           set -euo pipefail
-
-          # Detect machine type
           if lscpu | grep -q "Intel(R) Core(TM) i7-4650U"; then
             echo "macbook-air"
           elif lscpu | grep -q "Intel(R) Core(TM) i5-5257U"; then
@@ -58,12 +56,26 @@
             bash ./init.sh
           fi
 
-          echo "Applying configuration..."
-          # Run directly from GitHub with --no-write-lock-file
-          # Nix will automatically detect the correct machine configuration
+          # Detect machine type
+          MACHINE=$(nix run github:Beta-Techno/flakes#detect-machine)
+          if [ "$MACHINE" = "unknown" ]; then
+            echo "Unknown machine type. Please specify manually:"
+            echo "1) MacBook Air (2014)"
+            echo "2) MacBook Pro 13\" (2015)"
+            read -p "Choose (1/2): " choice
+            case $choice in
+              1) MACHINE="macbook-air" ;;
+              2) MACHINE="macbook-pro" ;;
+              *) echo "Invalid choice"; exit 1 ;;
+            esac
+          else
+            echo "Detected $MACHINE"
+          fi
+
+          echo "Applying configuration for $MACHINE..."
           nix run github:nix-community/home-manager/release-24.05 \
             --extra-experimental-features 'nix-command flakes' -- \
-            switch --no-write-lock-file --flake github:Beta-Techno/flakes
+            switch --no-write-lock-file --flake github:Beta-Techno/flakes#$MACHINE
         '';
       };
     });
