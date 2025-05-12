@@ -33,7 +33,6 @@ in
 {
   ############################  Basics  #######################################
   home.stateVersion  = "24.05";
-  targets.genericLinux.enable = true;
 
   ############################  Chrome launcher  ##############################
   home.activation.installChromeLauncher =
@@ -128,9 +127,6 @@ EOF
   };
 
   fonts.fontconfig.enable = true;
-
-  ############################  Ghostty terminfo  #############################
-  # Removed terminfo configuration as it's not needed for basic setup
 
   ############################  Cloudflared  ##################################
   systemd.user.services.cloudflared = {
