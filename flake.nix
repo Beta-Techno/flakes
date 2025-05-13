@@ -83,7 +83,7 @@
           fi
 
           # Detect machine type
-          MACHINE=$(${pkgs.detect-machine}/bin/detect-machine)
+          MACHINE=$(${self.packages.${system}.detect-machine}/bin/detect-machine)
           
           if [ "$MACHINE" = "unknown" ]; then
             echo "Unknown machine type. Please specify manually:"
