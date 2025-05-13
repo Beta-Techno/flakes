@@ -17,7 +17,7 @@
     {
       homeConfigurations = {
         # Default configuration using current user
-        default = { username, ... }@args: home-manager.lib.homeManagerConfiguration {
+        default = { config, username, ... }: home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             ./modules/common.nix
@@ -26,7 +26,7 @@
         };
 
         # MacBook Air configuration
-        macbook-air = { username, ... }@args: home-manager.lib.homeManagerConfiguration {
+        macbook-air = { config, username, ... }: home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             ./modules/common.nix
@@ -36,7 +36,7 @@
         };
 
         # MacBook Pro configuration
-        macbook-pro = { username, ... }@args: home-manager.lib.homeManagerConfiguration {
+        macbook-pro = { config, username, ... }: home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             ./modules/common.nix
