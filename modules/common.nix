@@ -96,7 +96,7 @@ EOF
     jetbrains.rider
 
     # Other GUI
-    emacs29-pgtk
+    emacs30-pgtk
     alacrittyWrapped
     chromeWrapped
     (lib.lowPrio pkgs.google-chrome)
