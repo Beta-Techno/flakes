@@ -22,6 +22,9 @@
           modules = [
             ./modules/common.nix
           ];
+          extraSpecialArgs = {
+            username = builtins.getEnv "USER";
+          };
         };
 
         # MacBook Air configuration
@@ -31,6 +34,9 @@
             ./modules/common.nix
             ./hosts/macbook-air.nix
           ];
+          extraSpecialArgs = {
+            username = builtins.getEnv "USER";
+          };
         };
 
         # MacBook Pro configuration
@@ -40,6 +46,9 @@
             ./modules/common.nix
             ./hosts/macbook-pro.nix
           ];
+          extraSpecialArgs = {
+            username = builtins.getEnv "USER";
+          };
         };
       };
 
