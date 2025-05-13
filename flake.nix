@@ -17,23 +17,23 @@
     {
       homeConfigurations = {
         # MacBook Air configuration
-        macbook-air = { username }: home-manager.lib.homeManagerConfiguration {
+        macbook-air = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             ./modules/common.nix
             ./hosts/macbook-air.nix
           ];
-          extraSpecialArgs = { inherit username; };
+          extraSpecialArgs = { username = "dev"; };
         };
 
         # MacBook Pro configuration
-        macbook-pro = { username }: home-manager.lib.homeManagerConfiguration {
+        macbook-pro = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             ./modules/common.nix
             ./hosts/macbook-pro.nix
           ];
-          extraSpecialArgs = { inherit username; };
+          extraSpecialArgs = { username = "dev"; };
         };
       };
 
@@ -96,13 +96,9 @@
           # Set username (fall back to current user if not specified)
           USERNAME="''${USERNAME:-$USER}"
 
-          # Build the configuration
+          # Build and activate the configuration
           echo "Building configuration for $USERNAME on $MACHINE..."
-          nix build ".#homeConfigurations.$MACHINE" \
-            --argstr username "$USERNAME" \
-            -o /tmp/hm-build
-
-          # Run the activation script
+          nix build ".#homeConfigurations.$MACHINE" -o /tmp/hm-build
           echo "Activating configuration..."
           /tmp/hm-build/activationPackage/activate
         '';
