@@ -13,37 +13,19 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
+      mkHomeConfiguration = username: machine: home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
+        modules = [
+          ./modules/common.nix
+        ] ++ (if machine != "default" then [ ./hosts/${machine}.nix ] else []);
+        extraSpecialArgs = { inherit username; };
+      };
     in
     {
       homeConfigurations = {
-        # Default configuration using current user
-        default = { username, ... }@args: home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [
-            ./modules/common.nix
-          ];
-          extraSpecialArgs = { inherit username; };
-        };
-
-        # MacBook Air configuration
-        macbook-air = { username, ... }@args: home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [
-            ./modules/common.nix
-            ./hosts/macbook-air.nix
-          ];
-          extraSpecialArgs = { inherit username; };
-        };
-
-        # MacBook Pro configuration
-        macbook-pro = { username, ... }@args: home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [
-            ./modules/common.nix
-            ./hosts/macbook-pro.nix
-          ];
-          extraSpecialArgs = { inherit username; };
-        };
+        default = mkHomeConfiguration (builtins.getEnv "USER") "default";
+        macbook-air = mkHomeConfiguration (builtins.getEnv "USER") "macbook-air";
+        macbook-pro = mkHomeConfiguration (builtins.getEnv "USER") "macbook-pro";
       };
 
       packages.${system} = {
