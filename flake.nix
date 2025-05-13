@@ -18,7 +18,11 @@
       homeConfigurations = {
         # MacBook Air configuration
         macbook-air = 
-          let username = builtins.getEnv "USERNAME" // builtins.getEnv "USER"; in
+          let 
+            username = if builtins.getEnv "USERNAME" != "" 
+                      then builtins.getEnv "USERNAME" 
+                      else builtins.getEnv "USER";
+          in
           home-manager.lib.homeManagerConfiguration {
             inherit pkgs;
             modules = [
@@ -30,7 +34,11 @@
 
         # MacBook Pro configuration
         macbook-pro = 
-          let username = builtins.getEnv "USERNAME" // builtins.getEnv "USER"; in
+          let 
+            username = if builtins.getEnv "USERNAME" != "" 
+                      then builtins.getEnv "USERNAME" 
+                      else builtins.getEnv "USER";
+          in
           home-manager.lib.homeManagerConfiguration {
             inherit pkgs;
             modules = [
