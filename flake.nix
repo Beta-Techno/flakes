@@ -17,32 +17,29 @@
     {
       homeConfigurations = {
         # Default configuration using current user
-        default = { config, username, ... }: home-manager.lib.homeManagerConfiguration {
+        default = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             ./modules/common.nix
           ];
-          extraSpecialArgs = { inherit username; };
         };
 
         # MacBook Air configuration
-        macbook-air = { config, username, ... }: home-manager.lib.homeManagerConfiguration {
+        macbook-air = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             ./modules/common.nix
             ./hosts/macbook-air.nix
           ];
-          extraSpecialArgs = { inherit username; };
         };
 
         # MacBook Pro configuration
-        macbook-pro = { config, username, ... }: home-manager.lib.homeManagerConfiguration {
+        macbook-pro = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             ./modules/common.nix
             ./hosts/macbook-pro.nix
           ];
-          extraSpecialArgs = { inherit username; };
         };
       };
 
@@ -104,7 +101,7 @@
 
           # Apply configuration
           if [ -n "$USERNAME" ]; then
-            nix run .#homeConfigurations.$MACHINE.activationPackage -- --arg username "$USERNAME"
+            nix run .#homeConfigurations.$MACHINE.activationPackage -- --argstr username "$USERNAME"
           else
             nix run .#homeConfigurations.$MACHINE.activationPackage
           fi
