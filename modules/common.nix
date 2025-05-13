@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, username ? builtins.getEnv "USER", ... }:
 
 ################################################################################
 # Helpers
@@ -33,7 +33,9 @@ in
 {
   ############################  Basics  #######################################
   home.stateVersion  = "24.05";
-  
+  home.username = username;
+  home.homeDirectory = "/home/${username}";
+
   ############################  Chrome launcher  ##############################
   home.activation.installChromeLauncher =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -127,6 +129,14 @@ EOF
   };
 
   fonts.fontconfig.enable = true;
+
+  ############################  Ghostty terminfo  #############################
+  home.file."terminfo/ghostty.terminfo".source = ../terminfo/ghostty.terminfo;
+  home.activation.installGhosttyTerminfo =
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      mkdir -p "$HOME/.terminfo"
+      tic -x -o "$HOME/.terminfo" ${../terminfo/ghostty.terminfo}
+    '';
 
   ############################  Cloudflared  ##################################
   systemd.user.services.cloudflared = {
