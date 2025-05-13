@@ -17,24 +17,28 @@
     {
       homeConfigurations = {
         # MacBook Air configuration
-        macbook-air = { username }: home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [
-            ./modules/common.nix
-            ./hosts/macbook-air.nix
-          ];
-          extraSpecialArgs = { inherit username; };
-        };
+        macbook-air = 
+          let username = builtins.getEnv "USERNAME" or builtins.getEnv "USER"; in
+          home-manager.lib.homeManagerConfiguration {
+            inherit pkgs;
+            modules = [
+              ./modules/common.nix
+              ./hosts/macbook-air.nix
+            ];
+            extraSpecialArgs = { inherit username; };
+          };
 
         # MacBook Pro configuration
-        macbook-pro = { username }: home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [
-            ./modules/common.nix
-            ./hosts/macbook-pro.nix
-          ];
-          extraSpecialArgs = { inherit username; };
-        };
+        macbook-pro = 
+          let username = builtins.getEnv "USERNAME" or builtins.getEnv "USER"; in
+          home-manager.lib.homeManagerConfiguration {
+            inherit pkgs;
+            modules = [
+              ./modules/common.nix
+              ./hosts/macbook-pro.nix
+            ];
+            extraSpecialArgs = { inherit username; };
+          };
       };
 
       packages.${system} = {
@@ -96,16 +100,10 @@
           # Set username (fall back to current user if not specified)
           USERNAME="''${USERNAME:-$USER}"
 
-          # Build the configuration
+          # Build and activate the configuration
           echo "Building configuration for $USERNAME on $MACHINE..."
-          nix build \
-            --argstr username "$USERNAME" \
-            ".#homeConfigurations.''${MACHINE}.activationPackage" \
-            -o /tmp/hm-activate
-
-          # Run the activation script
-          echo "Activating configuration..."
-          /tmp/hm-activate/activate
+          export USERNAME
+          nix run .#homeConfigurations.''${MACHINE}.activationPackage --impure
         '';
       };
     };
