@@ -22,6 +22,7 @@
           modules = [
             ./modules/common.nix
           ];
+          extraSpecialArgs = { inherit username; };
         };
 
         # MacBook Air configuration
@@ -31,6 +32,7 @@
             ./modules/common.nix
             ./hosts/macbook-air.nix
           ];
+          extraSpecialArgs = { inherit username; };
         };
 
         # MacBook Pro configuration
@@ -40,6 +42,7 @@
             ./modules/common.nix
             ./hosts/macbook-pro.nix
           ];
+          extraSpecialArgs = { inherit username; };
         };
       };
 
