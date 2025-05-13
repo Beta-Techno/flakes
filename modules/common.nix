@@ -1,4 +1,4 @@
-{ config, pkgs, lib, username ? builtins.getEnv "USER", ... }:
+{ config, pkgs, lib, username, ... }:
 
 ################################################################################
 # Helpers

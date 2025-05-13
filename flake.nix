@@ -16,17 +16,8 @@
     in
     {
       homeConfigurations = {
-        # Default configuration using current user
-        default = { username ? builtins.getEnv "USER" }: home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [
-            ./modules/common.nix
-          ];
-          extraSpecialArgs = { inherit username; };
-        };
-
         # MacBook Air configuration
-        macbook-air = { username ? builtins.getEnv "USER" }: home-manager.lib.homeManagerConfiguration {
+        macbook-air = { username }: home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             ./modules/common.nix
@@ -36,7 +27,7 @@
         };
 
         # MacBook Pro configuration
-        macbook-pro = { username ? builtins.getEnv "USER" }: home-manager.lib.homeManagerConfiguration {
+        macbook-pro = { username }: home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             ./modules/common.nix
@@ -106,7 +97,7 @@
           if [ -n "$USERNAME" ]; then
             nix run .#homeConfigurations.$MACHINE.activationPackage -- --argstr username "$USERNAME"
           else
-            nix run .#homeConfigurations.$MACHINE.activationPackage
+            nix run .#homeConfigurations.$MACHINE.activationPackage -- --argstr username "$USER"
           fi
         '';
       };
