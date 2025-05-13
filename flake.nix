@@ -93,12 +93,18 @@
             echo "Detected $MACHINE"
           fi
 
-          # Apply configuration
-          if [ -n "$USERNAME" ]; then
-            nix run .#homeConfigurations.$MACHINE.activationPackage -- --argstr username "$USERNAME"
-          else
-            nix run .#homeConfigurations.$MACHINE.activationPackage -- --argstr username "$USER"
-          fi
+          # Set username (fall back to current user if not specified)
+          USERNAME="''${USERNAME:-$USER}"
+
+          # Build the configuration
+          echo "Building configuration for $USERNAME on $MACHINE..."
+          nix build ".#homeConfigurations.$MACHINE" \
+            --argstr username "$USERNAME" \
+            -o /tmp/hm-build
+
+          # Run the activation script
+          echo "Activating configuration..."
+          /tmp/hm-build/activationPackage/activate
         '';
       };
     };
