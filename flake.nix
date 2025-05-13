@@ -100,7 +100,7 @@
           echo "Building configuration for $USERNAME on $MACHINE..."
           nix build \
             --argstr username "$USERNAME" \
-            ".#homeConfigurations.${MACHINE}.activationPackage" \
+            ".#homeConfigurations.''${MACHINE}.activationPackage" \
             -o /tmp/hm-activate
 
           # Run the activation script
