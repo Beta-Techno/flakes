@@ -139,7 +139,7 @@
     };
 
     # Expose doomEmacs and doomConfig as outputs for path resolution
-    doomEmacs = doomEmacs;
-    doomConfig = doomConfig;
+    doomEmacs = self.inputs.doomEmacs;
+    doomConfig = self.inputs.doomConfig;
   
 }
