@@ -6,8 +6,8 @@
     terminal = "screen-256color";
     historyLimit = 10000;
     shell = "${pkgs.zsh}/bin/zsh";
-    shortcut = "Space";
-    baseIndex = 1;
+    shortcut = "C-b";
+    baseIndex = 0;
     escapeTime = 0;
     keyMode = "vi";
 
@@ -33,9 +33,9 @@
       # Enable mouse support
       set -g mouse on
 
-      # Start windows and panes at 1, not 0
-      set -g base-index 1
-      setw -g pane-base-index 1
+      # Start windows and panes at 0
+      set -g base-index 0
+      setw -g pane-base-index 0
 
       # Automatically set window title
       setw -g automatic-rename on
@@ -52,14 +52,6 @@
       set -g @continuum-restore 'on'
       set -g @resurrect-capture-pane-contents 'on'
       set -g @resurrect-strategy-nvim 'session'
-
-      # Status bar customization
-      set -g status-style bg=default
-      set -g status-left "#[fg=green]#H #[fg=black]• #[fg=green,bright]#(uname -r | cut -c 1-6)#[default]"
-      set -g status-left-length 50
-      set -g status-right "#[fg=black]• #[fg=green]#(cut -d ' ' -f 1-3 /proc/loadavg)#[default]"
-      set -g status-right-length 50
-      set -g status-interval 5
     '';
   };
 } 
