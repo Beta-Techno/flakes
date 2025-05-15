@@ -9,15 +9,19 @@
     };
     lazyvimStarter.url = "github:LazyVim/starter";
     lazyvimStarter.flake = false;
-    doomEmacs.url   = "github:doomemacs/doomemacs";
-    doomEmacs.flake = false;
-    doomConfig.url   = "path:./home/editors/doom";
-    doomConfig.flake = false;
+    doomEmacs = {
+      url = "github:doomemacs/doomemacs";
+      flake = false;
+    };
+    doomConfig = {
+      url = "path:./home/editors/doom";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, lazyvimStarter, doomEmacs, doomConfig, ... }:
-  let
-    system = "x86_64-linux";
+  outputs = { self, nixpkgs, home-manager, ... }@inputs:
+    let
+      system = "x86_64-linux";
       pkgs = import nixpkgs {
         inherit system;
         config = {
@@ -29,50 +33,44 @@
           ];
         };
       };
-  in
-  {
-    homeConfigurations = {
-        # MacBook Air configuration
-        macbook-air = 
-          let 
-            username = if builtins.getEnv "USERNAME" != "" 
-                      then builtins.getEnv "USERNAME" 
-                      else builtins.getEnv "USER";
-          in
-          home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
-            modules = [
-              ./modules/common.nix
-              ./modules/editors/nvim-lazyvim.nix
-              ./hosts/macbook-air.nix
-            ];
-            extraSpecialArgs = {
-              inherit username lazyvimStarter doomEmacs doomConfig;
-            };
-      };
+    in
+    {
+      # Expose doomEmacs and doomConfig for nix eval and home.file use
+      doomEmacs = inputs.doomEmacs;
+      doomConfig = inputs.doomConfig;
 
-        # MacBook Pro configuration
-        macbook-pro = 
-          let 
-            username = if builtins.getEnv "USERNAME" != "" 
-                      then builtins.getEnv "USERNAME" 
-                      else builtins.getEnv "USER";
-          in
-          home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
-            modules = [
-              ./modules/common.nix
-              ./modules/editors/nvim-lazyvim.nix
-              ./hosts/macbook-pro.nix
-            ];
-            extraSpecialArgs = {
-              inherit username lazyvimStarter doomEmacs doomConfig;
-            };
+      homeConfigurations = {
+        macbook-air = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          modules = [
+            ./modules/common.nix
+            ./modules/editors/nvim-lazyvim.nix
+            ./modules/editors/doom.nix
+            ./hosts/macbook-air.nix
+          ];
+          extraSpecialArgs = {
+            username = if builtins.getEnv "USERNAME" != "" then builtins.getEnv "USERNAME" else builtins.getEnv "USER";
+            inherit lazyvimStarter;
+            inherit (inputs) doomEmacs doomConfig;
           };
+        };
+        macbook-pro = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          modules = [
+            ./modules/common.nix
+            ./modules/editors/nvim-lazyvim.nix
+            ./modules/editors/doom.nix
+            ./hosts/macbook-pro.nix
+          ];
+          extraSpecialArgs = {
+            username = if builtins.getEnv "USERNAME" != "" then builtins.getEnv "USERNAME" else builtins.getEnv "USER";
+            inherit lazyvimStarter;
+            inherit (inputs) doomEmacs doomConfig;
+          };
+        };
       };
 
       packages.${system} = {
-        # Machine detection script
         detect-machine = pkgs.writeShellScriptBin "detect-machine" ''
           set -euo pipefail
           if lscpu | grep -q "Intel(R) Core(TM) i7-4650U"; then
@@ -83,8 +81,6 @@
             echo "unknown"
           fi
         '';
-
-        # Bootstrap script
         bootstrap = pkgs.writeShellScriptBin "bootstrap" ''
           set -euo pipefail
 
@@ -137,9 +133,4 @@
         '';
       };
     };
-
-    # Expose doomEmacs and doomConfig as outputs for path resolution
-    doomEmacs = self.inputs.doomEmacs;
-    doomConfig = self.inputs.doomConfig;
-  
 }
