@@ -1,4 +1,4 @@
-{ lib, pkgs, lazyvim, ... }:
+{ lib, pkgs, lazyvimStarter, ... }:
 {
   # 1) Neovim binary and helpers
   home.packages = with pkgs; [
@@ -6,9 +6,9 @@
     ripgrep fd git gcc gnumake nodejs_20
   ];
 
-  # 2) Drop the entire LazyVim tree into ~/.config/nvim (recursive = true)
+  # 2) Drop the entire LazyVim starter tree into ~/.config/nvim (recursive = true)
   xdg.configFile."nvim" = {
-    source = lazyvim;
+    source = lazyvimStarter;
     recursive = true;
   };
 

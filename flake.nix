@@ -7,11 +7,11 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    lazyvim.url = "github:LazyVim/LazyVim";
-    lazyvim.flake = false;
+    lazyvimStarter.url = "github:LazyVim/starter";
+    lazyvimStarter.flake = false;
   };
 
-  outputs = { self, nixpkgs, home-manager, lazyvim, ... }:
+  outputs = { self, nixpkgs, home-manager, lazyvimStarter, ... }:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs {
@@ -42,7 +42,7 @@
               ./modules/editors/nvim-lazyvim.nix
               ./hosts/macbook-air.nix
             ];
-            extraSpecialArgs = { inherit username lazyvim; };
+            extraSpecialArgs = { inherit username lazyvimStarter; };
           };
 
         # MacBook Pro configuration
@@ -59,7 +59,7 @@
               ./modules/editors/nvim-lazyvim.nix
               ./hosts/macbook-pro.nix
             ];
-            extraSpecialArgs = { inherit username lazyvim; };
+            extraSpecialArgs = { inherit username lazyvimStarter; };
           };
       };
 
