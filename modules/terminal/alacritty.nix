@@ -7,7 +7,7 @@ let
     ${nixBin} ${pkgs.alacritty}/bin/alacritty "$@"
   '';
 
-  alacrittySvg = "${pkgs.alacritty}/share/applications/Alacritty.svg";
+  alacrittySvg = "${pkgs.alacritty}/share/icons/hicolor/scalable/apps/Alacritty.svg";
 in
 {
   programs.alacritty = {
