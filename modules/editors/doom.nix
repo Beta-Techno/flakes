@@ -6,22 +6,30 @@
     ripgrep fd git gcc gnumake nodejs_20
   ];
 
-  home.file.".emacs.d" = { source = doomEmacs;  recursive = true; };
-  home.file.".doom.d"  = { source = doomConfig; recursive = true; };
+  # Put Doom in ~/.config/emacs
+  xdg.configFile."emacs" = {
+    source     = doomEmacs;
+    recursive  = true;
+  };
+  xdg.configFile."doom" = {
+    source     = doomConfig;
+    recursive  = true;
+  };
 
+  # Adjust the activation script path:
   home.activation.doomSync = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     set -euo pipefail
-    if [[ ! -d "$HOME/.emacs.d/.local" ]]; then
+    if [[ ! -d "$HOME/.config/emacs/.local" ]]; then
       echo "[Doom] first-time install…"
-      "$HOME/.emacs.d/bin/doom" --yes install
+      "$HOME/.config/emacs/bin/doom" --yes install
     else
       echo "[Doom] syncing…"
-      "$HOME/.emacs.d/bin/doom" --yes sync
+      "$HOME/.config/emacs/bin/doom" --yes sync
     fi
   '';
 
   programs.zsh.shellAliases = {
-    doomsync = "$HOME/.emacs.d/bin/doom sync --yes";
-    doomup   = "$HOME/.emacs.d/bin/doom upgrade --yes";
+    doomsync = "$HOME/.config/emacs/bin/doom sync --yes";
+    doomup   = "$HOME/.config/emacs/bin/doom upgrade --yes";
   };
 } 
