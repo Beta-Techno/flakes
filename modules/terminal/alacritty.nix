@@ -93,24 +93,28 @@ in
     };
   };
 
-  # Desktop launcher
-  home.file.".local/share/applications/alacritty.desktop".text = ''
-    [Desktop Entry]
-    Name=Alacritty
-    Exec=${alacrittyWrapped}/bin/alacritty
-    Icon=${alacrittySvg}
-    Type=Application
-    Categories=TerminalEmulator;
-    Terminal=false
-  '';
-
-  # Icon
+  # Desktop launcher and icon installation
   home.activation = {
-    installAlacrittyIcon = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    installAlacrittyDesktop = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      $DRY_RUN_CMD mkdir -p $VERBOSE_ARG ~/.local/share/applications
+      $DRY_RUN_CMD rm -f $VERBOSE_ARG ~/.local/share/applications/alacritty.desktop
+      $DRY_RUN_CMD cat > $VERBOSE_ARG ~/.local/share/applications/alacritty.desktop << EOF
+[Desktop Entry]
+Name=Alacritty
+Exec=${alacrittyWrapped}/bin/alacritty
+Icon=${alacrittySvg}
+Type=Application
+Categories=TerminalEmulator;
+Terminal=false
+EOF
+      $DRY_RUN_CMD update-desktop-database $VERBOSE_ARG ~/.local/share/applications
+    '';
+
+    installAlacrittyIcon = lib.hm.dag.entryAfter ["installAlacrittyDesktop"] ''
       $DRY_RUN_CMD mkdir -p $VERBOSE_ARG ~/.local/share/icons/hicolor/scalable/apps
+      $DRY_RUN_CMD rm -f $VERBOSE_ARG ~/.local/share/icons/hicolor/scalable/apps/alacritty.svg
       $DRY_RUN_CMD cp $VERBOSE_ARG ${alacrittySvg} ~/.local/share/icons/hicolor/scalable/apps/alacritty.svg
       $DRY_RUN_CMD gtk-update-icon-cache $VERBOSE_ARG -f -t ~/.local/share/icons/hicolor
-      $DRY_RUN_CMD update-desktop-database $VERBOSE_ARG ~/.local/share/applications
     '';
   };
 } 
