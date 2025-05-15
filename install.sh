@@ -1,42 +1,57 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Instructions for the user
-echo "This script will set up your Nix environment on your MacBook."
-echo "Please make sure you have:"
-echo "1. A working internet connection"
-echo "2. Sudo privileges"
-echo ""
-read -p "Press Enter to continue or Ctrl+C to cancel..."
+# 0. Install curl if not present
+if ! command -v curl >/dev/null 2>&1; then
+  echo "[INFO] Installing curl..."
+  sudo apt-get update
+  sudo apt-get install -y curl
+else
+  echo "[INFO] curl is already installed."
+fi
 
-echo "→ Installing Nix..."
+# 1. Install git if not present
+if ! command -v git >/dev/null 2>&1; then
+  echo "[INFO] Installing git..."
+  sudo apt-get update
+  sudo apt-get install -y git
+else
+  echo "[INFO] git is already installed."
+fi
+
+# 2. Install Nix if not present
 if ! command -v nix >/dev/null 2>&1; then
-    sh <(curl -L https://nixos.org/nix/install) --daemon
-    # Source nix for the current shell
-    . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+  echo "[INFO] Installing Nix..."
+  sh <(curl -L https://nixos.org/nix/install) --daemon
+  . /etc/profile.d/nix.sh
+else
+  echo "[INFO] Nix is already installed."
+  . /etc/profile.d/nix.sh || true
 fi
 
-echo "→ Enabling flakes..."
-if ! grep -q "experimental-features = nix-command flakes" /etc/nix/nix.conf 2>/dev/null; then
-    echo "experimental-features = nix-command flakes" | sudo tee -a /etc/nix/nix.conf
+# 3. Enable flakes and experimental features
+mkdir -p ~/.config/nix
+if ! grep -q 'experimental-features =.*flakes' ~/.config/nix/nix.conf 2>/dev/null; then
+  echo "[INFO] Enabling flakes and nix-command..."
+  echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+else
+  echo "[INFO] Flakes already enabled."
 fi
 
-echo "→ Allow unprivileged user-namespaces (needed by Chrome/Electron)..."
-sudo tee /etc/sysctl.d/60-apparmor-userns.conf >/dev/null <<'EOF'
-# Allow Chrome/Electron and other user-namespace tools to run without extra AppArmor rules
-kernel.apparmor_restrict_unprivileged_userns = 0
-EOF
+# 4. Clone the repo if not already present
+if [ ! -d flakes ]; then
+  echo "[INFO] Cloning Beta-Techno/flakes..."
+  git clone https://github.com/Beta-Techno/flakes.git
+else
+  echo "[INFO] flakes directory already exists. Skipping clone."
+fi
+cd flakes
 
-# Apply immediately without reboot
-sudo systemctl restart systemd-sysctl.service 2>/dev/null || sudo sysctl -p /etc/sysctl.d/60-apparmor-userns.conf
-
-echo "→ Installing Home Manager..."
-nix run github:nix-community/home-manager/release-24.05 -- init --switch
-
-echo "→ Applying configuration..."
-nix run github:Beta-Techno/flakes#bootstrap --no-write-lock-file
-
-echo "✓ Installation complete!"
-echo "Please:"
-echo "1. Restart your terminal"
-echo "2. Log out and back in for all changes to take effect" 
+# 5. Run the bootstrap script
+if [ $# -gt 0 ]; then
+  echo "[INFO] Running bootstrap with user: $1"
+  nix run .#bootstrap -- --user "$1"
+else
+  echo "[INFO] Running bootstrap with current user."
+  nix run .#bootstrap
+fi
