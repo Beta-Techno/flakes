@@ -70,8 +70,10 @@ in
         };
       };
 
-      shell = {
-        program = "${pkgs.zsh}/bin/zsh";
+      terminal = {
+        shell = {
+          program = "${pkgs.zsh}/bin/zsh";
+        };
       };
 
       key_bindings = [
@@ -150,8 +152,9 @@ colors:
     cyan: '0x95E6CB'
     white: '0xF2F2F2'
 
-shell:
-  program: ${pkgs.zsh}/bin/zsh
+terminal:
+  shell:
+    program: ${pkgs.zsh}/bin/zsh
 
 key_bindings:
   - { key: V, mods: Control|Shift, action: Paste }
