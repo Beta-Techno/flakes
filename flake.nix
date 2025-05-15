@@ -50,7 +50,7 @@
           ];
           extraSpecialArgs = {
             username = if builtins.getEnv "USERNAME" != "" then builtins.getEnv "USERNAME" else builtins.getEnv "USER";
-            inherit lazyvimStarter;
+            inherit (inputs) lazyvimStarter;
             inherit (inputs) doomEmacs doomConfig;
           };
         };
@@ -64,7 +64,7 @@
           ];
           extraSpecialArgs = {
             username = if builtins.getEnv "USERNAME" != "" then builtins.getEnv "USERNAME" else builtins.getEnv "USER";
-            inherit lazyvimStarter;
+            inherit (inputs) lazyvimStarter;
             inherit (inputs) doomEmacs doomConfig;
           };
         };
