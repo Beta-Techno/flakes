@@ -53,4 +53,33 @@ This repository contains a Nix Home Manager configuration for managing user envi
 
 ## License
 
-MIT License - feel free to use and modify as needed. 
+MIT License - feel free to use and modify as needed.
+
+# Getting Started
+
+1. **Install Nix** (if not already):
+   ```sh
+   sh <(curl -L https://nixos.org/nix/install)
+   ```
+2. **Clone this repo and run the bootstrap/install script:**
+   ```sh
+   git clone <repo-url>
+   cd <repo-root>
+   ./install.sh
+   # or
+   ./init.sh
+   ```
+3. **Switch to your Home Manager config:**
+   ```sh
+   home-manager switch --flake .#<host>
+   # e.g. .#macbook-air
+   ```
+4. **Launch Emacs:**
+   ```sh
+   emacs
+   ```
+   You should see the Doom dashboard and your custom config active.
+
+5. **Doom Emacs Aliases:**
+   - `doomsync` — Sync Doom config
+   - `doomup`   — Upgrade Doom 
