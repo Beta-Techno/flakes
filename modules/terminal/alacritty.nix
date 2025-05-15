@@ -76,33 +76,35 @@ in
         };
       };
 
-      key_bindings = [
-        {
-          key = "V";
-          mods = "Control|Shift";
-          action = "Paste";
-        }
-        {
-          key = "C";
-          mods = "Control|Shift";
-          action = "Copy";
-        }
-        {
-          key = "Key0";
-          mods = "Control";
-          action = "ResetFontSize";
-        }
-        {
-          key = "Equals";
-          mods = "Control";
-          action = "IncreaseFontSize";
-        }
-        {
-          key = "Minus";
-          mods = "Control";
-          action = "DecreaseFontSize";
-        }
-      ];
+      keyboard = {
+        bindings = [
+          {
+            key = "V";
+            mods = "Control|Shift";
+            action = "Paste";
+          }
+          {
+            key = "C";
+            mods = "Control|Shift";
+            action = "Copy";
+          }
+          {
+            key = "Key0";
+            mods = "Control";
+            action = "ResetFontSize";
+          }
+          {
+            key = "Equals";
+            mods = "Control";
+            action = "IncreaseFontSize";
+          }
+          {
+            key = "Minus";
+            mods = "Control";
+            action = "DecreaseFontSize";
+          }
+        ];
+      };
 
       scrolling = {
         history = 10000;
@@ -176,22 +178,23 @@ terminal:
   shell:
     program: ${pkgs.zsh}/bin/zsh
 
-key_bindings:
-  - key: V
-    mods: Control|Shift
-    action: Paste
-  - key: C
-    mods: Control|Shift
-    action: Copy
-  - key: Key0
-    mods: Control
-    action: ResetFontSize
-  - key: Equals
-    mods: Control
-    action: IncreaseFontSize
-  - key: Minus
-    mods: Control
-    action: DecreaseFontSize
+keyboard:
+  bindings:
+    - key: V
+      mods: Control|Shift
+      action: Paste
+    - key: C
+      mods: Control|Shift
+      action: Copy
+    - key: Key0
+      mods: Control
+      action: ResetFontSize
+    - key: Equals
+      mods: Control
+      action: IncreaseFontSize
+    - key: Minus
+      mods: Control
+      action: DecreaseFontSize
 
 scrolling:
   history: 10000
