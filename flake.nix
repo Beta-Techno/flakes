@@ -14,9 +14,10 @@
       url = "path:./home/editors/doom";
       flake = false;
     };
+    nixGL.url = "github:guibou/nixGL";
   };
 
-  outputs = { self, nixpkgs, home-manager, nix-doom, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, nix-doom, nixGL, ... }@inputs:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs {
@@ -43,11 +44,13 @@
             ./modules/common.nix
             ./modules/editors/nvim-lazyvim.nix
             inputs.nix-doom.homeModule
+            ./modules/terminal/alacritty.nix
+            ./modules/terminal/tmux.nix
             ./hosts/macbook-air.nix
           ];
           extraSpecialArgs = {
             username = if builtins.getEnv "USERNAME" != "" then builtins.getEnv "USERNAME" else builtins.getEnv "USER";
-            inherit (inputs) lazyvimStarter doomConfig;
+            inherit (inputs) lazyvimStarter doomConfig nixGL;
           };
         };
         macbook-pro = home-manager.lib.homeManagerConfiguration {
@@ -56,11 +59,13 @@
             ./modules/common.nix
             ./modules/editors/nvim-lazyvim.nix
             inputs.nix-doom.homeModule
+            ./modules/terminal/alacritty.nix
+            ./modules/terminal/tmux.nix
             ./hosts/macbook-pro.nix
           ];
           extraSpecialArgs = {
             username = if builtins.getEnv "USERNAME" != "" then builtins.getEnv "USERNAME" else builtins.getEnv "USER";
-            inherit (inputs) lazyvimStarter doomConfig;
+            inherit (inputs) lazyvimStarter doomConfig nixGL;
           };
         };
       };

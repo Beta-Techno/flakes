@@ -18,12 +18,6 @@ let
          --sandbox-executable=/usr/local/bin/chrome-sandbox "$@"
   '';
 
-  # ── Alacritty wrapper (runs through nixGLIntel) ────────────────────────────
-  alacrittyWrapped = pkgs.writeShellScriptBin "alacritty" ''
-    exec ${nixBin} run --impure github:guibou/nixGL#nixGLIntel -- \
-         ${pkgs.alacritty}/bin/alacritty "$@"
-  '';
-
   alacrittySvg =
     "${pkgs.alacritty}/share/icons/hicolor/scalable/apps/Alacritty.svg";
 in
@@ -54,35 +48,10 @@ EOF
       ${pkgs.desktop-file-utils}/bin/update-desktop-database "$apps" || true
     '';
 
-  ############################  Alacritty launcher/icon  ######################
-  home.activation.installAlacrittyLauncher =
-    lib.hm.dag.entryAfter [ "installChromeLauncher" ] ''
-      apps="$HOME/.local/share/applications"
-      mkdir -p "$apps"
-      cat > "$apps/alacritty.desktop" <<EOF
-[Desktop Entry]
-Name=Alacritty
-Exec=${alacrittyWrapped}/bin/alacritty
-Icon=alacritty
-Type=Application
-Categories=System;TerminalEmulator;
-Terminal=false
-EOF
-      ${pkgs.desktop-file-utils}/bin/update-desktop-database "$apps" || true
-    '';
-
-  home.activation.installAlacrittyIcon =
-    lib.hm.dag.entryAfter [ "installAlacrittyLauncher" ] ''
-      theme="$HOME/.local/share/icons/hicolor/scalable/apps"
-      mkdir -p "$theme"
-      cp -f ${alacrittySvg} "$theme/alacritty.svg"
-      ${pkgs.gtk3}/bin/gtk-update-icon-cache "$HOME/.local/share/icons/hicolor" || true
-    '';
-
   ############################  Packages  #####################################
   home.packages = with pkgs; [
     # CLI
-    tmux git ripgrep fd bat fzf jq htop inetutils
+    git ripgrep fd bat fzf jq htop inetutils
     neovim nodejs_20 docker-compose kubectl
 
     # Electron GUI (sandbox preserved)
@@ -96,7 +65,6 @@ EOF
     jetbrains.rider
 
     # Other GUI
-    alacrittyWrapped
     chromeWrapped
     (lib.lowPrio pkgs.google-chrome)
 
@@ -108,12 +76,6 @@ EOF
   programs.zsh.enable           = true;
   programs.zsh.oh-my-zsh.enable = true;
   programs.zsh.oh-my-zsh.theme  = "agnoster";
-
-  programs.tmux.enable      = true;
-  programs.tmux.extraConfig = ''
-    set -g mouse on
-    set -g history-limit 100000
-  '';
 
   programs.git = {
     enable    = true;
