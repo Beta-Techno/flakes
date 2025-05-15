@@ -137,4 +137,9 @@
         '';
       };
     };
+
+    # Expose doomEmacs and doomConfig as outputs for path resolution
+    doomEmacs = doomEmacs;
+    doomConfig = doomConfig;
+  };
 }
