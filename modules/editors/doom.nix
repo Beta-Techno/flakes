@@ -19,12 +19,17 @@
   # Adjust the activation script path:
   home.activation.doomSync = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     set -euo pipefail
+
+    # Ensure the doom script is executable
+    chmod +x "$HOME/.config/emacs/bin/doom"
+
+    # First-time setup
     if [[ ! -d "$HOME/.config/emacs/.local" ]]; then
       echo "[Doom] first-time install…"
-      "$HOME/.config/emacs/bin/doom" --yes install
+      "$HOME/.config/emacs/bin/doom" install --yes
     else
       echo "[Doom] syncing…"
-      "$HOME/.config/emacs/bin/doom" --yes sync
+      "$HOME/.config/emacs/bin/doom" sync --yes
     fi
   '';
 
