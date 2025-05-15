@@ -176,6 +176,6 @@ EOF
     enable = true;
     doomDir = doomConfig;
     emacs = pkgs.emacs30-pgtk;
-    doomLocalDir = "~/.local/share/doom";
+    doomLocalDir = "/home/${username}/.local/share/doom";
   };
 } 
