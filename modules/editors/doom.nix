@@ -2,7 +2,7 @@
 
 {
   home.packages = with pkgs; [
-    emacs29-pgtk
+    emacs30-pgtk
     ripgrep fd git gcc gnumake nodejs_20
   ];
 
