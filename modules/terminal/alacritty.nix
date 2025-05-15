@@ -96,9 +96,10 @@ in
   # Ensure the config directory exists and write the config file
   home.activation = {
     installAlacrittyConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
-      $DRY_RUN_CMD mkdir -p $VERBOSE_ARG ~/.config/alacritty
-      $DRY_RUN_CMD rm -f $VERBOSE_ARG ~/.config/alacritty/alacritty.yml
-      $DRY_RUN_CMD cat > $VERBOSE_ARG ~/.config/alacritty/alacritty.yml << EOF
+      set -e
+      mkdir -p ~/.config/alacritty
+      rm -f ~/.config/alacritty/alacritty.yml
+      cat > ~/.config/alacritty/alacritty.yml << EOF
 env:
   TERM: xterm-256color
 
@@ -164,9 +165,10 @@ EOF
     '';
 
     installAlacrittyDesktop = lib.hm.dag.entryAfter ["installAlacrittyConfig"] ''
-      $DRY_RUN_CMD mkdir -p $VERBOSE_ARG ~/.local/share/applications
-      $DRY_RUN_CMD rm -f $VERBOSE_ARG ~/.local/share/applications/alacritty.desktop
-      $DRY_RUN_CMD cat > $VERBOSE_ARG ~/.local/share/applications/alacritty.desktop << EOF
+      set -e
+      mkdir -p ~/.local/share/applications
+      rm -f ~/.local/share/applications/alacritty.desktop
+      cat > ~/.local/share/applications/alacritty.desktop << EOF
 [Desktop Entry]
 Name=Alacritty
 Exec=${alacrittyWrapped}/bin/alacritty
@@ -175,14 +177,15 @@ Type=Application
 Categories=TerminalEmulator;
 Terminal=false
 EOF
-      $DRY_RUN_CMD update-desktop-database $VERBOSE_ARG ~/.local/share/applications
+      update-desktop-database ~/.local/share/applications
     '';
 
     installAlacrittyIcon = lib.hm.dag.entryAfter ["installAlacrittyDesktop"] ''
-      $DRY_RUN_CMD mkdir -p $VERBOSE_ARG ~/.local/share/icons/hicolor/scalable/apps
-      $DRY_RUN_CMD rm -f $VERBOSE_ARG ~/.local/share/icons/hicolor/scalable/apps/alacritty.svg
-      $DRY_RUN_CMD cp $VERBOSE_ARG ${alacrittySvg} ~/.local/share/icons/hicolor/scalable/apps/alacritty.svg
-      $DRY_RUN_CMD gtk-update-icon-cache $VERBOSE_ARG -f -t ~/.local/share/icons/hicolor
+      set -e
+      mkdir -p ~/.local/share/icons/hicolor/scalable/apps
+      rm -f ~/.local/share/icons/hicolor/scalable/apps/alacritty.svg
+      cp ${alacrittySvg} ~/.local/share/icons/hicolor/scalable/apps/alacritty.svg
+      gtk-update-icon-cache -f -t ~/.local/share/icons/hicolor
     '';
   };
 } 
