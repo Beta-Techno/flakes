@@ -15,7 +15,7 @@
     doomConfig.flake = false;
   };
 
-  outputs = { self, nixpkgs, home-manager, lazyvimStarter, ... }:
+  outputs = { self, nixpkgs, home-manager, lazyvimStarter, doomEmacs, doomConfig, ... }:
   let
     system = "x86_64-linux";
       pkgs = import nixpkgs {
