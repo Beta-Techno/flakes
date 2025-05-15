@@ -9,17 +9,14 @@
     };
     lazyvimStarter.url = "github:LazyVim/starter";
     lazyvimStarter.flake = false;
-    doomEmacs = {
-      url = "github:doomemacs/doomemacs";
-      flake = false;
-    };
+    nix-doom.url = "github:marienz/nix-doom-emacs-unstraightened";
     doomConfig = {
       url = "path:./home/editors/doom";
       flake = false;
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, nix-doom, ... }@inputs:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs {
@@ -45,13 +42,12 @@
           modules = [
             ./modules/common.nix
             ./modules/editors/nvim-lazyvim.nix
-            ./modules/editors/doom.nix
+            inputs.nix-doom.homeModule
             ./hosts/macbook-air.nix
           ];
           extraSpecialArgs = {
             username = if builtins.getEnv "USERNAME" != "" then builtins.getEnv "USERNAME" else builtins.getEnv "USER";
-            inherit (inputs) lazyvimStarter;
-            inherit (inputs) doomEmacs doomConfig;
+            inherit (inputs) lazyvimStarter doomConfig;
           };
         };
         macbook-pro = home-manager.lib.homeManagerConfiguration {
@@ -59,13 +55,12 @@
           modules = [
             ./modules/common.nix
             ./modules/editors/nvim-lazyvim.nix
-            ./modules/editors/doom.nix
+            inputs.nix-doom.homeModule
             ./hosts/macbook-pro.nix
           ];
           extraSpecialArgs = {
             username = if builtins.getEnv "USERNAME" != "" then builtins.getEnv "USERNAME" else builtins.getEnv "USER";
-            inherit (inputs) lazyvimStarter;
-            inherit (inputs) doomEmacs doomConfig;
+            inherit (inputs) lazyvimStarter doomConfig;
           };
         };
       };

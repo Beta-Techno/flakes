@@ -1,4 +1,4 @@
-{ config, pkgs, lib, username, ... }:
+{ config, pkgs, lib, username, doomConfig, ... }:
 
 ################################################################################
 # Helpers
@@ -96,7 +96,6 @@ EOF
     jetbrains.rider
 
     # Other GUI
-    emacs30-pgtk
     alacrittyWrapped
     chromeWrapped
     (lib.lowPrio pkgs.google-chrome)
@@ -172,7 +171,11 @@ EOF
     "org/gnome/desktop/interface" = { color-scheme = "prefer-dark"; };
   };
 
-  imports = [
-    ./editors/doom.nix
-  ];
+  ############################  Doom Emacs  ###################################
+  programs.doom-emacs = {
+    enable = true;
+    doomDir = doomConfig;
+    emacs = pkgs.emacs30-pgtk;
+    doomLocalDir = "~/.local/share/doom";
+  };
 } 
