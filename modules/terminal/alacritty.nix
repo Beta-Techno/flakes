@@ -93,6 +93,11 @@ in
     };
   };
 
+  # Add desktop-file-utils to home.packages
+  home.packages = with pkgs; [
+    desktop-file-utils
+  ];
+
   # Ensure the config directory exists and write the config file
   home.activation = {
     installAlacrittyConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
@@ -177,7 +182,7 @@ Type=Application
 Categories=TerminalEmulator;
 Terminal=false
 EOF
-      update-desktop-database ~/.local/share/applications
+      ${pkgs.desktop-file-utils}/bin/update-desktop-database ~/.local/share/applications
     '';
 
     installAlacrittyIcon = lib.hm.dag.entryAfter ["installAlacrittyDesktop"] ''
@@ -185,7 +190,7 @@ EOF
       mkdir -p ~/.local/share/icons/hicolor/scalable/apps
       rm -f ~/.local/share/icons/hicolor/scalable/apps/alacritty.svg
       cp ${alacrittySvg} ~/.local/share/icons/hicolor/scalable/apps/alacritty.svg
-      gtk-update-icon-cache -f -t ~/.local/share/icons/hicolor
+      ${pkgs.gtk3}/bin/gtk-update-icon-cache -f -t ~/.local/share/icons/hicolor
     '';
   };
 } 
