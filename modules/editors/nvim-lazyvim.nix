@@ -9,6 +9,7 @@ let
     rm -rf $out/lua/plugins  # Remove all starter plugin specs
     mkdir -p $out/lua/plugins  # Recreate plugins directory
     cp -R ${lazyvimConfig}/lua/plugins/* $out/lua/plugins/  # Copy our plugin files
+    mv $out/lua/plugins/00-lazyvim-imports.lua $out/lua/plugins/init.lua  # Rename to init.lua
     cp -R ${lazyvimConfig}/lua/config $out/lua/
   '';
 in
