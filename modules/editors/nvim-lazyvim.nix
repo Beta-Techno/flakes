@@ -1,13 +1,30 @@
 { config, pkgs, lib, lazyvimStarter, lazyvimConfig, ... }:
 
 let
+  # Define our extras
+  extras = ''
+    -- 2 · all extras you want
+    { import = "lazyvim.plugins.extras.dap.core" },
+    { import = "lazyvim.plugins.extras.lang.python" },
+    { import = "lazyvim.plugins.extras.lang.rust" },
+    { import = "lazyvim.plugins.extras.lang.typescript" },
+    { import = "lazyvim.plugins.extras.lsp.none-ls" },
+  '';
+
   # Create a merged LazyVim configuration
   lazyvimMerged = pkgs.runCommand "lazyvim-merged" { } ''
     mkdir -p $out
     cp -R ${lazyvimStarter}/* $out/
     chmod -R u+w $out  # Make files writable
-    rm -rf $out/lua/plugins  # Remove all starter plugin specs
-    mkdir -p $out/lua/plugins  # Recreate plugins directory
+
+    # Insert our extras before the plugins import in lazy.lua
+    sed -i "/{ import = \"plugins\" }/i ${builtins.replaceStrings ["\n"] ["\\n"] extras}" \
+        $out/lua/config/lazy.lua
+
+    # Remove any existing extras from plugins directory
+    rm -f $out/lua/plugins/*extras*.lua
+
+    # Copy our custom plugin files
     cp -R ${lazyvimConfig}/lua/plugins/* $out/lua/plugins/  # Copy our plugin files
     cp -R ${lazyvimConfig}/lua/config/* $out/lua/config/  # Copy only the contents of config/
   '';
