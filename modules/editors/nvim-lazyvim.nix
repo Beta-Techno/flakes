@@ -1,44 +1,28 @@
-{ lib, pkgs, lazyvimStarter, lazyvimConfig, ... }:
+{ config, pkgs, lib, lazyvimStarter, lazyvimConfig, ... }:
 
 let
-  lazyvimMerged = pkgs.runCommand "lazyvim-merged" {
-    passthru.starter = lazyvimStarter;
-    passthru.config  = lazyvimConfig;
-  } ''
+  # Create a merged LazyVim configuration that ensures our imports are loaded first
+  lazyvimMerged = pkgs.runCommand "lazyvim-merged" { } ''
     mkdir -p $out
-    # Copy starter template and make it writable
     cp -R ${lazyvimStarter}/* $out/
-    chmod -R u+w $out
-    # overlay only the lua dir; your files win
-    cp -R ${lazyvimConfig}/lua/* $out/lua/
-    # Ensure all files are writable
-    chmod -R u+w $out/lua
-    # Remove example.lua and any other files that might contain extras
-    rm -f $out/lua/plugins/example.lua
-    # Clean any existing Lazy cache
-    rm -rf $out/lua/plugins/.lazy
+    rm -rf $out/lua/plugins  # Drop all starter plugin specs
+    cp -R ${lazyvimConfig}/lua/plugins $out/lua/
+    cp -R ${lazyvimConfig}/lua/config $out/lua/
   '';
 in
 {
-  # 1) Neovim binary and helpers
   home.packages = with pkgs; [
     neovim
-    ripgrep fd git gcc gnumake nodejs_20
+    tree-sitter
+    ripgrep
+    fd
+    lazygit
   ];
 
-  # 2) Single entry for the merged configuration
-  xdg.configFile."nvim" = {
-    source = lazyvimMerged;
-    recursive = true;
+  xdg.configFile = {
+    "nvim" = {
+      source = lazyvimMerged;
+      recursive = true;
+    };
   };
-
-  # 3) Optional: auto-sync plugins right after home-manager switch
-  home.activation.lazyvimSync =
-    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      if command -v nvim >/dev/null; then
-        echo "[LazyVim] Cleaning and syncing plugins…"
-        nvim --headless "+Lazy! clean" +qa || true
-        nvim --headless "+Lazy! sync" +qa || true
-      fi
-    '';
-} 
+}
