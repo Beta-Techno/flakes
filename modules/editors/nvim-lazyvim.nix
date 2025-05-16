@@ -27,8 +27,8 @@ let
         $out/lua/config/lazy.lua
 
     # Set clipboard options in lazy.lua
-    # sed -i "/vim.g.mapleader = \" \"/a vim.opt.clipboard = \"unnamedplus\"\nvim.opt.clipboard:append(\"unnamed\")\nvim.opt.clipboard:append(\"autoselect\")" \
-    #     $out/lua/config/lazy.lua
+    sed -i "/vim.g.mapleader = \" \"/a vim.opt.clipboard = \"unnamedplus\"\nvim.opt.clipboard:append(\"unnamed\")\nvim.opt.clipboard:append(\"autoselect\")" \
+        $out/lua/config/lazy.lua
 
     # Remove any existing extras from plugins directory
     rm -f $out/lua/plugins/*extras*.lua
