@@ -25,6 +25,14 @@ return {
     },
   },
 
+  -- Configure Mason
+  {
+    "williamboman/mason.nvim",
+    opts = {
+      automatic_installation = false,  -- Disable automatic installation
+    },
+  },
+
   -- Configure formatters and linters
   {
     "stevearc/conform.nvim",
@@ -43,7 +51,7 @@ return {
     "mfussenegger/nvim-lint",
     opts = {
       linters_by_ft = {
-        python = { "flake8" },
+        python = { "ruff" },  -- Use ruff instead of flake8
         javascript = { "eslint" },
         typescript = { "eslint" },
       },
