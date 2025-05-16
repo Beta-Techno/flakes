@@ -1,6 +1,4 @@
 return {
-  -- 1 · core
-  { import = "lazyvim.plugins" },
 
   -- 2 · extras (add/remove as you like, order doesn't matter here)
   { import = "lazyvim.plugins.extras.dap.core" },
