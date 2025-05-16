@@ -13,6 +13,8 @@ let
     cp -R ${lazyvimConfig}/lua/* $out/lua/
     # Ensure all files are writable
     chmod -R u+w $out/lua
+    # Remove example.lua
+    rm -f $out/lua/plugins/example.lua
   '';
 in
 {
