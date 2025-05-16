@@ -74,3 +74,11 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
+
+;; ── Org-Babel: enable shell blocks ──────────────────────────────────────────
+(after! org
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((shell . t)))          ; allow #+begin_src shell
+  ;; (optional) skip confirmation prompts
+  (setq org-confirm-babel-evaluate nil))
