@@ -37,7 +37,8 @@
       };
     in
     {
-      # Expose doomEmacs and doomConfig for nix eval and home.file use
+      # Expose configurations for nix eval and home.file use
+      lazyvimConfig = inputs.lazyvimConfig;
       doomEmacs = inputs.doomEmacs;
       doomConfig = inputs.doomConfig;
 
