@@ -9,20 +9,5 @@ vim.g.maplocalleader = " "
 require("config.options")
 require("config.keymaps")
 
--- Load plugin configurations
-require("plugins.lazyvim")
-require("plugins.lsp")
-require("plugins.ui")
-
--- Plugin imports (must be first)
-return {
-  -- 1. LazyVim core plugins (must be first)
-  { import = "lazyvim.plugins" },
-
-  -- 2. Essential extras only
-  { import = "lazyvim.plugins.extras.dap.core" },
-  { import = "lazyvim.plugins.extras.lang.python" },
-  { import = "lazyvim.plugins.extras.lang.rust" },
-  { import = "lazyvim.plugins.extras.lang.typescript" },
-  { import = "lazyvim.plugins.extras.lsp.none-ls" },
-} 
+-- Bootstrap Lazy & pass it the spec list
+require("config.lazy")

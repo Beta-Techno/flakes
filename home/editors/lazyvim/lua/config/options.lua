@@ -36,7 +36,7 @@ opt.backspace = "indent,eol,start"
 --]]
 
 -- Clipboard
-opt.clipboard:append("unnamedplus")
+opt.clipboard = "unnamedplus"
 
 -- Split windows
 opt.splitright = true
@@ -50,4 +50,4 @@ opt.iskeyword:append("-")
 --[[
 -- Disable swapfile
 opt.swapfile = false
---]] 
+--]]

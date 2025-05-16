@@ -50,4 +50,4 @@ map("n", "<leader>bd", ":bdelete<CR>", { desc = "Delete buffer" })
 
 -- Toggle terminal
 map("n", "<leader>tt", ":ToggleTerm<CR>", { desc = "Toggle terminal" })
---]] 
+--]]
