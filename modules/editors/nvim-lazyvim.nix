@@ -6,9 +6,13 @@ let
     passthru.config  = lazyvimConfig;
   } ''
     mkdir -p $out
+    # Copy starter template and make it writable
     cp -R ${lazyvimStarter}/* $out/
+    chmod -R u+w $out
     # overlay only the lua dir; your files win
     cp -R ${lazyvimConfig}/lua/* $out/lua/
+    # Ensure all files are writable
+    chmod -R u+w $out/lua
   '';
 in
 {
