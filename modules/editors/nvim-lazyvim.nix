@@ -6,7 +6,7 @@ let
     mkdir -p $out
     cp -R ${lazyvimStarter}/* $out/
     chmod -R u+w $out  # Make files writable
-    rm -rf $out/lua/plugins  # Drop all starter plugin specs
+    rm -f $out/lua/plugins/init.lua  # Remove the starter's init.lua that's causing the warning
     cp -R ${lazyvimConfig}/lua/plugins $out/lua/
     cp -R ${lazyvimConfig}/lua/config $out/lua/
   '';
