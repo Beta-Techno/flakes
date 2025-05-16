@@ -7,7 +7,10 @@ let
     cp -R ${lazyvimStarter}/* $out/
     chmod -R u+w $out  # Make files writable
     rm -rf $out/lua/plugins  # Drop all starter plugin specs
-    cp -R ${lazyvimConfig}/lua/plugins $out/lua/
+    mkdir -p $out/lua/plugins
+    # Copy our imports file as init.lua to ensure it's loaded first
+    cp ${lazyvimConfig}/lua/plugins/00-lazyvim-imports.lua $out/lua/plugins/init.lua
+    # Copy the rest of our config
     cp -R ${lazyvimConfig}/lua/config $out/lua/
   '';
 in
