@@ -6,8 +6,9 @@ let
     mkdir -p $out
     cp -R ${lazyvimStarter}/* $out/
     chmod -R u+w $out  # Make files writable
-    rm -rf $out/lua/plugins  # Drop all starter plugin specs
-    cp -R ${lazyvimConfig}/lua/plugins $out/lua/
+    rm -rf $out/lua/plugins  # Remove all starter plugin specs
+    mkdir -p $out/lua/plugins  # Recreate plugins directory
+    cp -R ${lazyvimConfig}/lua/plugins/* $out/lua/plugins/  # Copy our plugin files
     cp -R ${lazyvimConfig}/lua/config $out/lua/
   '';
 in
