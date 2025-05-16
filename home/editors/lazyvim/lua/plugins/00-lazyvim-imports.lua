@@ -1,7 +1,7 @@
--- Main plugin imports file
--- This file ensures plugins are loaded in the correct order
+-- LazyVim imports file
+-- This file must be loaded first to satisfy LazyVim's import order requirements
 return {
-  -- 1. Core LazyVim plugin set
+  -- 1. LazyVim core plugins (must be first)
   { import = "lazyvim.plugins" },
 
   -- 2. LazyVim extras
@@ -17,7 +17,4 @@ return {
   { import = "lazyvim.plugins.extras.ui.mini-animate" },
   { import = "lazyvim.plugins.extras.util.mini-hipatterns" },
   { import = "lazyvim.plugins.extras.vscode" },
-
-  -- 3. Load all other plugin files from this directory
-  { import = "plugins" },
 } 
