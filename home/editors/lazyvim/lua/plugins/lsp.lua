@@ -25,18 +25,28 @@ return {
     },
   },
 
-  -- Configure null-ls
+  -- Configure formatters and linters
   {
-    "nvimtools/none-ls.nvim",
-    opts = function(_, opts)
-      local nls = require("null-ls")
-      opts.sources = vim.list_extend(opts.sources or {}, {
-        nls.builtins.formatting.prettier,
-        nls.builtins.formatting.black,
-        nls.builtins.formatting.stylua,
-        nls.builtins.diagnostics.eslint,
-        nls.builtins.diagnostics.flake8,
-      })
-    end,
+    "stevearc/conform.nvim",
+    opts = {
+      formatters_by_ft = {
+        lua = { "stylua" },
+        python = { "black" },
+        javascript = { "prettier" },
+        typescript = { "prettier" },
+        json = { "prettier" },
+        markdown = { "prettier" },
+      },
+    },
+  },
+  {
+    "mfussenegger/nvim-lint",
+    opts = {
+      linters_by_ft = {
+        python = { "flake8" },
+        javascript = { "eslint" },
+        typescript = { "eslint" },
+      },
+    },
   },
 } 
