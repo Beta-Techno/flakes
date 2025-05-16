@@ -26,8 +26,8 @@ let
     sed -i "/{ import = \"plugins\" }/i ${builtins.replaceStrings ["\n"] ["\\n"] extras}" \
         $out/lua/config/lazy.lua
 
-    # Set clipboard option in lazy.lua
-    sed -i "/vim.g.mapleader = \" \"/a vim.opt.clipboard = \"unnamedplus\"" \
+    # Set clipboard options in lazy.lua
+    sed -i "/vim.g.mapleader = \" \"/a vim.opt.clipboard = \"unnamedplus\"\nvim.opt.clipboard:append(\"unnamed\")" \
         $out/lua/config/lazy.lua
 
     # Remove any existing extras from plugins directory
