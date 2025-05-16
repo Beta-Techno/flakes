@@ -1,13 +1,12 @@
 return {
+  -- 1 Override global LazyVim opts
   {
-    -- ① tell Lazy to pull in the core spec list
     "LazyVim/LazyVim",
-    import = "lazyvim.plugins",    -- ← THIS is the missing piece
-    version = false,               -- track the main branch (optional but handy)
-
-    -- ② any global LazyVim opts you want to override
     opts = {
       colorscheme = "tokyonight",
     },
   },
+
+  -- 2 Import the core spec list (must appear before any extras)
+  { import = "lazyvim.plugins" },
 }
