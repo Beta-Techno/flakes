@@ -26,6 +26,10 @@ let
     sed -i "/{ import = \"plugins\" }/i ${builtins.replaceStrings ["\n"] ["\\n"] extras}" \
         $out/lua/config/lazy.lua
 
+    # Set clipboard option in lazy.lua
+    sed -i "/vim.g.mapleader = \" \"/a vim.opt.clipboard = \"unnamedplus\"" \
+        $out/lua/config/lazy.lua
+
     # Remove any existing extras from plugins directory
     rm -f $out/lua/plugins/*extras*.lua
 
@@ -68,6 +72,10 @@ in
     # Debug tools
     lldb  # Debugger
     gdb  # Debugger
+
+    # Clipboard support
+    xclip
+    wl-clipboard
   ];
 
   xdg.configFile = {
