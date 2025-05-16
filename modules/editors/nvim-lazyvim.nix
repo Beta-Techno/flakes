@@ -1,4 +1,4 @@
-{ lib, pkgs, lazyvimStarter, ... }:
+{ lib, pkgs, lazyvimStarter, lazyvimConfig, ... }:
 {
   # 1) Neovim binary and helpers
   home.packages = with pkgs; [
@@ -12,7 +12,13 @@
     recursive = true;
   };
 
-  # 3) Optional: auto-sync plugins right after home-manager switch
+  # 3) Add custom configuration
+  xdg.configFile."nvim/lua/custom" = {
+    source = lazyvimConfig;
+    recursive = true;
+  };
+
+  # 4) Optional: auto-sync plugins right after home-manager switch
   home.activation.lazyvimSync =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       if command -v nvim >/dev/null; then

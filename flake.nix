@@ -9,6 +9,10 @@
     };
     lazyvimStarter.url = "github:LazyVim/starter";
     lazyvimStarter.flake = false;
+    lazyvimConfig = {
+      url = "path:./home/editors/lazyvim";
+      flake = false;
+    };
     nix-doom.url = "github:marienz/nix-doom-emacs-unstraightened";
     doomConfig = {
       url = "path:./home/editors/doom";
@@ -50,7 +54,7 @@
           ];
           extraSpecialArgs = {
             username = if builtins.getEnv "USERNAME" != "" then builtins.getEnv "USERNAME" else builtins.getEnv "USER";
-            inherit (inputs) lazyvimStarter doomConfig nixGL;
+            inherit (inputs) lazyvimStarter lazyvimConfig doomConfig nixGL;
           };
         };
         macbook-pro = home-manager.lib.homeManagerConfiguration {
@@ -65,7 +69,7 @@
           ];
           extraSpecialArgs = {
             username = if builtins.getEnv "USERNAME" != "" then builtins.getEnv "USERNAME" else builtins.getEnv "USER";
-            inherit (inputs) lazyvimStarter doomConfig nixGL;
+            inherit (inputs) lazyvimStarter lazyvimConfig doomConfig nixGL;
           };
         };
       };
