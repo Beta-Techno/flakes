@@ -36,11 +36,38 @@ let
 in
 {
   home.packages = with pkgs; [
+    # Core tools
     neovim
     tree-sitter
     ripgrep
     fd
     lazygit
+
+    # Python tools
+    ruff  # Python linter
+    black  # Python formatter
+    mypy  # Python type checker
+    python3Packages.pylint  # Python linter
+
+    # Rust tools
+    rustc  # Rust compiler
+    cargo  # Rust package manager
+    rust-analyzer  # Rust LSP
+
+    # TypeScript/JavaScript tools
+    nodejs  # Node.js runtime
+    nodePackages.typescript  # TypeScript compiler
+    nodePackages.typescript-language-server  # TypeScript LSP
+    nodePackages.prettier  # Code formatter
+    nodePackages.eslint  # JavaScript/TypeScript linter
+
+    # JSON tools
+    jq  # JSON processor
+    nodePackages.jsonlint  # JSON linter
+
+    # Debug tools
+    lldb  # Debugger
+    gdb  # Debugger
   ];
 
   xdg.configFile = {
