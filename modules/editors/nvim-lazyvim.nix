@@ -13,8 +13,10 @@ let
     cp -R ${lazyvimConfig}/lua/* $out/lua/
     # Ensure all files are writable
     chmod -R u+w $out/lua
-    # Remove example.lua
+    # Remove example.lua and any other files that might contain extras
     rm -f $out/lua/plugins/example.lua
+    # Clean any existing Lazy cache
+    rm -rf $out/lua/plugins/.lazy
   '';
 in
 {
@@ -34,7 +36,8 @@ in
   home.activation.lazyvimSync =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       if command -v nvim >/dev/null; then
-        echo "[LazyVim] Syncing plugins…"
+        echo "[LazyVim] Cleaning and syncing plugins…"
+        nvim --headless "+Lazy! clean" +qa || true
         nvim --headless "+Lazy! sync" +qa || true
       fi
     '';
