@@ -13,8 +13,8 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Your spec list in the correct order
 require("lazy").setup({
-  -- 1. core
-  { import = "lazyvim.plugins" },
+  -- 1. LazyVim core
+  { "LazyVim/LazyVim", import = "lazyvim.plugins" },
 
   -- 2. LazyVim extras
   { import = "lazyvim.plugins.extras.dap.core" },
