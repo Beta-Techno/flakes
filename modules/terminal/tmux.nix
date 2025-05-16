@@ -52,6 +52,9 @@
       set -g @continuum-restore 'on'
       set -g @resurrect-capture-pane-contents 'on'
       set -g @resurrect-strategy-nvim 'session'
+
+      # Pass through Ctrl+L to clear screen
+      bind-key -n C-l send-keys C-l
     '';
   };
 } 
