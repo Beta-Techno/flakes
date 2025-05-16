@@ -25,14 +25,6 @@ return {
     },
   },
 
-  -- Configure Mason
-  {
-    "williamboman/mason.nvim",
-    opts = {
-      automatic_installation = false,  -- Disable automatic installation
-    },
-  },
-
   -- Configure formatters and linters
   {
     "stevearc/conform.nvim",
