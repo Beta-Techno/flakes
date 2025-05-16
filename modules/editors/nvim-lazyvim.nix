@@ -4,11 +4,11 @@ let
   # Define our extras
   extras = ''
     -- 2 · all extras you want
-    { import = "lazyvim.plugins.extras.dap.core" },
-    { import = "lazyvim.plugins.extras.lang.python" },
-    { import = "lazyvim.plugins.extras.lang.rust" },
-    { import = "lazyvim.plugins.extras.lang.typescript" },
-    { import = "lazyvim.plugins.extras.lsp.none-ls" },
+    { import = \"lazyvim.plugins.extras.dap.core\" },
+    { import = \"lazyvim.plugins.extras.lang.python\" },
+    { import = \"lazyvim.plugins.extras.lang.rust\" },
+    { import = \"lazyvim.plugins.extras.lang.typescript\" },
+    { import = \"lazyvim.plugins.extras.lsp.none-ls\" },
   '';
 
   # Create a merged LazyVim configuration
