@@ -12,8 +12,8 @@
     recursive = true;
   };
 
-  # 3) Add custom configuration
-  xdg.configFile."nvim/lua/custom" = {
+  # 3) Add custom configuration directly to lua/
+  xdg.configFile."nvim/lua" = {
     source = lazyvimConfig;
     recursive = true;
   };
