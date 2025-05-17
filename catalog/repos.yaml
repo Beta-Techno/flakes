@@ -1,0 +1,5 @@
+# catalog/repos.yaml
+- name: billing-api
+  url:  git@github.com:acme/billing-api.git
+  kind: service        # <-- what it *is*
+  lang: rust           # <-- how it’s built

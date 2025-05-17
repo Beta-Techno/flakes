@@ -1,0 +1,73 @@
+#+TITLE: 02‑Workflows
+#+AUTHOR: Acme Tooling Team
+#+OPTIONS: toc:t num:nil
+
+*Contents:*  ⟨[[./01-overview.org][← overview]] · workflows · [[./03-reference.org][reference →]]⟩
+
+* 1 · Bootstrap a brand‑new laptop
+  #+begin_src shell :results verbatim :exports both
+
+# clone the toolbox
+
+$ git clone [git@github.com](mailto:git@github.com):acme/nix-flake ~/code/toolbox && cd $_
+
+# build tool‑chain & helper CLIs
+
+$ nix run .#activate
+
+# interactive onboarding (SSH key + GitHub login)
+
+$ onboard
+
+# clone / update every repo into ~/code/<kind>/<lang>/<repo>
+
+$ sync-repos
+#+end_src
+
+* ~~nix run .#activate~~ builds immutable binaries into your Nix store.
+* ~~onboard~~ generates an =ed25519= key *only* if you don’t have one and uploads it via the GitHub CLI.
+* ~~sync-repos~~ reads =catalog/repos.yaml= at **run‑time**, so you never have to rebuild when new repos appear.
+
+- 2 · Daily routine
+  | Step | Command | Notes |
+  |------|---------|-------|
+  | Pull latest scripts & catalog | `git -C ~/code/toolbox pull --ff-only` | timer does this hourly by default |
+  | Sync repos | `sync-repos` | adds/updates/archives as needed |
+  | *If* flake changed | `nix run ~/code/toolbox#activate` | path‑filtered hook prints reminder |
+
+- 3 · Provision a personal Proxmox sandbox
+  #+begin_src shell :results verbatim :exports code
+  $ nix run ~/code/toolbox#provision.proxmox --&#x20;
+  --token $PM_TOKEN --target-node pve01 --plan
+  #+end_src
+
+* Add =~~--auto-approve=~~ to apply; omit to just see the Terraform plan.
+* Remote state is stored under =pve01/sandbox/terraform.tfstate=; destroy with =~~--destroy=~~.
+
+- 4 · Contributing changes
+
+1. *Fork → branch → edit.*  Keep /catalog edits and /flake edits in **separate commits**.
+2. Push → PR.  CI pipeline:
+
+   * YAML & shell lint every commit.
+   * `nix flake check` *only* when flake files touched.
+   * Dry‑run ~~provision.<env>~~ plan if anything under =infra/= changed.
+3. One approval from *@tooling-owners* (plus *@ops-owners* if infra).
+4. Merge → Cachix push → teammates pull.
+
+* 5 · Troubleshooting quick table
+  | Symptom | Fix |
+  |---------|-----|
+  | `sync-repos: command not found` | rerun `nix run .#activate`; ensure `$HOME/.nix-profile/bin` in $PATH |
+  | SSH permission denied | `onboard` again or `gh auth status` |
+  | Flake eval slow | check internet / Cachix; local cache miss logs in `~/.cache/nix` |
+  | Timer not firing | `systemctl --user status sync-repos.timer` |
+
+* 6 · Removing everything (reset)
+  #+begin_src shell :results verbatim :exports code
+  systemctl --user stop sync-repos.timer && systemctl --user disable sync-repos.timer
+  rm -rf ~/code            # your cloned repos
+  nix profile remove nix-flake   # optional: remove tool-chain closure
+  #+end_src
+
+*Next up →* [[./03-reference.org][Reference]] – full CLI flags, environment variables, and CI path‑filter rules.

@@ -1,0 +1,68 @@
+#+TITLE: 03-Reference
+#+AUTHOR: Acme Tooling Team
+#+OPTIONS: toc:t num:nil
+
+*Contents:*  ⟨[[./02-workflows.org][← workflows]] · reference · [[./04-roadmap.org][roadmap →]]⟩
+
+* 1 · Helper CLIs
+
+| CLI               | Purpose                                                        | Common flags                                                  |
+| ----------------- | -------------------------------------------------------------- | ------------------------------------------------------------- |
+| `onboard`         | Generate SSH key, log into GitHub, upload key.                 | `--key-type ed25519` (default) · `--skip-gh`                  |
+| `sync-repos`      | Clone / pull every repo into `~/code/<kind>/<lang>/<repo>`.    | `--dry-run` · `--filter kind=services` · `--filter lang=rust` |
+| `provision.<env>` | Build + run infra blueprint for env (`proxmox`, `aws`, `k8s`). | `--plan` · `--auto-approve` · `--destroy`                     |
+| `nix develop`     | Enter language-specific shell.                                 | `-i rust` · `-i haskell`                                      |
+
+* 1.1 Onboard
+  #+BEGIN_SRC shell :results verbatim :exports both
+  onboard --help | head -n 15
+  #+END_SRC
+
+* 1.2 Sync Repos filters
+
+```text
+--filter kind=services        (services only)
+--filter lang=rust            (Rust only)
+--filter kind=services,lang=rust
+```
+
+Multiple filters are additive (logical AND). Pattern syntax uses =jq=.
+
+* 2 · Environment variables
+
+| Variable         | Effect                                     | Default               |
+| ---------------- | ------------------------------------------ | --------------------- |
+| `ACME_CODE_ROOT` | Root of repo tree.                         | `~/code`              |
+| `SYNC_PARALLEL`  | Max parallel git fetches.                  | `$(nproc)`            |
+| `GITHUB_TOKEN`   | Used when cloning via HTTPS.               | unset (SSH preferred) |
+| `PM_API_TOKEN`   | Proxmox API token for `provision.proxmox`. | none                  |
+| `AWS_PROFILE`    | Chosen by `provision.aws`.                 | `default`             |
+
+* 3 · CI path‑filter rules
+
+| Path changed                | Job                            | Notes                                |
+| --------------------------- | ------------------------------ | ------------------------------------ |
+| `catalog/*`                 | `yaml-lint`, `sync-test`       | No Nix build.                        |
+| `flake.nix` or `flake.lock` | `nix flake check`, Cachix push | Heavy job runs only here.            |
+| `infra/**`                  | `provision.<env> plan`         | Dry-run; apply gated on main branch. |
+| `pkgs/**`                   | Rebuild CLIs, push cache       |                                      |
+
+* 4 · Store paths & cache size hints
+
+| Derivation           | Closure size | Cache key                     |
+| -------------------- | ------------ | ----------------------------- |
+| `pkgs.shell.rust`    | ~250 MiB    | `nix-flake-shell-rust-<hash>` |
+| `pkgs.shell.haskell` | ~480 MiB    | `nix-flake-shell-hs-<hash>`   |
+| `pkgs.sync-repos`    | <5 MiB       | `sync-repos-<hash>`           |
+
+All store paths are uploaded to *Cachix* under organisation ~~acme/toolbox~~.
+
+* 5 · Common troubleshooting commands
+
+| Issue                           | Command                              |                            |
+| ------------------------------- | ------------------------------------ | -------------------------- |
+| Verify caches                   | `nix path-info -r .#sync-repos      | cachix push acme/toolbox` |
+| Missed timer                    | `systemctl --user list-timers sync*` |                            |
+| Evaluate shell without entering | `nix print-dev-env`                  |                            |
+
+*Next up →* [[./04-roadmap.org][Roadmap]]

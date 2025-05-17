@@ -1,0 +1,50 @@
+#+TITLE: 04‑Roadmap
+#+AUTHOR: Acme Tooling Team
+#+OPTIONS: toc:t num:nil
+
+*Contents:*  ⟨[[./03-reference.org][← reference]] · roadmap⟩
+
+* 2025 Q3 milestones
+  ** M‑01 *Module registry publishing*
+
+  * Publish ~~bricks/~~ modules to Acme’s private Terraform Registry.
+  * CI gate: semantic‑release tags + provenance signature.
+  * Owners: *infra‑platform squad*.
+    ** M‑02 *Remote cache migration*
+  * Move from public Cachix to self‑hosted Attic instance for SLA & quota.
+  * Target: July 2025.
+    ** M‑03 *Windows developer support*
+  * Add `x86_64-windows-gnu` shell via `nix-ld` on WSL + native Git for Windows.
+  * Docs update in ~~02-workflows.org~~.
+
+* 2025 Q4 stretch goals
+  ** S‑01 *Pulumi provider* optional pathway
+
+  * Experiment with Pulumi Go SDK for teams that prefer imperative IaC.
+  * Must not break existing Terraform pipelines.
+    ** S‑02 *Sourcegraph code search SaaS*
+  * Deploy docker‑compose bundle in ~~ops/sourcegraph~~ blueprint.
+  * Auto‑index all repos nightly.
+
+* Longer‑term (2026+) ideas
+  | Idea | Status | Notes |
+  |------|--------|-------|
+  | Monorepo experiment (Bazel) | *research* | Prototype in `experiments/` branch; measure CI time. |
+  | BSL‑licensed AI agent for routine PRs | *backlog* | Needs legal review (BSL → Apache after 36 mo). |
+  | IPv6‑only cluster support | *backlog* | Requires module updates + service manifests. |
+
+* Proposal workflow
+
+1. Fork / branch this file → add heading =*** P‑XX Title= with rationale & rough sizing.
+2. Open PR tagged =proposal=; gather feedback in comments.
+3. Quarterly roadmap review merges accepted items; rejected items are closed with explanation.
+
+* Recently shipped ✓
+  | Date | Item |
+  |------|------|
+  | 2025‑05‑20 | CI path‑filtering → 55 % pipeline time drop |
+  | 2025‑05‑12 | Proxmox blueprint demo (single‑node) |
+  | 2025‑04‑30 | Org‑wide on‑call docs moved to `docs/02-workflows` |
+
+* Feedback
+  Have an idea or disagree with priorities? Open an issue labeled =roadmap= or ping *@tooling-leads* on Slack.

@@ -1,85 +1,101 @@
-# Nix Home Manager Configuration
+# flakes
 
-This repository contains a Nix Home Manager configuration for managing user environments on Linux/macOS systems. It's designed to be used with the stable NixOS 24.05 channel.
+*A single repo that gives you everything you need to **develop**, **test**, and **run** the Acme open‑source platform.*
 
-## Features
+> If you’re new, **clone this first**. One command will install all tools and clone every other repo you’ll touch.
 
-- Development tools (VS Code, Emacs, Neovim)
-- JetBrains IDEs (DataGrip, Rider)
-- Modern terminals (Ghostty, Alacritty)
-- Browsers and development tools
-- CLI utilities and shell configurations
-- Systemd user services
+---
 
-## Prerequisites
+## Why this repo exists
 
-- Nix package manager installed
-- Flakes enabled in your Nix configuration
+| What you get                                                       | Why it matters                                                                              |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| **Reproducible tool‑chain** (Rust, Haskell, OCaml, JS, Terraform…) | No “works‑on‑my‑machine” issues – everyone builds with the same bits.                       |
+| **Helper CLIs** (`onboard`, `sync-repos`, language shells)         | Zero‑friction onboarding and daily repo sync.                                               |
+| **Repo catalogue** (`catalog/repos.yaml`)                          | Single source of truth for every service, library, and tool repo.                           |
+| **Environment blueprints** (`infra/`)                              | Declarative specs (Proxmox, AWS, k8s) anyone can deploy if they want to run the full stack. |
+| **Living documentation** (Org files)                               | Explanations + runnable examples side‑by‑side.                                              |
 
-## Quick Start
+Everything is built, cached, and distributed by **one Nix flake** so workstations, computers, sensors, CI runners, servers, and clusters stay in lock‑step.
 
-1. Install Nix (if not already installed):
-   ```bash
-   sh <(curl -L https://nixos.org/nix/install) --daemon
-   ```
+---
 
-2. Enable flakes by adding to `/etc/nix/nix.conf`:
-   ```
-   experimental-features = nix-command flakes
-   ```
+## Quick start
 
-3. Clone this repository:
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/nix-config.git
-   cd nix-config
-   ```
+### 1. Developer workstation (≈3 min)
 
-4. Apply the configuration:
-   ```bash
-   nix run home-manager/master -- init --switch --flake .#rob
-   ```
+```bash
+# clone the toolbox
+git clone git@github.com:acme/nix-flake ~/code/toolbox && cd $_
 
-## Configuration
+# build tool‑chain and helper CLIs
+nix run .#activate
 
-- `flake.nix`: Main configuration file defining the flake structure
-- `home/dev.nix`: User-specific configuration including packages and settings
+# interactive onboarding (SSH key + GitHub login)
+onboard
 
-## Customization
+# clone / update all repos into ~/code/<kind>/<lang>/<repo>
+sync-repos
+```
 
-1. Fork this repository
-2. Modify `home/dev.nix` to add/remove packages
-3. Update the username and home directory in the configuration
-4. Apply changes with `home-manager switch`
+### 2. Try the all‑in‑one Proxmox demo (≈10 min)
+
+```bash
+nix run .#provision.proxmox -- \
+  --token $PM_TOKEN --target-node pve01
+```
+
+*(Full cloud deploy how‑to is in the docs.)*
+
+---
+
+## Directory map
+
+```text
+nix-flake/
+├─ flake.{nix,lock}      ← all build definitions
+├─ catalog/repos.yaml    ← repo list (kind + lang + path)
+├─ pkgs/                 ← pure Nix packages & devShells
+├─ infra/                ← environment blueprints (proxmox, aws, k8s)
+├─ scripts/              ← post‑Nix wrappers & systemd timers
+└─ docs/                 ← living documentation
+```
+
+---
+
+## Documentation
+
+| File                      | What you’ll find                                     |
+| ------------------------- | ---------------------------------------------------- |
+| **docs/01-overview\.org** | Big‑picture architecture & why this repo exists.     |
+| **docs/02-workflows.org** | Step‑by‑step: bootstrap, daily update, contributing. |
+| **docs/03-reference.org** | CLI flags, env vars, CI path filters.                |
+| **docs/04-roadmap.org**   | Upcoming work & open ideas.                          |
+
+Open the Org files in Emacs for runnable blocks (`C-c C-c`) or read the rendered HTML (updated nightly).
+
+---
+
+## Updating
+
+1. **Tool‑chain change?** `git pull && nix run .#activate`
+2. **Repo list change?** `git pull && sync-repos`
+3. **Blueprint tweak?** `git pull && nix run .#provision.<env>`
+
+Path-filtered CI ensures each commit runs only the jobs it needs.
+
+---
+
+## Contributing
+
+1. Fork, branch, commit.
+2. CI lints YAML and, if the flake files changed, runs `nix flake check`.<br>CI also dry‑runs `infra/` plans (no apply).
+3. One approval from **@tooling‑owners** → merge.
+
+Please keep catalogue edits and tool‑chain bumps in separate commits for easy rollback.
+
+---
 
 ## License
 
-MIT License - feel free to use and modify as needed.
-
-# Getting Started
-
-1. **Install Nix** (if not already):
-   ```sh
-   sh <(curl -L https://nixos.org/nix/install)
-   ```
-2. **Clone this repo and run the bootstrap/install script:**
-   ```sh
-   git clone <repo-url>
-   cd <repo-root>
-   ./install.sh
-   # or
-   ./init.sh
-   ```
-3. **Switch to your Home Manager config:**
-   ```sh
-   home-manager switch --flake .#<host>
-   # e.g. .#macbook-air
-   ```
-4. **Launch Emacs:**
-   ```sh
-   emacs
-   ```
-   You should see the Doom dashboard and your custom config active.
-
-5. **Doom Emacs Aliases:**
-   - `doomsync` — Sync Doom config
-   - `doomup`   — Upgrade Doom 
+MIT © Acme Corp – tooling & blueprints only. Individual service repos have their own licences; check each one.

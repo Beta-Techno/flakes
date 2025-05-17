@@ -1,0 +1,82 @@
+#+TITLE: 01‑Overview
+#+AUTHOR: Acme Tooling Team
+#+OPTIONS: toc:nil num:nil
+
+
+* What is *nix‑flake?*
+  This repository is the *single specification* for every environment in the
+  Acme open‑source platform:
+
+- **Developer / CI tool‑chain** – reproducible shells, helper CLIs, repo catalogue.
+- **Infrastructure blueprints** – declarative specs that let *anyone* spin up a
+  full production stack on Proxmox, AWS, or k8s.
+- **Living documentation** – Org files like this one that mix *explanation* with
+  *runnable* code blocks.
+
+By pinning everything in one Nix flake we guarantee that laptops, CI runners,
+and demo clusters all use *exactly* the same binaries and config—no surprises.
+
+* 10 000‑ft Architecture
+  #+BEGIN_SRC dot :file ../docs/arch.svg :exports results :results file
+  digraph G {
+  rankdir=LR;
+  node [shape=box, style=rounded, fontsize=10];
+
+  subgraph cluster_tool {
+  label = "nix‑flake repo";
+  flake [label="flake.{nix,lock}"];
+  catalog [label="catalog/repos.yaml"];
+  pkgs [label="pkgs/ (CLIs + shells)"];
+  docs [label="docs/*.org"];
+  }
+
+  subgraph cluster_dev {
+  label = "Developer laptop";
+  devshell [label="nix develop"];
+  repos [label="~/code/<kind>/<lang>/<repo>"];
+  }
+
+  subgraph cluster_ci {label="CI runner"; ci [label="nix develop"]}
+
+  subgraph cluster_prod {label="Live stack"; tf [label="terraform plan/apply" style=dashed]}
+
+  flake -> devshell;
+  flake -> ci;
+  pkgs -> devshell;
+  pkgs -> ci;
+  catalog -> repos;
+  catalogs [style=invis];
+  devshell -> repos [label="sync‑repos"];
+  ci -> tf [label="provision.<env>"];
+  }
+  #+END_SRC
+  #+RESULTS:
+  [[file:../docs/arch.svg]]
+
+* Core Components
+  | Path | Role |
+  |------+--------------------------------------------------------------|
+  | ~~flake.nix / lock~~ | Pins every binary & library version.             |
+  | ~~catalog/repos.yaml~~ | Single source of truth for *all* repos.         |
+  | ~~pkgs/~~             | Pure Nix packages (shells & helper CLIs).       |
+  | ~~infra/~~            | Environment blueprints (proxmox, aws, k8s).     |
+  | ~~scripts/~~          | Post‑Nix wrappers and systemd‑user timers.      |
+  | ~~docs/~~             | This and other runnable Org files.              |
+
+* How to read the other docs
+
+1. =02-workflows.org=: step‑by‑step usage (bootstrap, daily update, contribute).
+2. =03-reference.org=: full CLI flags, env‑vars, CI path filters.
+3. =04-roadmap.org=: where we’re headed next.
+
+* Try something now
+  #+BEGIN_SRC shell :results verbatim :exports both
+  onboard --help | head -n 10
+  #+END_SRC
+
+Re‑run this block (=C-c C-c=) any time; Org captures the output inline so the
+doc stays up‑to‑date.
+
+* Questions?
+  Tag *#tooling* in Slack or open an issue—this file is a living document; help us
+  improve it!
