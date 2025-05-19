@@ -18,6 +18,25 @@ check_command() {
   fi
 }
 
+# ── Install Nix if not present ───────────────────────────────
+if ! command -v nix >/dev/null 2>&1; then
+  echo "+ installing Nix"
+  if [[ "$(uname)" == "Darwin" ]]; then
+    # macOS
+    sh <(curl -L https://nixos.org/nix/install) --daemon
+  else
+    # Linux
+    sh <(curl -L https://nixos.org/nix/install) --daemon
+  fi
+  
+  # Source Nix environment
+  if [[ -f /etc/profile.d/nix.sh ]]; then
+    . /etc/profile.d/nix.sh
+  elif [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
+    . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+  fi
+fi
+
 # ── Check prerequisites ──────────────────────────────────────
 echo "Checking prerequisites..."
 check_command nix
