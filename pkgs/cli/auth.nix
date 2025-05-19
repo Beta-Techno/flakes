@@ -8,6 +8,8 @@
       jq
       xclip
       git
+      gawk        # for awk
+      openssh     # for ssh-keygen
     ];
 
     text = ''
@@ -46,7 +48,7 @@
         fi
 
         # Upload key if missing
-        fingerprint="$(ssh-keygen -lf ''${KEY_PATH}.pub | awk '{print $2}')"
+        fingerprint="$(ssh-keygen -lf "''${KEY_PATH}.pub" | awk '{print $2}')"
         if ! gh ssh-key list --json fingerprint | jq -e ".[] | select(.fingerprint==\"''${fingerprint}\")" >/dev/null; then
           echo "+ uploading SSH key to GitHub"
           gh ssh-key add "''${KEY_PATH}.pub" -t "$(hostname)"
