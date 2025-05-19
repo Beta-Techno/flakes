@@ -7,6 +7,7 @@
       nix
       home-manager
       git
+      github-cli  # for gh auth status
     ];
 
     text = ''
@@ -23,9 +24,14 @@
         die "Nix is not installed"
       fi
 
+      # ── Install auth tool first ──────────────────────────────────
+      echo "+ installing auth tool"
+      nix profile install .#auth
+
       # ── Check GitHub authentication ──────────────────────────────
       if ! gh auth status &>/dev/null; then
-        die "GitHub authentication required. Run 'auth' first"
+        echo "+ running auth tool"
+        auth || die "GitHub authentication failed. Please try again"
       fi
 
       # ── Install development shells ───────────────────────────────
