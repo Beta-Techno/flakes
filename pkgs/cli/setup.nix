@@ -13,7 +13,8 @@
     text = ''
       set -euo pipefail
 
-      FLAKE="''${self}"  # absolute path passed from flake.nix
+      # Absolute path to the flake that built this binary
+      FLAKE="''${self}"
 
       # ── Helper functions ─────────────────────────────────────────
       die() {
