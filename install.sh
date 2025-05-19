@@ -91,6 +91,11 @@ else
   fi
 fi
 
+# ── Enable nix-command experimental feature ─────────────────
+echo "+ enabling nix-command experimental feature"
+mkdir -p ~/.config/nix
+echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+
 # ── Install CLI tools ───────────────────────────────────────
 echo "+ installing CLI tools"
 for tool in auth setup sync-repos doctor activate; do
