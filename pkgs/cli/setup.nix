@@ -24,14 +24,17 @@
         die "Nix is not installed"
       fi
 
-      # ── Install auth tool first ──────────────────────────────────
-      echo "+ installing auth tool"
-      nix profile install .#auth
-
       # ── Check GitHub authentication ──────────────────────────────
       if ! gh auth status &>/dev/null; then
         echo "+ running auth tool"
-        auth || die "GitHub authentication failed. Please try again"
+        # Use command -v to find the installed auth command
+        AUTH_CMD="$(command -v auth)"
+        if [ -z "''${AUTH_CMD}" ]; then
+          echo "+ installing auth tool"
+          nix profile install .#auth
+          AUTH_CMD="$(command -v auth)"
+        fi
+        "''${AUTH_CMD}" || die "GitHub authentication failed. Please try again"
       fi
 
       # ── Install development shells ───────────────────────────────
