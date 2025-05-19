@@ -1,5 +1,15 @@
 # catalog/repos.yaml
-- name: billing-api
-  url:  git@github.com:acme/billing-api.git
+- name: devdoc
+  url:  git@github.com:Beta-Techno/devdoc.git
   kind: service        # <-- what it *is*
-  lang: rust           # <-- how it’s built
+  lang: rust           # <-- how it's built
+
+- name: qualia
+  url:  git@github.com:Beta-Techno/qualia.git
+  kind: service        # <-- what it *is*
+  lang: rust           # <-- how it's built
+
+- name: flakes
+  url:  git@github.com:Beta-Techno/flakes.git
+  kind: tooling        # <-- what it *is*
+  lang: nix            # <-- how it's built
