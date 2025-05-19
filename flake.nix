@@ -128,11 +128,11 @@
           nix run .#homeConfigurations.''${MACHINE}.activationPackage --impure
         '';
         # CLI tools
-        auth = import ./pkgs/cli/auth.nix { inherit pkgs; };
-        setup = import ./pkgs/cli/setup.nix { inherit pkgs; };
-        sync-repos = import ./pkgs/cli/sync-repos.nix { inherit pkgs; };
-        doctor = import ./pkgs/cli/doctor.nix { inherit pkgs; };
-        activate = import ./pkgs/cli/activate.nix { inherit pkgs; };
+        auth = (import ./pkgs/cli/auth.nix { inherit pkgs; }).program;
+        setup = (import ./pkgs/cli/setup.nix { inherit pkgs; }).program;
+        sync-repos = (import ./pkgs/cli/sync-repos.nix { inherit pkgs; }).program;
+        doctor = (import ./pkgs/cli/doctor.nix { inherit pkgs; }).program;
+        activate = (import ./pkgs/cli/activate.nix { inherit pkgs; }).program;
       };
     };
 } 
