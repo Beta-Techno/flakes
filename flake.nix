@@ -127,6 +127,12 @@
           export USERNAME
           nix run .#homeConfigurations.''${MACHINE}.activationPackage --impure
         '';
+        # CLI tools
+        auth = import ./pkgs/cli/auth.nix { inherit pkgs; };
+        setup = import ./pkgs/cli/setup.nix { inherit pkgs; };
+        sync-repos = import ./pkgs/cli/sync-repos.nix { inherit pkgs; };
+        doctor = import ./pkgs/cli/doctor.nix { inherit pkgs; };
+        activate = import ./pkgs/cli/activate.nix { inherit pkgs; };
       };
     };
 } 
