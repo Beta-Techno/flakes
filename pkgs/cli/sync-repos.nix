@@ -1,75 +1,61 @@
 { pkgs, lib }:
 
-pkgs.writeShellApplication {
-  name = "sync-repos";
-  runtimeInputs = with pkgs; [
-    git
-    yq
-    parallel
-  ];
+{
+  program = pkgs.writeShellApplication {
+    name = "sync-repos";
+    runtimeInputs = with pkgs; [
+      git
+      yq
+    ];
 
-  text = ''
-    set -euo pipefail
+    text = ''
+      set -euo pipefail
 
-    # ── Configuration ────────────────────────────────────────────
-    CATALOG_FILE="$(dirname "$0")/../../catalog/repos.yaml"
-    CODE_ROOT="''${ACME_CODE_ROOT:-$HOME/code}"
+      # ── Configuration ────────────────────────────────────────────
+      CATALOG_FILE="''${PWD}/catalog/repos.yaml"
+      REPOS_DIR="$HOME/repos"
 
-    # ── Helper functions ─────────────────────────────────────────
-    die() {
-      echo "Error: $1" >&2
-      exit 1
-    }
+      # ── Helper functions ─────────────────────────────────────────
+      die() {
+        echo "Error: $1" >&2
+        exit 1
+      }
 
-    clone_or_update() {
-      local repo="$1"
-      local kind="$2"
-      local lang="$3"
-      local name="$4"
-      
-      # Create structured path
-      local target_dir="$CODE_ROOT/$kind/$lang/$name"
-      
-      if [ ! -d "$target_dir" ]; then
-        echo "+ cloning $repo to $target_dir"
-        mkdir -p "$target_dir"
-        git clone "git@github.com:$repo.git" "$target_dir"
-      else
-        echo "+ updating $repo in $target_dir"
-        (cd "$target_dir" && git pull --ff-only)
+      # ── Check catalog file ───────────────────────────────────────
+      if [ ! -f "''${CATALOG_FILE}" ]; then
+        die "Catalog file not found: ''${CATALOG_FILE}"
       fi
-    }
-    export -f clone_or_update
 
-    # ── Check catalog file ───────────────────────────────────────
-    if [ ! -f "$CATALOG_FILE" ]; then
-      die "Catalog file not found: $CATALOG_FILE"
-    fi
+      # ── Create repos directory ───────────────────────────────────
+      mkdir -p "''${REPOS_DIR}"
 
-    # ── Process repositories ──────────────────────────────────────
-    echo "+ syncing repositories"
-    mkdir -p "$CODE_ROOT"
-    
-    # If yq is not available, use a simple grep-based approach
-    if command -v yq >/dev/null 2>&1; then
-      yq -r '.[] | [.url, .kind, .lang, .name] | @tsv' "$CATALOG_FILE" | \
-        parallel --colsep '\t' clone_or_update
-    else
-      # Simple grep-based approach for basic repo syncing
-      while IFS= read -r line; do
-        if [[ $line == *"name:"* ]]; then
-          name=$(echo "$line" | cut -d' ' -f2)
-          read -r url_line
-          url=$(echo "$url_line" | cut -d' ' -f2)
-          read -r kind_line
-          kind=$(echo "$kind_line" | cut -d' ' -f2)
-          read -r lang_line
-          lang=$(echo "$lang_line" | cut -d' ' -f2)
-          clone_or_update "$url" "$kind" "$lang" "$name"
+      # ── Process each repository ──────────────────────────────────
+      while IFS= read -r repo; do
+        if [ -z "''${repo}" ]; then
+          continue
         fi
-      done < "$CATALOG_FILE"
-    fi
 
-    echo "✅  Repository sync complete"
-  '';
+        # Extract repository name and path
+        name="''${repo%%:*}"
+        path="''${repo#*:}"
+        full_path="''${REPOS_DIR}/''${path}"
+
+        echo "+ syncing ''${name} to ''${path}"
+
+        # Create directory if it doesn't exist
+        mkdir -p "$(dirname "''${full_path}")"
+
+        # Clone or update repository
+        if [ ! -d "''${full_path}/.git" ]; then
+          echo "  cloning..."
+          git clone "git@github.com:Beta-Techno/''${name}.git" "''${full_path}"
+        else
+          echo "  updating..."
+          (cd "''${full_path}" && git pull --ff-only)
+        fi
+      done < <(yq e '.repos[] | .name + ":" + .path' "''${CATALOG_FILE}")
+
+      echo "✅  Repository sync complete"
+    '';
+  };
 } 
