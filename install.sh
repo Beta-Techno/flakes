@@ -40,11 +40,34 @@ fi
 # ── Check prerequisites ──────────────────────────────────────
 echo "Checking prerequisites..."
 check_command nix
-check_command git
 
 # ── Check Nix installation ───────────────────────────────────
 if ! nix --version | grep -q "nix (Nix) 2"; then
   die "Nix 2.x is required. Please upgrade your Nix installation."
+fi
+
+# ── Install minimal git if not present ───────────────────────
+if ! command -v git >/dev/null 2>&1; then
+  echo "+ installing minimal git"
+  if [[ "$(uname)" == "Darwin" ]]; then
+    # macOS
+    if command -v brew >/dev/null 2>&1; then
+      brew install git
+    else
+      die "Homebrew is required to install git on macOS. Please install Homebrew first."
+    fi
+  else
+    # Linux
+    if command -v apt-get >/dev/null 2>&1; then
+      sudo apt-get update && sudo apt-get install -y git
+    elif command -v dnf >/dev/null 2>&1; then
+      sudo dnf install -y git
+    elif command -v yum >/dev/null 2>&1; then
+      sudo yum install -y git
+    else
+      die "Could not find a supported package manager to install git."
+    fi
+  fi
 fi
 
 # ── Check Home-Manager ───────────────────────────────────────
