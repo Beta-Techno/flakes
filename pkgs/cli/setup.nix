@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs, self }:
 
 {
   program = pkgs.writeShellApplication {
@@ -12,6 +12,8 @@
 
     text = ''
       set -euo pipefail
+
+      FLAKE="''${self}"  # absolute path passed from flake.nix
 
       # ── Helper functions ─────────────────────────────────────────
       die() {
@@ -27,26 +29,29 @@
       # ── Check GitHub authentication ──────────────────────────────
       if ! gh auth status &>/dev/null; then
         echo "+ running auth tool"
-        # Use command -v to find the installed auth command
-        AUTH_CMD="$(command -v auth)"
-        if [ -z "''${AUTH_CMD}" ]; then
-          echo "+ installing auth tool"
-          nix profile install .#auth
-          AUTH_CMD="$(command -v auth)"
+        
+        # ── Ensure auth CLI is present and executable ───────────────
+        AUTH_CMD="$(type -P auth || true)"   # like command -v but silent
+        if ! [ -x "$AUTH_CMD" ]; then        # missing *or* non-executable
+          echo "+ (re)installing auth"
+          nix profile install "$FLAKE"#auth
+          AUTH_CMD="$(type -P auth)"         # must succeed now
         fi
-        "''${AUTH_CMD}" || die "GitHub authentication failed. Please try again"
+
+        echo "+ running auth"
+        "$AUTH_CMD" || die "GitHub authentication failed. Please try again"
       fi
 
       # ── Install development shells ───────────────────────────────
       echo "+ installing development shells"
-      nix profile install .#rust
-      nix profile install .#go
-      nix profile install .#python
+      nix profile install "$FLAKE"#rust
+      nix profile install "$FLAKE"#go
+      nix profile install "$FLAKE"#python
 
       # ── Install helper CLIs ──────────────────────────────────────
       echo "+ installing helper CLIs"
-      nix profile install .#sync-repos
-      nix profile install .#doctor
+      nix profile install "$FLAKE"#sync-repos
+      nix profile install "$FLAKE"#doctor
 
       # ── Set up user configuration ────────────────────────────────
       CONFIG_DIR="$HOME/.config/toolbox"
