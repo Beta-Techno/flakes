@@ -129,7 +129,7 @@
         '';
         # CLI tools
         auth = (import ./pkgs/cli/auth.nix { inherit pkgs; }).program;
-        setup = (import ./pkgs/cli/setup.nix { inherit pkgs; }).program;
+        setup = (import ./pkgs/cli/setup.nix { inherit pkgs self; }).program;
         sync-repos = (import ./pkgs/cli/sync-repos.nix { inherit pkgs; }).program;
         doctor = (import ./pkgs/cli/doctor.nix { inherit pkgs; }).program;
         activate = (import ./pkgs/cli/activate.nix { inherit pkgs; }).program;
