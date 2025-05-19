@@ -1,4 +1,4 @@
-{ pkgs, lib }:
+{ pkgs }:
 
 {
   program = pkgs.writeShellApplication {
