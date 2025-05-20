@@ -96,7 +96,7 @@
 
   # ── GNOME packages ─────────────────────────────────────────────
   home.packages = with pkgs; [
-    gnome.gnome-tweaks
+    gnome-tweaks
     gnome.gnome-shell-extensions
     gnome.gnome-backgrounds
     gnome.gnome-themes-extra
