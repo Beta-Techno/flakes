@@ -63,9 +63,11 @@
   ];
 
   # ── Desktop environment detection ───────────────────────────────
-  imports = lib.optional platform.hasGnome ./desktop/gnome.nix
-    ++ lib.optional platform.hasKDE ./desktop/kde.nix
-    ++ lib.optional platform.isWSL ./wsl.nix;
+  imports = lib.flatten [
+    (lib.optional platform.hasGnome ./desktop/gnome.nix)
+    (lib.optional platform.hasKDE ./desktop/kde.nix)
+    (lib.optional platform.isWSL ./wsl.nix)
+  ];
 
   # ── Systemd user services ───────────────────────────────────────
   systemd.user.services = lib.mkIf platform.hasSystemd {
