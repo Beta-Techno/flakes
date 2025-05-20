@@ -98,10 +98,10 @@
   home.packages = with pkgs; [
     gnome-tweaks
     gnome-shell-extensions
-    gnome.gnome-backgrounds
-    gnome.gnome-themes-extra
-    gnome.adwaita-icon-theme
-    gnome.gnome-shell
-    gnome.gnome-control-center
+    gnome-backgrounds
+    gnome-themes-extra
+    adwaita-icon-theme
+    gnome-shell
+    gnome-control-center
   ];
 } 
