@@ -20,43 +20,17 @@ let
 in
 {
   # ── Platform detection ──────────────────────────────────────────
-  assertions = {
+  _module.args = {
     inherit isDarwin isLinux isWSL;
   };
 
   # ── Platform-specific options ───────────────────────────────────
-  options = {
-    # Linux-specific options
-    hasSystemd = lib.mkOption {
-      type = lib.types.bool;
-      default = hasSystemd;
-      readOnly = true;
-      visible = isLinux;
-    };
-    hasNvidia = lib.mkOption {
-      type = lib.types.bool;
-      default = hasNvidia;
-      readOnly = true;
-      visible = isLinux;
-    };
-    hasAMD = lib.mkOption {
-      type = lib.types.bool;
-      default = hasAMD;
-      readOnly = true;
-      visible = isLinux;
-    };
-    hasGnome = lib.mkOption {
-      type = lib.types.bool;
-      default = hasGnome;
-      readOnly = true;
-      visible = isLinux;
-    };
-    hasKDE = lib.mkOption {
-      type = lib.types.bool;
-      default = hasKDE;
-      readOnly = true;
-      visible = isLinux;
-    };
+  config = lib.mkIf isLinux {
+    hasSystemd = hasSystemd;
+    hasNvidia = hasNvidia;
+    hasAMD = hasAMD;
+    hasGnome = hasGnome;
+    hasKDE = hasKDE;
   };
 
   # ── Darwin-specific options ─────────────────────────────────────
