@@ -1,5 +1,8 @@
 { pkgs, self }:
 
+let
+  flakePath = self;
+in
 {
   program = pkgs.writeShellApplication {
     name = "setup";
@@ -14,7 +17,7 @@
       set -euo pipefail
 
       # Absolute path to the flake that built this binary
-      FLAKE="''${self}"
+      FLAKE="''${flakePath}"
 
       # ── Helper functions ─────────────────────────────────────────
       die() {
