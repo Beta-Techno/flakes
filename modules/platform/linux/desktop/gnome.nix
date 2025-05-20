@@ -97,7 +97,7 @@
   # ── GNOME packages ─────────────────────────────────────────────
   home.packages = with pkgs; [
     gnome-tweaks
-    gnome.gnome-shell-extensions
+    gnome-shell-extensions
     gnome.gnome-backgrounds
     gnome.gnome-themes-extra
     gnome.adwaita-icon-theme
