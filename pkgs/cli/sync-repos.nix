@@ -5,7 +5,7 @@
     name = "sync-repos";
     runtimeInputs = with pkgs; [
       git
-      yq
+      yq-go       # go v4 -> has 'yq e', 'yq eval', etc.
     ];
 
     text = ''
