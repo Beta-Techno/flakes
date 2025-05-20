@@ -19,23 +19,64 @@ let
   hasKDE = isLinux && builtins.pathExists "/usr/bin/plasmashell";
 in
 {
-  config = {
+  options = {
     # ── Platform detection ──────────────────────────────────────────
-    _module.args = {
-      inherit isDarwin isLinux isWSL;
+    isDarwin = lib.mkOption {
+      type = lib.types.bool;
+      default = isDarwin;
+      readOnly = true;
+      description = "Whether the system is running macOS";
+    };
+    isLinux = lib.mkOption {
+      type = lib.types.bool;
+      default = isLinux;
+      readOnly = true;
+      description = "Whether the system is running Linux";
+    };
+    isWSL = lib.mkOption {
+      type = lib.types.bool;
+      default = isWSL;
+      readOnly = true;
+      description = "Whether the system is running in WSL";
     };
 
-    # ── Platform-specific options ───────────────────────────────────
-  } // lib.mkIf isLinux {
-    hasSystemd = hasSystemd;
-    hasNvidia = hasNvidia;
-    hasAMD = hasAMD;
-    hasGnome = hasGnome;
-    hasKDE = hasKDE;
-  };
+    # ── System capabilities ─────────────────────────────────────────
+    hasSystemd = lib.mkOption {
+      type = lib.types.bool;
+      default = hasSystemd;
+      readOnly = true;
+      description = "Whether the system uses systemd";
+    };
+    hasNvidia = lib.mkOption {
+      type = lib.types.bool;
+      default = hasNvidia;
+      readOnly = true;
+      description = "Whether the system has an NVIDIA GPU";
+    };
+    hasAMD = lib.mkOption {
+      type = lib.types.bool;
+      default = hasAMD;
+      readOnly = true;
+      description = "Whether the system has an AMD GPU";
+    };
 
-  # ── Darwin-specific options ─────────────────────────────────────
-  options = lib.mkIf isDarwin {
-    # Add Darwin-specific options here if needed
+    # ── Desktop environment detection ───────────────────────────────
+    hasGnome = lib.mkOption {
+      type = lib.types.bool;
+      default = hasGnome;
+      readOnly = true;
+      description = "Whether GNOME is installed";
+    };
+    hasKDE = lib.mkOption {
+      type = lib.types.bool;
+      default = hasKDE;
+      readOnly = true;
+      description = "Whether KDE is installed";
+    };
   };
-} 
+}
+
+# ── Darwin-specific options ─────────────────────────────────────
+options = lib.mkIf isDarwin {
+  # Add Darwin-specific options here if needed
+}; 

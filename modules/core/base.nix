@@ -4,7 +4,7 @@
   # ── Basic configuration ──────────────────────────────────────────
   home.stateVersion = "24.05";
   home.username = username;
-  home.homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${username}" else "/home/${username}";
+  home.homeDirectory = if config.isDarwin then "/Users/${username}" else "/home/${username}";
 
   # ── Font configuration ───────────────────────────────────────────
   fonts.fontconfig.enable = true;
