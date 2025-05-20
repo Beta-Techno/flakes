@@ -28,7 +28,6 @@
       git-lfs
       gnumake
       gcc
-      clang
       cmake
       pkg-config
       openssl
