@@ -49,11 +49,6 @@ in
     };
   };
 
-  # ── Editor configurations ──────────────────────────────────────
-  # Expose configurations for nix eval and home.file use
-  lazyvimConfig = lazyvimConfig;
-  doomConfig = doomConfig;
-
   # Pass special arguments to editor modules
   _module.args = {
     inherit lazyvimStarter lazyvimConfig doomConfig nixGL helpers;
