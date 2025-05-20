@@ -1,6 +1,6 @@
 { config, pkgs, lib, ... }:
 
 {
-  imports = lib.optional config.isLinux ./linux
-    ++ lib.optional config.isDarwin ./darwin;
+  imports = lib.optional config.platform.isLinux ./linux
+    ++ lib.optional config.platform.isDarwin ./darwin;
 } 

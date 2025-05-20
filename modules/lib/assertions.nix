@@ -1,10 +1,12 @@
-{ config, pkgs, lib, ... }:
+{ lib, ... }:
 
 let
-  # ── Platform detection ──────────────────────────────────────────
-  isDarwin = pkgs.stdenv.isDarwin;
-  isLinux = pkgs.stdenv.isLinux;
-  isWSL = pkgs.stdenv.isLinux && builtins.pathExists "/proc/version" && 
+  inherit (lib) mkOption types mkIf;
+
+  # ── Platform detection (pure builtins) ──────────────────────────
+  isDarwin = builtins.match ".*-darwin" builtins.currentSystem != null;
+  isLinux = builtins.match ".*-linux" builtins.currentSystem != null;
+  isWSL = isLinux && builtins.pathExists "/proc/version" && 
           builtins.readFile "/proc/version" != "" && 
           builtins.match ".*Microsoft.*" (builtins.readFile "/proc/version") != null;
 
@@ -19,64 +21,64 @@ let
   hasKDE = isLinux && builtins.pathExists "/usr/bin/plasmashell";
 in
 {
-  options = {
+  options.platform = {
     # ── Platform detection ──────────────────────────────────────────
-    isDarwin = lib.mkOption {
-      type = lib.types.bool;
+    isDarwin = mkOption {
+      type = types.bool;
       default = isDarwin;
       readOnly = true;
       description = "Whether the system is running macOS";
     };
-    isLinux = lib.mkOption {
-      type = lib.types.bool;
+    isLinux = mkOption {
+      type = types.bool;
       default = isLinux;
       readOnly = true;
       description = "Whether the system is running Linux";
     };
-    isWSL = lib.mkOption {
-      type = lib.types.bool;
+    isWSL = mkOption {
+      type = types.bool;
       default = isWSL;
       readOnly = true;
       description = "Whether the system is running in WSL";
     };
 
     # ── System capabilities ─────────────────────────────────────────
-    hasSystemd = lib.mkOption {
-      type = lib.types.bool;
+    hasSystemd = mkOption {
+      type = types.bool;
       default = hasSystemd;
       readOnly = true;
       description = "Whether the system uses systemd";
     };
-    hasNvidia = lib.mkOption {
-      type = lib.types.bool;
+    hasNvidia = mkOption {
+      type = types.bool;
       default = hasNvidia;
       readOnly = true;
       description = "Whether the system has an NVIDIA GPU";
     };
-    hasAMD = lib.mkOption {
-      type = lib.types.bool;
+    hasAMD = mkOption {
+      type = types.bool;
       default = hasAMD;
       readOnly = true;
       description = "Whether the system has an AMD GPU";
     };
 
     # ── Desktop environment detection ───────────────────────────────
-    hasGnome = lib.mkOption {
-      type = lib.types.bool;
+    hasGnome = mkOption {
+      type = types.bool;
       default = hasGnome;
       readOnly = true;
       description = "Whether GNOME is installed";
     };
-    hasKDE = lib.mkOption {
-      type = lib.types.bool;
+    hasKDE = mkOption {
+      type = types.bool;
       default = hasKDE;
       readOnly = true;
       description = "Whether KDE is installed";
     };
   };
 
-  # ── Darwin-specific options ─────────────────────────────────────
-  config = lib.mkIf isDarwin {
-    # Add Darwin-specific options here if needed
+  # ── Darwin-specific config ─────────────────────────────────────
+  config = mkIf isDarwin {
+    # Add Darwin-specific config here if needed
   };
 } 

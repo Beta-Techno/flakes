@@ -50,7 +50,7 @@
     nixos-rebuild
     nixos-generate-config
     nixos-enter
-  ] // lib.optionalAttrs config.hasAMD [
+  ] // lib.optionalAttrs config.platform.hasAMD [
     # AMD GPU specific packages
     rocm-opencl-runtime
     rocm-opencl-icd
@@ -63,12 +63,12 @@
   ];
 
   # ── Desktop environment detection ───────────────────────────────
-  imports = lib.optional config.hasGnome ./desktop/gnome.nix
-    ++ lib.optional config.hasKDE ./desktop/kde.nix
-    ++ lib.optional config.isWSL ./wsl.nix;
+  imports = lib.optional config.platform.hasGnome ./desktop/gnome.nix
+    ++ lib.optional config.platform.hasKDE ./desktop/kde.nix
+    ++ lib.optional config.platform.isWSL ./wsl.nix;
 
   # ── Systemd user services ───────────────────────────────────────
-  systemd.user.services = lib.mkIf config.hasSystemd {
+  systemd.user.services = lib.mkIf config.platform.hasSystemd {
     # Add systemd user services here
   };
 
@@ -85,13 +85,13 @@
       driSupport = true;
       driSupport32Bit = true;
     };
-  } // lib.optionalAttrs config.hasNvidia {
+  } // lib.optionalAttrs config.platform.hasNvidia {
     nvidia = {
       package = config.boot.kernelPackages.nvidiaPackages.stable;
       modesetting.enable = true;
       powerManagement.enable = true;
     };
-  } // lib.optionalAttrs config.hasAMD {
+  } // lib.optionalAttrs config.platform.hasAMD {
     amdgpu = {
       enable = true;
     };
