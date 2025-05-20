@@ -1,9 +1,5 @@
-{ pkgs, self }:
+{ pkgs }:
 
-let
-  flakePath = self;
-  cloneDir = "$HOME/repos";
-in
 {
   program = pkgs.writeShellApplication {
     name = "setup";
@@ -18,8 +14,8 @@ in
     text = ''
       set -euo pipefail
 
-      # Absolute path to the flake that built this binary
-      FLAKE="''${flakePath}"
+      # Get the absolute path to the flake directory
+      FLAKE="$(cd "$(dirname "$0")/../../.." && pwd)"
 
       # ── Helper functions ─────────────────────────────────────────
       die() {
