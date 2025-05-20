@@ -35,7 +35,7 @@
           ];
         };
       };
-      flakeRef = builtins.toString self;  # Convert flake to store path
+      flakeRef = "github:Beta-Techno/flakes";  # Using remote ref instead of store path
     in
     {
       # Expose configurations for nix eval and home.file use
