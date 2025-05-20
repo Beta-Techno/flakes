@@ -72,6 +72,7 @@ in
       document-font-name = "JetBrainsMono Nerd Font 11";
       enable-hot-corners = true;
       show-battery-percentage = true;
+      accent-color = primaryColor;
     };
 
     "org/gnome/shell/extensions/user-theme" = {
@@ -93,20 +94,6 @@ in
       primary-color = primaryColor;
       secondary-color = secondaryColor;
       color-shading-type = "solid";
-    };
-
-    # Set accent color for various GNOME components
-    "org/gnome/desktop/interface" = {
-      color-scheme = "prefer-dark";
-      gtk-theme = "Yaru-dark";
-      icon-theme = "Yaru";
-      cursor-theme = "Yaru";
-      font-name = "JetBrainsMono Nerd Font 11";
-      monospace-font-name = "JetBrainsMono Nerd Font 11";
-      document-font-name = "JetBrainsMono Nerd Font 11";
-      enable-hot-corners = true;
-      show-battery-percentage = true;
-      accent-color = primaryColor;
     };
 
     "org/gnome/shell" = {
