@@ -31,7 +31,7 @@
         echo "Unknown machine type. Please specify manually:"
         echo "1) MacBook Air (2014)"
         echo "2) MacBook Pro 13\" (2015)"
-        read -p "Choose (1/2): " choice
+        read -rp "Choose (1/2): " choice
         case $choice in
           1) MACHINE="macbook-air" ;;
           2) MACHINE="macbook-pro" ;;
