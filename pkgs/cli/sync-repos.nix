@@ -30,16 +30,16 @@
       mkdir -p "''${REPOS_DIR}"
 
       # ── Process each repository ──────────────────────────────────
-      while IFS= read -r repo; do
+      yq e '.[]' "''${CATALOG_FILE}" | while read -r repo; do
         if [ -z "''${repo}" ]; then
           continue
         fi
 
         # Extract repository details
-        name=$(echo "''${repo}" | yq e '.name' -)
-        url=$(echo "''${repo}" | yq e '.url' -)
-        kind=$(echo "''${repo}" | yq e '.kind' -)
-        lang=$(echo "''${repo}" | yq e '.lang' -)
+        name=$(yq e '.name' - <<< "''${repo}")
+        url=$(yq e '.url' - <<< "''${repo}")
+        kind=$(yq e '.kind' - <<< "''${repo}")
+        lang=$(yq e '.lang' - <<< "''${repo}")
         
         # Create target path from kind and lang
         target="''${REPOS_DIR}/''${kind}/''${lang}/''${name}"
@@ -57,7 +57,7 @@
           echo "  updating..."
           (cd "''${target}" && git pull --ff-only)
         fi
-      done < <(yq e '.[]' "''${CATALOG_FILE}")
+      done
 
       echo "✅  Repository sync complete"
     '';
