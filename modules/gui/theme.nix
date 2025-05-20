@@ -13,15 +13,6 @@ in
   # Explicitly enable XDG support
   xdg.enable = true;
 
-  # Create backgrounds directory
-  home.activation = {
-    createBackgroundsDir = lib.hm.dag.entryAfter ["writeBoundary"] ''
-      $DRY_RUN_CMD mkdir -p $VERBOSE_ARG ${config.xdg.dataHome}/backgrounds
-      $DRY_RUN_CMD chmod $VERBOSE_ARG 755 ${config.xdg.dataHome}/backgrounds
-      echo "Created backgrounds directory at ${config.xdg.dataHome}/backgrounds"
-    '';
-  };
-
   # GTK Theme
   gtk = {
     enable = true;
@@ -57,11 +48,13 @@ in
   };
 
   # ── Wallpaper Configuration ─────────────────────────────────────
-  xdg.dataFile = lib.mkMerge [
-    {
-      "backgrounds/fish.jpeg".source = wallpaperPath;
-    }
-  ];
+  home.activation = {
+    copyWallpaper = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      $DRY_RUN_CMD mkdir -p $VERBOSE_ARG ${xdgDataHome}/backgrounds
+      $DRY_RUN_CMD cp $VERBOSE_ARG ${wallpaperPath} ${xdgDataHome}/backgrounds/fish.jpeg
+      echo "Copied wallpaper to ${xdgDataHome}/backgrounds/fish.jpeg"
+    '';
+  };
 
   # ── GNOME Theme Settings ────────────────────────────────────────
   dconf.enable = true;
