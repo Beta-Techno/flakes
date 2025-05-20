@@ -12,7 +12,6 @@
   # ── Home Manager ────────────────────────────────────────────────
   programs.home-manager = {
     enable = true;
-    path = "...";  # This will be set by home-manager
   };
 
   # ── Shell configuration ─────────────────────────────────────────
