@@ -35,6 +35,7 @@
           ];
         };
       };
+      flakeRef = builtins.toString self;  # Convert flake to store path
     in
     {
       # Expose configurations for nix eval and home.file use
@@ -130,8 +131,7 @@
         # CLI tools
         auth = (import ./pkgs/cli/auth.nix { inherit pkgs; }).program;
         setup = (import ./pkgs/cli/setup.nix { 
-          inherit pkgs;
-          flakeRef = builtins.toString self;
+          inherit pkgs flakeRef;
         }).program;
         sync-repos = (import ./pkgs/cli/sync-repos.nix { inherit pkgs; }).program;
         doctor = (import ./pkgs/cli/doctor.nix { inherit pkgs; }).program;
