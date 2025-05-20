@@ -65,6 +65,7 @@
           modules = [
             ./profiles/default-linux.nix
             ./hosts/macbook-air.nix
+            nix-doom.hmModule
           ];
           extraSpecialArgs = {
             username = if builtins.getEnv "USERNAME" != "" then builtins.getEnv "USERNAME" else builtins.getEnv "USER";
@@ -77,6 +78,7 @@
           modules = [
             ./profiles/default-linux.nix
             ./hosts/macbook-pro.nix
+            nix-doom.hmModule
           ];
           extraSpecialArgs = {
             username = if builtins.getEnv "USERNAME" != "" then builtins.getEnv "USERNAME" else builtins.getEnv "USER";
