@@ -9,6 +9,14 @@ in
   # Explicitly enable XDG support
   xdg.enable = true;
 
+  # Create backgrounds directory
+  home.activation = {
+    createBackgroundsDir = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      $DRY_RUN_CMD mkdir -p $VERBOSE_ARG ${config.xdg.dataHome}/backgrounds
+      $DRY_RUN_CMD chmod $VERBOSE_ARG 755 ${config.xdg.dataHome}/backgrounds
+    '';
+  };
+
   # GTK Theme
   gtk = {
     enable = true;
@@ -48,7 +56,9 @@ in
     source = ../../assets/wallpapers/fish.jpeg;
     onChange = ''
       echo "Wallpaper file changed at $(date)"
-      ls -l ${config.xdg.dataHome}/backgrounds/fish.jpeg
+      echo "XDG_DATA_HOME: $XDG_DATA_HOME"
+      echo "Target directory: ${config.xdg.dataHome}/backgrounds"
+      ls -la ${config.xdg.dataHome}/backgrounds
     '';
   };
 
