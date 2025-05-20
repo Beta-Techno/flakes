@@ -110,4 +110,9 @@
     usbutils
     lshw
   ];
+
+  # ── Platform-specific imports ───────────────────────────────────
+  imports = [
+    ./platform-specific.nix
+  ];
 } 
