@@ -80,10 +80,4 @@
       close = ["<Super>q"];
     };
   };
-
-  # ── GNOME packages ─────────────────────────────────────────────
-  home.packages = with pkgs; [
-    gnome-shell
-    gnome-control-center
-  ];
 } 
