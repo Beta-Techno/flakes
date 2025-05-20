@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ../../gui/theme.nix
+    ../../../gui/theme.nix
   ];
 
   # ── GNOME-specific settings ────────────────────────────────────
