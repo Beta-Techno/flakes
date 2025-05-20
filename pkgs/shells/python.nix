@@ -1,12 +1,12 @@
-{ pkgs, ... }:
+{ pkgs }:
 
-{
+pkgs.mkShell {
   buildInputs = with pkgs; [
     # Python toolchain
     python3
     python3Packages.pip
     python3Packages.virtualenv
-    python3Packages.poetry
+    poetry-core
 
     # Development tools
     ruff  # Fast Python linter
