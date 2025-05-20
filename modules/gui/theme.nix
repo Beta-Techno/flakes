@@ -81,7 +81,7 @@ in
     gnome-tweaks
     gnome-shell-extensions
     gnomeExtensions.appindicator
-    gnome-shell-extension-tray-icons-reloaded
+    gnomeExtensions.tray-icons-reloaded
     hardcode-tray
   ];
 
