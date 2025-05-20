@@ -1,5 +1,9 @@
 { config, pkgs, lib, ... }:
 
+let
+  # Get the wallpaper path relative to the repository root
+  wallpaperPath = ./../../../assets/wallpapers/fish.jpeg;
+in
 {
   # ── GNOME-specific settings ────────────────────────────────────
   dconf.enable = true;
@@ -46,13 +50,13 @@
       titlebar-font = "JetBrainsMono Nerd Font Bold 11";
     };
     "org/gnome/desktop/background" = {
-      picture-uri = "file://${pkgs.gnome-backgrounds}/share/backgrounds/gnome/adwaita-timed.xml";
-      picture-uri-dark = "file://${pkgs.gnome-backgrounds}/share/backgrounds/gnome/adwaita-timed.xml";
+      picture-uri = "file://${wallpaperPath}";
+      picture-uri-dark = "file://${wallpaperPath}";
       primary-color = "#3071AE";
       secondary-color = "#000000";
     };
     "org/gnome/desktop/screensaver" = {
-      picture-uri = "file://${pkgs.gnome-backgrounds}/share/backgrounds/gnome/adwaita-timed.xml";
+      picture-uri = "file://${wallpaperPath}";
       primary-color = "#3071AE";
       secondary-color = "#000000";
     };
