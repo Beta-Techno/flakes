@@ -19,13 +19,14 @@ let
   hasKDE = isLinux && builtins.pathExists "/usr/bin/plasmashell";
 in
 {
-  # ── Platform detection ──────────────────────────────────────────
-  _module.args = {
-    inherit isDarwin isLinux isWSL;
-  };
+  config = {
+    # ── Platform detection ──────────────────────────────────────────
+    _module.args = {
+      inherit isDarwin isLinux isWSL;
+    };
 
-  # ── Platform-specific options ───────────────────────────────────
-  config = lib.mkIf isLinux {
+    # ── Platform-specific options ───────────────────────────────────
+  } // lib.mkIf isLinux {
     hasSystemd = hasSystemd;
     hasNvidia = hasNvidia;
     hasAMD = hasAMD;
