@@ -45,7 +45,7 @@
         macbook-air = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
-            ./profiles/default-darwin.nix
+            ./profiles/default-linux.nix
             ./hosts/macbook-air.nix
           ];
           extraSpecialArgs = {
@@ -56,7 +56,7 @@
         macbook-pro = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
-            ./profiles/default-darwin.nix
+            ./profiles/default-linux.nix
             ./hosts/macbook-pro.nix
           ];
           extraSpecialArgs = {
@@ -69,10 +69,19 @@
       packages.${system} = {
         detect-machine = pkgs.writeShellScriptBin "detect-machine" ''
           set -euo pipefail
-          if lscpu | grep -q "Intel(R) Core(TM) i7-4650U"; then
-            echo "macbook-air"
-          elif lscpu | grep -q "Intel(R) Core(TM) i5-5257U"; then
-            echo "macbook-pro"
+          if [ -f /sys/class/dmi/id/product_name ]; then
+            PRODUCT_NAME=$(cat /sys/class/dmi/id/product_name)
+            case "$PRODUCT_NAME" in
+              "MacBookAir6,2")
+                echo "macbook-air"
+                ;;
+              "MacBookPro12,1")
+                echo "macbook-pro"
+                ;;
+              *)
+                echo "unknown"
+                ;;
+            esac
           else
             echo "unknown"
           fi
