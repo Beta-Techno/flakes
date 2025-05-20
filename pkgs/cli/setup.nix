@@ -41,14 +41,14 @@
       echo "▶ Installing development shells"
       for lang in rust go python; do
         echo "+ installing $lang toolchain"
-        nix profile install "$FLAKE"#"$lang" -L || die "Failed to install $lang toolchain"
+        nix profile install "$FLAKE"#"$lang" --impure -L || die "Failed to install $lang toolchain"
       done
 
       # ── Install helper CLIs ──────────────────────────────────────
       echo "▶ Installing helper CLIs"
       for tool in sync-repos doctor; do
         echo "+ installing $tool"
-        nix profile install "$FLAKE"#"$tool" -L || die "Failed to install $tool"
+        nix profile install "$FLAKE"#"$tool" --impure -L || die "Failed to install $tool"
       done
 
       # ── Set up user configuration ────────────────────────────────
