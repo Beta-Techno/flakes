@@ -26,12 +26,12 @@ in
   gtk = {
     enable = true;
     theme = {
-      name = "Adwaita-dark";
-      package = pkgs.gnome-themes-extra;
+      name = "Yaru-dark";
+      package = pkgs.yaru-theme;
     };
     iconTheme = {
-      name = "Adwaita";
-      package = pkgs.adwaita-icon-theme;
+      name = "Yaru";
+      package = pkgs.yaru-theme;
     };
   };
 
@@ -42,8 +42,8 @@ in
       name = "gtk";
     };
     style = {
-      name = "adwaita-dark";
-      package = pkgs.adwaita-qt;
+      name = "yaru-dark";
+      package = pkgs.yaru-theme;
     };
   };
 
