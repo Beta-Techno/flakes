@@ -15,11 +15,13 @@
   ];
 
   # Enable Doom Emacs
-  programs.doom-emacs = {
-    enable = true;
-    doomDir = doomConfig;
-    emacs = pkgs.emacs30-pgtk;
-    doomLocalDir = "/home/${username}/.local/share/doom";
+  programs = {
+    doom-emacs = {
+      enable = true;
+      doomDir = doomConfig;
+      emacs = pkgs.emacs30-pgtk;
+      doomLocalDir = "/home/${username}/.local/share/doom";
+    };
   };
 
   # Use the templates from home/editors/doom
