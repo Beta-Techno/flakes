@@ -1,8 +1,11 @@
 { config, pkgs, lib, ... }:
 
 let
-  # Theme package
-  theme = pkgs.yaru-theme;
+  # Theme package - use Ubuntu's official package
+  yaruUbuntu = pkgs.deb2nix.buildDebPackage {
+    url = "https://mirrors.kernel.org/ubuntu/pool/main/y/yaru-theme/yaru-theme_24.04.1_all.deb";
+    sha256 = "0lqlp93sf2n8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q";  # TODO: Get actual hash
+  };
   # Wallpaper path
   wallpaperPath = ../../assets/wallpapers/fish.jpeg;
   # XDG data home with fallback
@@ -13,16 +16,21 @@ in
   # Explicitly enable XDG support
   xdg.enable = true;
 
+  # Put Ubuntu's data dir after the Nix profile
+  home.sessionVariables = {
+    XDG_DATA_DIRS = lib.mkForce "${config.home.profileDirectory}/share:/usr/share";
+  };
+
   # GTK Theme
   gtk = {
     enable = true;
     theme = {
       name = "Yaru-dark";  # Plain Yaru-dark without color suffix
-      package = theme;
+      package = yaruUbuntu;
     };
     iconTheme = {
       name = "Yaru";  # Plain Yaru without color suffix
-      package = theme;
+      package = yaruUbuntu;
     };
     font = {
       name = "JetBrainsMono Nerd Font";
@@ -43,7 +51,7 @@ in
   # Cursor Theme
   home.pointerCursor = {
     name = "Yaru-dark";
-    package = theme;
+    package = yaruUbuntu;
     size = 24;
   };
 
@@ -69,6 +77,7 @@ in
       document-font-name = "JetBrainsMono Nerd Font 11";
       enable-hot-corners = true;
       show-battery-percentage = true;
+      accent-color = "purple";  # This should now work with Ubuntu's schemas
     };
 
     "org/gnome/shell/extensions/user-theme" = {
