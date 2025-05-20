@@ -1,4 +1,4 @@
-{ pkgs, flakeRef }:
+{ pkgs }:
 
 {
   program = pkgs.writeShellApplication {
@@ -14,8 +14,9 @@
     text = ''
       set -euo pipefail
 
-      # Get the flake reference
-      FLAKE="${flakeRef}"
+      # Set default FLAKE_PATH if not provided
+      FLAKE_PATH="''${FLAKE_PATH:-$HOME/flakes}"
+      FLAKE="$FLAKE_PATH"
 
       # ── Helper functions ─────────────────────────────────────────
       die() {
@@ -41,7 +42,7 @@
       echo "▶ Installing development shells"
       for lang in rust go python; do
         echo "+ installing $lang toolchain"
-        nix profile install "$FLAKE"#"$lang" --impure -L || die "Failed to install $lang toolchain"
+        nix profile install "$FLAKE"#"$lang" -L || die "Failed to install $lang toolchain"
       done
 
       # ── Install helper CLIs ──────────────────────────────────────

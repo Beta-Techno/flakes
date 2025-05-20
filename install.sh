@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # ── Configuration ────────────────────────────────────────────
-TOOLBOX_DIR="$HOME/.local/share/flakes"
+TOOLBOX_DIR="$HOME/flakes"
 REPO_URL_HTTPS="https://github.com/Beta-Techno/flakes.git"
 REPO_URL_SSH="git@github.com:Beta-Techno/flakes.git"
 

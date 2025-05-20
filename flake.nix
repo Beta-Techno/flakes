@@ -35,7 +35,6 @@
           ];
         };
       };
-      flakeRef = "github:Beta-Techno/flakes";  # Using remote ref instead of store path
     in
     {
       # Expose configurations for nix eval and home.file use
@@ -154,7 +153,7 @@
         # CLI tools
         auth = (import ./pkgs/cli/auth.nix { inherit pkgs; }).program;
         setup = (import ./pkgs/cli/setup.nix { 
-          inherit pkgs flakeRef;
+          inherit pkgs;
         }).program;
         sync-repos = (import ./pkgs/cli/sync-repos.nix { inherit pkgs; }).program;
         doctor = (import ./pkgs/cli/doctor.nix { inherit pkgs; }).program;
