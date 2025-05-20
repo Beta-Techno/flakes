@@ -19,9 +19,10 @@
       flake = false;
     };
     nixGL.url = "github:guibou/nixGL";
+    deb2nix.url = "github:jordanisaacs/deb2nix";
   };
 
-  outputs = { self, nixpkgs, home-manager, nix-doom, nixGL, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, nix-doom, nixGL, deb2nix, ... }@inputs:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs {

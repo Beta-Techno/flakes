@@ -4,7 +4,7 @@ let
   # Theme package - use Ubuntu's official package
   yaruUbuntu = pkgs.deb2nix.buildDebPackage {
     url = "https://mirrors.kernel.org/ubuntu/pool/main/y/yaru-theme/yaru-theme_24.04.1_all.deb";
-    sha256 = "0lqlp93sf2n8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q";  # TODO: Get actual hash
+    sha256 = "sha256-0000000000000000000000000000000000000000000000000000";  # This will be updated by nix
   };
   # Wallpaper path
   wallpaperPath = ../../assets/wallpapers/fish.jpeg;
