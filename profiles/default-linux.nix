@@ -38,7 +38,9 @@ in
   # Enable Qt theming
   qt = {
     enable = true;
-    platformTheme = "gtk";
+    platformTheme = {
+      name = "gtk";
+    };
     style = {
       name = "adwaita-dark";
       package = pkgs.adwaita-qt;
@@ -49,6 +51,9 @@ in
   xdg = {
     portal = {
       enable = true;
+      config = {
+        common.default = "*";
+      };
       extraPortals = with pkgs; [
         xdg-desktop-portal-gtk
         xdg-desktop-portal-wlr
