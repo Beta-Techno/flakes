@@ -45,10 +45,9 @@
         if ! gh auth status &>/dev/null; then
           echo "+ authenticating with GitHub"
           echo "  Choose your preferred authentication method:"
-          echo "  1) Open browser automatically (may not work in all environments)"
-          echo "  2) Copy URL to clipboard and open manually"
-          echo "  3) Display URL to copy manually"
-          read -rp "  Enter choice [1-3]: " auth_choice
+          echo "  1) Open browser automatically"
+          echo "  2) Use token authentication"
+          read -rp "  Enter choice [1-2]: " auth_choice
 
           case "''${auth_choice}" in
             1)
@@ -58,25 +57,17 @@
               fi
               ;;
             2)
-              echo "  Copying URL to clipboard..."
-              auth_url="$(gh auth login --hostname github.com --web --print-url)"
-              echo "''${auth_url}" | xclip -selection clipboard
-              echo "  URL copied to clipboard. Please open it in your browser."
-              ;;
-            3)
-              echo "  Please visit this URL in your browser:"
-              gh auth login --hostname github.com --web --print-url
+              echo "  Please enter your GitHub token:"
+              read -rsp "  Token: " token
+              echo
+              if ! gh auth login --hostname github.com --with-token <<<"$token"; then
+                die "Failed to authenticate with token. Please try again."
+              fi
               ;;
             *)
               die "Invalid choice. Please try again."
               ;;
           esac
-
-          # Wait for user to complete authentication
-          echo ""
-          echo "  Please complete the authentication in your browser."
-          echo "  Press Enter when done..."
-          read -r
 
           # Verify authentication worked
           if ! gh auth status &>/dev/null; then
