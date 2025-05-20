@@ -41,7 +41,7 @@ in
   };
 
   # ── Wallpaper Configuration ─────────────────────────────────────
-  xdg.dataFile."backgrounds/fish.jpeg".source = ./../../assets/wallpapers/fish.jpeg;
+  xdg.dataFile."backgrounds/fish.jpeg".source = ../../assets/wallpapers/fish.jpeg;
 
   # ── GNOME Theme Settings ────────────────────────────────────────
   dconf.enable = true;
