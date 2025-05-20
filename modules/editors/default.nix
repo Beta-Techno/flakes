@@ -5,8 +5,4 @@
     ./lazyvim.nix
     ./doom.nix
   ];
-
-  _module.args = {
-    inherit helpers;
-  };
 } 

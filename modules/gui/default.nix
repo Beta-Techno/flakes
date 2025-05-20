@@ -1,8 +1,5 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, helpers, ... }:
 
-let
-  helpers = import ../lib/helpers.nix { inherit pkgs lib; };
-in
 {
   imports = [
     ./chrome.nix
@@ -12,8 +9,4 @@ in
     ./dock.nix
     ./fonts.nix
   ];
-
-  _module.args = {
-    inherit helpers;
-  };
 } 

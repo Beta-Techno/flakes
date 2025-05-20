@@ -4,8 +4,4 @@
   imports = [
     ./alacritty.nix
   ];
-
-  _module.args = {
-    inherit helpers;
-  };
 } 

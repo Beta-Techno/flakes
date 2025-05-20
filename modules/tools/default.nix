@@ -10,8 +10,4 @@
     ./network-tools.nix
     ./tmux.nix
   ];
-
-  _module.args = {
-    inherit helpers;
-  };
 } 
