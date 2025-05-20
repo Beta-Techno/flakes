@@ -7,6 +7,9 @@ let
   wallpaperPath = ../../assets/wallpapers/fish.jpeg;
   # XDG data home with fallback
   xdgDataHome = config.home.homeDirectory + "/.local/share";
+  # Theme colors
+  primaryColor = "#7B68EE";  # Medium Slate Blue
+  secondaryColor = "#4B0082";  # Indigo
 in
 {
   # ── Theme configuration ─────────────────────────────────────────
@@ -79,17 +82,40 @@ in
       picture-uri = "file://${xdgDataHome}/backgrounds/fish.jpeg";
       picture-uri-dark = "file://${xdgDataHome}/backgrounds/fish.jpeg";
       picture-options = "zoom";
-      primary-color = "#000000";
-      secondary-color = "#000000";
+      primary-color = primaryColor;
+      secondary-color = secondaryColor;
       color-shading-type = "solid";
     };
 
     "org/gnome/desktop/screensaver" = {
       picture-uri = "file://${xdgDataHome}/backgrounds/fish.jpeg";
       picture-options = "zoom";
-      primary-color = "#000000";
-      secondary-color = "#000000";
+      primary-color = primaryColor;
+      secondary-color = secondaryColor;
       color-shading-type = "solid";
+    };
+
+    # Set accent color for various GNOME components
+    "org/gnome/desktop/interface" = {
+      color-scheme = "prefer-dark";
+      gtk-theme = "Yaru-dark";
+      icon-theme = "Yaru";
+      cursor-theme = "Yaru";
+      font-name = "JetBrainsMono Nerd Font 11";
+      monospace-font-name = "JetBrainsMono Nerd Font 11";
+      document-font-name = "JetBrainsMono Nerd Font 11";
+      enable-hot-corners = true;
+      show-battery-percentage = true;
+      accent-color = primaryColor;
+    };
+
+    "org/gnome/shell" = {
+      enabled-extensions = [
+        "user-theme@gnome-shell-extensions.gcampax.github.com"
+        "appindicatorsupport@rgcjonas.gmail.com"
+        "trayIconsReloaded@selfmade.pl"
+      ];
+      color-scheme = "prefer-dark";
     };
   };
 
@@ -99,12 +125,5 @@ in
     gnome-shell-extensions
     gnomeExtensions.appindicator
     gnomeExtensions.tray-icons-reloaded
-  ];
-
-  # Enable required extensions
-  dconf.settings."org/gnome/shell".enabled-extensions = [
-    "user-theme@gnome-shell-extensions.gcampax.github.com"
-    "appindicatorsupport@rgcjonas.gmail.com"
-    "trayIconsReloaded@selfmade.pl"
   ];
 } 
