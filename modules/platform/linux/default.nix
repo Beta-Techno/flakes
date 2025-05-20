@@ -90,23 +90,4 @@
     enable = true;
     windowManager.command = "i3";
   };
-
-  # ── Graphics configuration ──────────────────────────────────────
-  hardware = {
-    opengl = {
-      enable = true;
-      driSupport = true;
-      driSupport32Bit = true;
-    };
-  } // lib.optionalAttrs platform.hasNvidia {
-    nvidia = {
-      package = pkgs.linuxPackages.nvidiaPackages.stable;
-      modesetting.enable = true;
-      powerManagement.enable = true;
-    };
-  } // lib.optionalAttrs platform.hasAMD {
-    amdgpu = {
-      enable = true;
-    };
-  };
 } 
