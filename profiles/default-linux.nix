@@ -52,21 +52,51 @@ in
     portal = {
       enable = true;
       config = {
-        common.default = [ "*" ];
-        # Explicitly set portal backends for each interface
-        "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
-        "org.freedesktop.impl.portal.Screenshot" = [ "gtk" ];
-        "org.freedesktop.impl.portal.Settings" = [ "gtk" ];
-        "org.freedesktop.impl.portal.Wallpaper" = [ "gtk" ];
-        "org.freedesktop.impl.portal.Notification" = [ "gtk" ];
-        "org.freedesktop.impl.portal.Clipboard" = [ "gtk" ];
-        "org.freedesktop.impl.portal.Device" = [ "gtk" ];
-        "org.freedesktop.impl.portal.AppChooser" = [ "gtk" ];
-        "org.freedesktop.impl.portal.Background" = [ "gtk" ];
-        "org.freedesktop.impl.portal.Inhibit" = [ "gtk" ];
-        "org.freedesktop.impl.portal.Print" = [ "gtk" ];
-        "org.freedesktop.impl.portal.Session" = [ "gtk" ];
-        "org.freedesktop.impl.portal.Trash" = [ "gtk" ];
+        # Common settings that apply to every desktop
+        common = {
+          default = [ "*" ];
+        };
+
+        # Interface-specific settings
+        "org.freedesktop.impl.portal.FileChooser" = {
+          default = [ "gtk" ];
+        };
+        "org.freedesktop.impl.portal.Screenshot" = {
+          default = [ "gtk" ];
+        };
+        "org.freedesktop.impl.portal.Settings" = {
+          default = [ "gtk" ];
+        };
+        "org.freedesktop.impl.portal.Wallpaper" = {
+          default = [ "gtk" ];
+        };
+        "org.freedesktop.impl.portal.Notification" = {
+          default = [ "gtk" ];
+        };
+        "org.freedesktop.impl.portal.Clipboard" = {
+          default = [ "gtk" ];
+        };
+        "org.freedesktop.impl.portal.Device" = {
+          default = [ "gtk" ];
+        };
+        "org.freedesktop.impl.portal.AppChooser" = {
+          default = [ "gtk" ];
+        };
+        "org.freedesktop.impl.portal.Background" = {
+          default = [ "gtk" ];
+        };
+        "org.freedesktop.impl.portal.Inhibit" = {
+          default = [ "gtk" ];
+        };
+        "org.freedesktop.impl.portal.Print" = {
+          default = [ "gtk" ];
+        };
+        "org.freedesktop.impl.portal.Session" = {
+          default = [ "gtk" ];
+        };
+        "org.freedesktop.impl.portal.Trash" = {
+          default = [ "gtk" ];
+        };
       };
       extraPortals = with pkgs; [
         xdg-desktop-portal-gtk
