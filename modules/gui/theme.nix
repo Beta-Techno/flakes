@@ -31,12 +31,12 @@ in
   };
 
   # Qt Theme
-  qt = lib.mkDefault {
+  qt = {
     enable = true;
     platformTheme = "gtk";
     style = {
       name = "yaru-dark";
-      package = theme;
+      package = null;  # Let the system use the GTK theme
     };
   };
 
