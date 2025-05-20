@@ -80,7 +80,7 @@ in
   home.packages = with pkgs; [
     gnome-tweaks
     gnome-shell-extensions
-    gnome-shell-extension-appindicator
+    gnomeExtensions.appindicator
     gnome-shell-extension-tray-icons-reloaded
     hardcode-tray
   ];
