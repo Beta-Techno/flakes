@@ -128,6 +128,29 @@
           export USERNAME
           nix run .#homeConfigurations.''${MACHINE}.activationPackage --impure
         '';
+        # Development shells
+        rust = pkgs.mkShell {
+          buildInputs = with pkgs; [
+            rustc
+            cargo
+            rustfmt
+            clippy
+          ];
+        };
+        go = pkgs.mkShell {
+          buildInputs = with pkgs; [
+            go
+            gopls
+            gotools
+          ];
+        };
+        python = pkgs.mkShell {
+          buildInputs = with pkgs; [
+            python3
+            python3Packages.pip
+            python3Packages.virtualenv
+          ];
+        };
         # CLI tools
         auth = (import ./pkgs/cli/auth.nix { inherit pkgs; }).program;
         setup = (import ./pkgs/cli/setup.nix { 
