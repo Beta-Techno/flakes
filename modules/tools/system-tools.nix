@@ -25,7 +25,7 @@
     unzip
     p7zip
     gzip
-    tar
+    gnutar
 
     # JetBrains tools
     jetbrains.datagrip
