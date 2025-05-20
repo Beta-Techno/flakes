@@ -49,7 +49,7 @@
       nixd
       nixos-option
       nixos-rebuild
-      nixos-generate-config
+      nixos-generators
       nixos-enter
 
       # X11 utilities
