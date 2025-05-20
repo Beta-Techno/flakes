@@ -5,6 +5,8 @@ let
   theme = pkgs.yaru-theme;
   # Wallpaper path
   wallpaperPath = ../../assets/wallpapers/fish.jpeg;
+  # XDG data home with fallback
+  xdgDataHome = config.home.homeDirectory + "/.local/share";
 in
 {
   # ── Theme configuration ─────────────────────────────────────────
@@ -81,8 +83,8 @@ in
     };
 
     "org/gnome/desktop/background" = {
-      picture-uri = "file://${config.xdg.dataHome}/backgrounds/fish.jpeg";
-      picture-uri-dark = "file://${config.xdg.dataHome}/backgrounds/fish.jpeg";
+      picture-uri = "file://${xdgDataHome}/backgrounds/fish.jpeg";
+      picture-uri-dark = "file://${xdgDataHome}/backgrounds/fish.jpeg";
       picture-options = "zoom";
       primary-color = "#000000";
       secondary-color = "#000000";
@@ -90,7 +92,7 @@ in
     };
 
     "org/gnome/desktop/screensaver" = {
-      picture-uri = "file://${config.xdg.dataHome}/backgrounds/fish.jpeg";
+      picture-uri = "file://${xdgDataHome}/backgrounds/fish.jpeg";
       picture-options = "zoom";
       primary-color = "#000000";
       secondary-color = "#000000";
