@@ -1,7 +1,8 @@
-{ lib, platform, ... }:
+{ lib, platform, pkgs, ... }:
 
 let
   inherit (lib) mkOption types mkIf;
+  system = pkgs.stdenv.system;
 in
 {
   ## Expose the pre-computed platform record as read-only
@@ -16,11 +17,11 @@ in
   config = {
     assertions = [
       {
-        assertion = !platform.isDarwin || (platform.isDarwin && (platform.system == "aarch64-darwin" || platform.system == "x86_64-darwin"));
+        assertion = !platform.isDarwin || (platform.isDarwin && (system == "aarch64-darwin" || system == "x86_64-darwin"));
         message = "The module targets.darwin.defaults does not support your platform. It only supports:\n- aarch64-darwin\n- x86_64-darwin";
       }
       {
-        assertion = !platform.isLinux || (platform.isLinux && (platform.system == "x86_64-linux" || platform.system == "aarch64-linux"));
+        assertion = !platform.isLinux || (platform.isLinux && (system == "x86_64-linux" || system == "aarch64-linux"));
         message = "The module targets.linux.defaults does not support your platform. It only supports:\n- x86_64-linux\n- aarch64-linux";
       }
     ];
