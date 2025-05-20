@@ -22,31 +22,6 @@ in
   ];
 
   # ── Linux-specific settings ───────────────────────────────────
-  # Enable GTK theming
-  gtk = {
-    enable = true;
-    theme = {
-      name = "Yaru-dark";
-      package = pkgs.yaru-theme;
-    };
-    iconTheme = {
-      name = "Yaru";
-      package = pkgs.yaru-theme;
-    };
-  };
-
-  # Enable Qt theming
-  qt = {
-    enable = true;
-    platformTheme = {
-      name = "gtk";
-    };
-    style = {
-      name = "yaru-dark";
-      package = pkgs.yaru-theme;
-    };
-  };
-
   # Enable XDG portal
   xdg = {
     portal = {
