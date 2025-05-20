@@ -31,12 +31,12 @@ in
   };
 
   # Qt Theme
-  qt = {
+  qt = lib.mkDefault {
     enable = true;
-    platformTheme = lib.mkDefault "gtk";
+    platformTheme = "gtk";
     style = {
-      name = lib.mkDefault "yaru-dark";
-      package = lib.mkDefault theme;
+      name = "yaru-dark";
+      package = theme;
     };
   };
 
