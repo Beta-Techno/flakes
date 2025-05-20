@@ -11,7 +11,7 @@
   ];
 
   # ── Kubernetes shell integration ──────────────────────────────
-  programs.zsh.shellInit = ''
+  programs.zsh.initExtra = ''
     # Kubernetes shell integration
     if [ -f /usr/share/zsh/site-functions/_kubectl ]; then
       source /usr/share/zsh/site-functions/_kubectl
