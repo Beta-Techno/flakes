@@ -2,12 +2,12 @@
 
 let
   helpers = import ../modules/lib/helpers.nix { inherit pkgs lib; };
-  assertions = import ../modules/lib/assertions.nix { inherit pkgs lib; };
 in
 {
   imports = [
     # Core modules
     ../modules/core/base.nix
+    ../modules/lib/assertions.nix
 
     # Platform-specific modules
     ../modules/platform/darwin
