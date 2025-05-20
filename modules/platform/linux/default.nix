@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ platform, pkgs, lib, ... }:
 
 {
   # ── Platform-specific settings ──────────────────────────────────
@@ -50,7 +50,7 @@
     nixos-rebuild
     nixos-generate-config
     nixos-enter
-  ] // lib.optionalAttrs config.platform.hasAMD [
+  ] // lib.optionalAttrs platform.hasAMD [
     # AMD GPU specific packages
     rocm-opencl-runtime
     rocm-opencl-icd
@@ -63,12 +63,12 @@
   ];
 
   # ── Desktop environment detection ───────────────────────────────
-  imports = lib.optional config.platform.hasGnome ./desktop/gnome.nix
-    ++ lib.optional config.platform.hasKDE ./desktop/kde.nix
-    ++ lib.optional config.platform.isWSL ./wsl.nix;
+  imports = lib.optional platform.hasGnome ./desktop/gnome.nix
+    ++ lib.optional platform.hasKDE ./desktop/kde.nix
+    ++ lib.optional platform.isWSL ./wsl.nix;
 
   # ── Systemd user services ───────────────────────────────────────
-  systemd.user.services = lib.mkIf config.platform.hasSystemd {
+  systemd.user.services = lib.mkIf platform.hasSystemd {
     # Add systemd user services here
   };
 
@@ -85,13 +85,13 @@
       driSupport = true;
       driSupport32Bit = true;
     };
-  } // lib.optionalAttrs config.platform.hasNvidia {
+  } // lib.optionalAttrs platform.hasNvidia {
     nvidia = {
-      package = config.boot.kernelPackages.nvidiaPackages.stable;
+      package = pkgs.linuxPackages.nvidiaPackages.stable;
       modesetting.enable = true;
       powerManagement.enable = true;
     };
-  } // lib.optionalAttrs config.platform.hasAMD {
+  } // lib.optionalAttrs platform.hasAMD {
     amdgpu = {
       enable = true;
     };
@@ -109,10 +109,5 @@
     pciutils
     usbutils
     lshw
-  ];
-
-  # ── Platform-specific imports ───────────────────────────────────
-  imports = [
-    ./platform-specific.nix
   ];
 } 
