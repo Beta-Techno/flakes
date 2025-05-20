@@ -10,7 +10,10 @@
   fonts.fontconfig.enable = true;
 
   # ── Home Manager ────────────────────────────────────────────────
-  programs.home-manager.enable = true;
+  programs.home-manager = {
+    enable = true;
+    path = "...";  # This will be set by home-manager
+  };
 
   # ── Shell configuration ─────────────────────────────────────────
   programs.zsh = {
