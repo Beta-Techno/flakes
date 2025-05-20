@@ -13,7 +13,7 @@
 
       # ── Configuration ────────────────────────────────────────────
       CATALOG_FILE="''${PWD}/catalog/repos.yaml"
-      REPOS_DIR="$HOME/repos"
+      REPOS_DIR="$HOME/code"
 
       # ── Helper functions ─────────────────────────────────────────
       die() {
@@ -35,25 +35,29 @@
           continue
         fi
 
-        # Extract repository name and path
-        name="''${repo%%:*}"
-        path="''${repo#*:}"
-        full_path="''${REPOS_DIR}/''${path}"
-
-        echo "+ syncing ''${name} to ''${path}"
+        # Extract repository details
+        name=$(echo "''${repo}" | yq e '.name' -)
+        url=$(echo "''${repo}" | yq e '.url' -)
+        kind=$(echo "''${repo}" | yq e '.kind' -)
+        lang=$(echo "''${repo}" | yq e '.lang' -)
+        
+        # Create target path from kind and lang
+        target="''${REPOS_DIR}/''${kind}/''${lang}/''${name}"
+        
+        echo "+ syncing ''${name} to ''${kind}/''${lang}/''${name}"
 
         # Create directory if it doesn't exist
-        mkdir -p "$(dirname "''${full_path}")"
+        mkdir -p "$(dirname "''${target}")"
 
         # Clone or update repository
-        if [ ! -d "''${full_path}/.git" ]; then
+        if [ ! -d "''${target}/.git" ]; then
           echo "  cloning..."
-          git clone "git@github.com:Beta-Techno/''${name}.git" "''${full_path}"
+          git clone "''${url}" "''${target}"
         else
           echo "  updating..."
-          (cd "''${full_path}" && git pull --ff-only)
+          (cd "''${target}" && git pull --ff-only)
         fi
-      done < <(yq e '.repos[] | .name + ":" + .path' "''${CATALOG_FILE}")
+      done < <(yq e '.[]' "''${CATALOG_FILE}")
 
       echo "✅  Repository sync complete"
     '';
