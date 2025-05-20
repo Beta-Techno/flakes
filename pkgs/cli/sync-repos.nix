@@ -30,34 +30,21 @@
       mkdir -p "''${REPOS_DIR}"
 
       # ── Process each repository ──────────────────────────────────
-      yq e '.[]' "''${CATALOG_FILE}" | while read -r repo; do
-        if [ -z "''${repo}" ]; then
-          continue
-        fi
+      yq e -o=tsv '.[] | [.name, .url, .kind, .lang] | @tsv' "''${CATALOG_FILE}" \
+      | while IFS=$'\t' read -r name url kind lang; do
+          echo "+ syncing ''${name} to ''${kind}/''${lang}/''${name}"
 
-        # Extract repository details
-        name=$(yq e '.name' - <<< "''${repo}")
-        url=$(yq e '.url' - <<< "''${repo}")
-        kind=$(yq e '.kind' - <<< "''${repo}")
-        lang=$(yq e '.lang' - <<< "''${repo}")
-        
-        # Create target path from kind and lang
-        target="''${REPOS_DIR}/''${kind}/''${lang}/''${name}"
-        
-        echo "+ syncing ''${name} to ''${kind}/''${lang}/''${name}"
+          target="''${REPOS_DIR}/''${kind}/''${lang}/''${name}"
+          mkdir -p "$(dirname "''${target}")"
 
-        # Create directory if it doesn't exist
-        mkdir -p "$(dirname "''${target}")"
-
-        # Clone or update repository
-        if [ ! -d "''${target}/.git" ]; then
-          echo "  cloning..."
-          git clone "''${url}" "''${target}"
-        else
-          echo "  updating..."
-          (cd "''${target}" && git pull --ff-only)
-        fi
-      done
+          if [ ! -d "''${target}/.git" ]; then
+            echo "  cloning..."
+            git clone "''${url}" "''${target}"
+          else
+            echo "  updating..."
+            (cd "''${target}" && git pull --ff-only)
+          fi
+        done
 
       echo "✅  Repository sync complete"
     '';
