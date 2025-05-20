@@ -6,6 +6,9 @@ let
 in
 {
   # ── Theme configuration ─────────────────────────────────────────
+  # Explicitly enable XDG support
+  xdg.enable = true;
+
   # GTK Theme
   gtk = {
     enable = true;
@@ -41,7 +44,13 @@ in
   };
 
   # ── Wallpaper Configuration ─────────────────────────────────────
-  xdg.dataFile."backgrounds/fish.jpeg".source = ../../assets/wallpapers/fish.jpeg;
+  xdg.dataFile."backgrounds/fish.jpeg" = {
+    source = ../../assets/wallpapers/fish.jpeg;
+    onChange = ''
+      echo "Wallpaper file changed at $(date)"
+      ls -l ${config.xdg.dataHome}/backgrounds/fish.jpeg
+    '';
+  };
 
   # ── GNOME Theme Settings ────────────────────────────────────────
   dconf.enable = true;
