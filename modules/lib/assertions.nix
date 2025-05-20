@@ -12,11 +12,17 @@ in
     description = "Platform detection and capabilities passed via specialArgs";
   };
 
-  ## Example: Darwin-only config (safe – evaluated after the graph exists)
-  config = mkIf platform.isDarwin {
-    assertions = [{
-      assertion = platform.isDarwin;
-      message   = "Darwin-specific profile imported on a non-Darwin host";
-    }];
+  ## Platform-specific assertions
+  config = {
+    assertions = [
+      {
+        assertion = !platform.isDarwin || (platform.isDarwin && (platform.system == "aarch64-darwin" || platform.system == "x86_64-darwin"));
+        message = "The module targets.darwin.defaults does not support your platform. It only supports:\n- aarch64-darwin\n- x86_64-darwin";
+      }
+      {
+        assertion = !platform.isLinux || (platform.isLinux && (platform.system == "x86_64-linux" || platform.system == "aarch64-linux"));
+        message = "The module targets.linux.defaults does not support your platform. It only supports:\n- x86_64-linux\n- aarch64-linux";
+      }
+    ];
   };
 } 
