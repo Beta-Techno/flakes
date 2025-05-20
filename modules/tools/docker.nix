@@ -1,13 +1,6 @@
 { config, pkgs, lib, ... }:
 
 {
-  # ── Docker configuration ───────────────────────────────────────
-  virtualisation.docker = {
-    enable = true;
-    enableOnBoot = true;
-    autoPrune.enable = true;
-  };
-
   # ── Docker Compose ────────────────────────────────────────────
   home.packages = with pkgs; [
     docker-compose
