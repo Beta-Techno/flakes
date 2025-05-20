@@ -11,11 +11,11 @@ in
     enable = true;
     theme = {
       name = "Yaru-dark";
-      package = theme;
+      package = lib.mkDefault theme;
     };
     iconTheme = {
       name = "Yaru";
-      package = theme;
+      package = lib.mkDefault theme;
     };
     font = {
       name = "JetBrainsMono Nerd Font";
