@@ -35,7 +35,7 @@
       zlib
       libffi
       python3
-      nodejs
+      nodejs_20
       rustc
       cargo
       go
