@@ -26,7 +26,7 @@ in
   # Qt Theme
   qt = {
     enable = true;
-    platformTheme = "gtk";
+    platformTheme = lib.mkDefault "gtk";
     style = {
       name = "yaru-dark";
       package = theme;
