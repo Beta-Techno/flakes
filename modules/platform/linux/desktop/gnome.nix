@@ -1,8 +1,11 @@
 { config, pkgs, lib, ... }:
 
 let
-  # Get the wallpaper path relative to the repository root
-  wallpaperPath = ./../../../assets/wallpapers/fish.jpeg;
+  # Create a derivation that copies the wallpaper to the Nix store
+  wallpaper = pkgs.runCommand "wallpaper" {} ''
+    mkdir -p $out/share/backgrounds
+    cp ${./../../../assets/wallpapers/fish.jpeg} $out/share/backgrounds/wallpaper.jpeg
+  '';
 in
 {
   # ── GNOME-specific settings ────────────────────────────────────
@@ -50,13 +53,13 @@ in
       titlebar-font = "JetBrainsMono Nerd Font Bold 11";
     };
     "org/gnome/desktop/background" = {
-      picture-uri = "file://${wallpaperPath}";
-      picture-uri-dark = "file://${wallpaperPath}";
+      picture-uri = "file://${wallpaper}/share/backgrounds/wallpaper.jpeg";
+      picture-uri-dark = "file://${wallpaper}/share/backgrounds/wallpaper.jpeg";
       primary-color = "#3071AE";
       secondary-color = "#000000";
     };
     "org/gnome/desktop/screensaver" = {
-      picture-uri = "file://${wallpaperPath}";
+      picture-uri = "file://${wallpaper}/share/backgrounds/wallpaper.jpeg";
       primary-color = "#3071AE";
       secondary-color = "#000000";
     };
