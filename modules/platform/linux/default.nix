@@ -1,15 +1,83 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, hasAMD, ... }:
 
 let
   inherit (import ../../lib/assertions.nix { inherit pkgs lib; })
     hasSystemd
     hasNvidia
-    hasAMD
     hasGnome
     hasKDE
     isWSL;
 in
 {
+  # ── Platform-specific settings ──────────────────────────────────
+  nixpkgs.config.allowUnfree = true;
+
+  # ── System packages ────────────────────────────────────────────
+  environment.systemPackages = with pkgs; [
+    # Core utilities
+    coreutils
+    gnused
+    gnugrep
+    findutils
+    which
+    file
+    tree
+    htop
+    ripgrep
+    fd
+    bat
+    exa
+    fzf
+    jq
+    yq-go
+    tmux
+    git
+    git-lfs
+    gnumake
+    gcc
+    clang
+    cmake
+    pkg-config
+    openssl
+    zlib
+    libffi
+    python3
+    nodejs
+    rustc
+    cargo
+    go
+    gopls
+    gotools
+    shellcheck
+    shfmt
+    nixpkgs-fmt
+    nixfmt
+    nil
+    nixd
+    nixos-option
+    nixos-rebuild
+    nixos-generate-config
+    nixos-enter
+  ] // lib.optionalAttrs hasAMD [
+    # AMD GPU specific packages
+    rocm-opencl-runtime
+    rocm-opencl-icd
+    rocm-smi
+    rocm-device-libs
+    rocm-runtime
+    rocm-thunk
+    rocm-llvm
+    rocm-cmake
+    rocm-opencl-runtime
+    rocm-opencl-icd
+    rocm-smi
+    rocm-device-libs
+    rocm-runtime
+    rocm-thunk
+    rocm-llvm
+    rocm-cmake
+  ];
+
   # ── Desktop environment detection ───────────────────────────────
   imports = lib.optional hasGnome ./desktop/gnome.nix
     ++ lib.optional hasKDE ./desktop/kde.nix
