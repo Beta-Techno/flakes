@@ -7,9 +7,6 @@ let
   wallpaperPath = ../../assets/wallpapers/fish.jpeg;
   # XDG data home with fallback
   xdgDataHome = config.home.homeDirectory + "/.local/share";
-  # Theme colors
-  primaryColor = "#7B68EE";  # Medium Slate Blue
-  secondaryColor = "#4B0082";  # Indigo
 in
 {
   # ── Theme configuration ─────────────────────────────────────────
@@ -20,11 +17,11 @@ in
   gtk = {
     enable = true;
     theme = {
-      name = lib.mkDefault "Yaru-dark";
+      name = lib.mkDefault "Yaru-purple-dark";
       package = lib.mkDefault theme;
     };
     iconTheme = {
-      name = lib.mkDefault "Yaru";
+      name = lib.mkDefault "Yaru-purple";
       package = lib.mkDefault theme;
     };
     font = {
@@ -64,36 +61,30 @@ in
   dconf.settings = {
     "org/gnome/desktop/interface" = {
       color-scheme = "prefer-dark";
-      gtk-theme = "Yaru-dark";
-      icon-theme = "Yaru";
+      gtk-theme = "Yaru-purple-dark";
+      icon-theme = "Yaru-purple";
       cursor-theme = "Yaru";
       font-name = "JetBrainsMono Nerd Font 11";
       monospace-font-name = "JetBrainsMono Nerd Font 11";
       document-font-name = "JetBrainsMono Nerd Font 11";
       enable-hot-corners = true;
       show-battery-percentage = true;
-      accent-color = primaryColor;
+      accent-color = "purple";
     };
 
     "org/gnome/shell/extensions/user-theme" = {
-      name = "Yaru-dark";
+      name = "Yaru-purple-dark";
     };
 
     "org/gnome/desktop/background" = {
       picture-uri = "file://${xdgDataHome}/backgrounds/fish.jpeg";
       picture-uri-dark = "file://${xdgDataHome}/backgrounds/fish.jpeg";
       picture-options = "zoom";
-      primary-color = primaryColor;
-      secondary-color = secondaryColor;
-      color-shading-type = "solid";
     };
 
     "org/gnome/desktop/screensaver" = {
       picture-uri = "file://${xdgDataHome}/backgrounds/fish.jpeg";
       picture-options = "zoom";
-      primary-color = primaryColor;
-      secondary-color = secondaryColor;
-      color-shading-type = "solid";
     };
 
     "org/gnome/shell" = {
