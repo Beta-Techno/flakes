@@ -1,0 +1,94 @@
+{ config, pkgs, lib, ... }:
+
+let
+  # Theme package
+  theme = pkgs.yaru-theme;
+in
+{
+  # ── Theme configuration ─────────────────────────────────────────
+  # GTK Theme
+  gtk = {
+    enable = true;
+    theme = {
+      name = "Yaru-dark";
+      package = theme;
+    };
+    iconTheme = {
+      name = "Yaru";
+      package = theme;
+    };
+    font = {
+      name = "JetBrainsMono Nerd Font";
+      size = 11;
+    };
+  };
+
+  # Qt Theme
+  qt = {
+    enable = true;
+    platformTheme = "gtk";
+    style = {
+      name = "yaru-dark";
+      package = theme;
+    };
+  };
+
+  # Cursor Theme
+  home.pointerCursor = {
+    name = "Yaru-dark";
+    package = theme;
+    size = 24;
+  };
+
+  # ── Wallpaper Configuration ─────────────────────────────────────
+  xdg.dataFile."wallpapers/background.jpg".source = ./../../../assets/wallpapers/fish.jpeg;
+
+  # ── GNOME Theme Settings ────────────────────────────────────────
+  dconf.enable = true;
+  dconf.settings = {
+    "org/gnome/desktop/interface" = {
+      color-scheme = "prefer-dark";
+      gtk-theme = "Yaru-dark";
+      icon-theme = "Yaru";
+      cursor-theme = "Yaru";
+      font-name = "JetBrainsMono Nerd Font 11";
+      monospace-font-name = "JetBrainsMono Nerd Font 11";
+      document-font-name = "JetBrainsMono Nerd Font 11";
+      enable-hot-corners = true;
+      show-battery-percentage = true;
+    };
+
+    "org/gnome/shell/extensions/user-theme" = {
+      name = "Yaru-dark";
+    };
+
+    "org/gnome/desktop/background" = {
+      picture-uri = "file://${config.xdg.dataHome}/wallpapers/background.jpg";
+      picture-uri-dark = "file://${config.xdg.dataHome}/wallpapers/background.jpg";
+      primary-color = "#3071AE";
+      secondary-color = "#000000";
+    };
+
+    "org/gnome/desktop/screensaver" = {
+      picture-uri = "file://${config.xdg.dataHome}/wallpapers/background.jpg";
+      primary-color = "#3071AE";
+      secondary-color = "#000000";
+    };
+  };
+
+  # ── GNOME Extensions ────────────────────────────────────────────
+  home.packages = with pkgs; [
+    gnome-tweaks
+    gnome-shell-extensions
+    gnome-shell-extension-appindicator
+    gnome-shell-extension-tray-icons-reloaded
+    hardcode-tray
+  ];
+
+  # Enable required extensions
+  dconf.settings."org/gnome/shell".enabled-extensions = [
+    "user-theme@gnome-shell-extensions.gcampax.github.com"
+    "appindicatorsupport@rgcjonas.gmail.com"
+    "trayIconsReloaded@selfmade.pl"
+  ];
+} 
