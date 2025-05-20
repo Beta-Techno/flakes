@@ -36,7 +36,7 @@ in {
 
     # Ask AccountsService to copy & register the icon
     busctl --system call org.freedesktop.Accounts \
-           /org/freedesktop/Accounts/User${uid} \
+           "/org/freedesktop/Accounts/User$uid" \
            org.freedesktop.Accounts.User SetIconFile s "$pic" \
       || echo "warning: could not set avatar"
   '';
