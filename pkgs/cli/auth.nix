@@ -53,19 +53,19 @@
           case "''${auth_choice}" in
             1)
               echo "  Attempting to open browser..."
-              if ! gh auth login --hostname github.com --ssh --web; then
+              if ! gh auth login --hostname github.com --web; then
                 die "Failed to open browser. Please try another method."
               fi
               ;;
             2)
               echo "  Copying URL to clipboard..."
-              auth_url="$(gh auth login --hostname github.com --ssh --web --print-url)"
+              auth_url="$(gh auth login --hostname github.com --web --print-url)"
               echo "''${auth_url}" | xclip -selection clipboard
               echo "  URL copied to clipboard. Please open it in your browser."
               ;;
             3)
               echo "  Please visit this URL in your browser:"
-              gh auth login --hostname github.com --ssh --web --print-url
+              gh auth login --hostname github.com --web --print-url
               ;;
             *)
               die "Invalid choice. Please try again."
