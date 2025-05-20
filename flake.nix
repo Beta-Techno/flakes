@@ -23,17 +23,17 @@
 
   outputs = { self, nixpkgs, home-manager, nix-doom, nixGL, ... }@inputs:
     let
-      libN = nixpkgs.lib;
       system = "x86_64-linux";
       pkgs = import nixpkgs {
         inherit system;
         config = {
           allowUnfree = true;
-          allowUnfreePredicate = pkg: builtins.elem (libN.getName pkg) [
-            "vscode"
-            "google-chrome"
-            "postman"
-          ];
+          allowUnfreePredicate = pkg:
+            let name =
+                  if pkg ? pname then pkg.pname
+                  else if pkg ? name then pkg.name
+                  else "unknown";
+            in builtins.elem name [ "vscode" "google-chrome" "postman" ];
         };
       };
 
