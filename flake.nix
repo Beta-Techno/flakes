@@ -23,7 +23,7 @@
 
   outputs = { self, nixpkgs, home-manager, nix-doom, nixGL, ... }@inputs:
     let
-      system = builtins.currentSystem;
+      system = "x86_64-linux";
       pkgs = import nixpkgs {
         inherit system;
         config = {
