@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs, flakeRef }:
 
 {
   program = pkgs.writeShellApplication {
@@ -14,8 +14,8 @@
     text = ''
       set -euo pipefail
 
-      # Get the absolute path to the flake directory
-      FLAKE="$(cd "$(dirname "$0")/../../.." && pwd)"
+      # Get the flake reference
+      FLAKE="''${flakeRef}"
 
       # ── Helper functions ─────────────────────────────────────────
       die() {
@@ -39,14 +39,17 @@
 
       # ── Install development shells ───────────────────────────────
       echo "▶ Installing development shells"
-      nix profile install "$FLAKE"#rust
-      nix profile install "$FLAKE"#go
-      nix profile install "$FLAKE"#python
+      for lang in rust go python; do
+        echo "+ installing $lang toolchain"
+        nix profile install "$FLAKE"#"$lang" -L || die "Failed to install $lang toolchain"
+      done
 
       # ── Install helper CLIs ──────────────────────────────────────
       echo "▶ Installing helper CLIs"
-      nix profile install "$FLAKE"#sync-repos
-      nix profile install "$FLAKE"#doctor
+      for tool in sync-repos doctor; do
+        echo "+ installing $tool"
+        nix profile install "$FLAKE"#"$tool" -L || die "Failed to install $tool"
+      done
 
       # ── Set up user configuration ────────────────────────────────
       CONFIG_DIR="$HOME/.config/toolbox"
