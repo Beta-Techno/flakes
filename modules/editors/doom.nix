@@ -17,7 +17,7 @@
   # Enable Doom Emacs
   programs.doom-emacs = {
     enable = true;
-    doomPrivateDir = doomConfig;
+    doomDir = doomConfig;
     emacsPackage = pkgs.emacs29-pgtk;
     doomLocalDir = "/home/${username}/.local/share/doom";
   };
