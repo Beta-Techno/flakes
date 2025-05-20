@@ -1,0 +1,231 @@
+{
+  "nodes": {
+	"doomConfig": {
+  	"flake": false,
+  	"locked": {
+    	"path": "./home/editors/doom",
+    	"type": "path"
+  	},
+  	"original": {
+    	"path": "./home/editors/doom",
+    	"type": "path"
+  	},
+  	"parent": []
+	},
+	"doomemacs": {
+  	"flake": false,
+  	"locked": {
+    	"lastModified": 1747521324,
+    	"narHash": "sha256-6NpulW+FJSA+jAWF8rrKjhDfiMMtoNCWlCqQ2e1opgc=",
+    	"owner": "doomemacs",
+    	"repo": "doomemacs",
+    	"rev": "11b4b8d2e5072f1f62df27943ca378c616678a72",
+    	"type": "github"
+  	},
+  	"original": {
+    	"owner": "doomemacs",
+    	"repo": "doomemacs",
+    	"type": "github"
+  	}
+	},
+	"emacs-overlay": {
+  	"inputs": {
+    	"nixpkgs": [
+      	"nix-doom"
+    	],
+    	"nixpkgs-stable": [
+      	"nix-doom"
+    	]
+  	},
+  	"locked": {
+    	"lastModified": 1747618089,
+    	"narHash": "sha256-mbzwxQlxNamIMErEfwWRZ+ECmlQzxJ4eJvOM6/fxV5s=",
+    	"owner": "nix-community",
+    	"repo": "emacs-overlay",
+    	"rev": "1b2bc802bbac29f4695e39fbf982944c0999b45d",
+    	"type": "github"
+  	},
+  	"original": {
+    	"owner": "nix-community",
+    	"repo": "emacs-overlay",
+    	"type": "github"
+  	}
+	},
+	"flake-utils": {
+  	"locked": {
+    	"lastModified": 1659877975,
+    	"narHash": "sha256-zllb8aq3YO3h8B/U0/J1WBgAL8EX5yWf5pMj3G0NAmc=",
+    	"owner": "numtide",
+    	"repo": "flake-utils",
+    	"rev": "c0e246b9b83f637f4681389ecabcb2681b4f3af0",
+    	"type": "github"
+  	},
+  	"original": {
+    	"owner": "numtide",
+    	"repo": "flake-utils",
+    	"type": "github"
+  	}
+	},
+	"home-manager": {
+  	"inputs": {
+    	"nixpkgs": [
+      	"nixpkgs"
+    	]
+  	},
+  	"locked": {
+    	"lastModified": 1747688838,
+    	"narHash": "sha256-FZq4/3OtGV/cti9Vccsy2tGSUrxTO4hkDF9oeGRTen4=",
+    	"owner": "nix-community",
+    	"repo": "home-manager",
+    	"rev": "45c2985644b60ab64de2a2d93a4d132ecb87cf66",
+    	"type": "github"
+  	},
+  	"original": {
+    	"owner": "nix-community",
+    	"repo": "home-manager",
+    	"type": "github"
+  	}
+	},
+	"lazyvimConfig": {
+  	"flake": false,
+  	"locked": {
+    	"path": "./home/editors/lazyvim",
+    	"type": "path"
+  	},
+  	"original": {
+    	"path": "./home/editors/lazyvim",
+    	"type": "path"
+  	},
+  	"parent": []
+	},
+	"lazyvimStarter": {
+  	"flake": false,
+  	"locked": {
+    	"lastModified": 1733936199,
+    	"narHash": "sha256-QrpnlDD4r1X4C8PqBhQ+S3ar5C+qDrU1Jm/lPqyMIFM=",
+    	"owner": "LazyVim",
+    	"repo": "starter",
+    	"rev": "803bc181d7c0d6d5eeba9274d9be49b287294d99",
+    	"type": "github"
+  	},
+  	"original": {
+    	"owner": "LazyVim",
+    	"repo": "starter",
+    	"type": "github"
+  	}
+	},
+	"nix-doom": {
+  	"inputs": {
+    	"doomemacs": "doomemacs",
+    	"emacs-overlay": "emacs-overlay",
+    	"nixpkgs": "nixpkgs",
+    	"systems": "systems"
+  	},
+  	"locked": {
+    	"lastModified": 1747644279,
+    	"narHash": "sha256-E0MFcAobECS57VmCqGxY/Z/9X3ZMHsPj9kr4sLWEfU0=",
+    	"owner": "marienz",
+    	"repo": "nix-doom-emacs-unstraightened",
+    	"rev": "dd215f073efe96dcf704a377a32796912b33751a",
+    	"type": "github"
+  	},
+  	"original": {
+    	"owner": "marienz",
+    	"repo": "nix-doom-emacs-unstraightened",
+    	"type": "github"
+  	}
+	},
+	"nixGL": {
+  	"inputs": {
+    	"flake-utils": "flake-utils",
+    	"nixpkgs": "nixpkgs_2"
+  	},
+  	"locked": {
+    	"lastModified": 1713543440,
+    	"narHash": "sha256-lnzZQYG0+EXl/6NkGpyIz+FEOc/DSEG57AP1VsdeNrM=",
+    	"owner": "guibou",
+    	"repo": "nixGL",
+    	"rev": "310f8e49a149e4c9ea52f1adf70cdc768ec53f8a",
+    	"type": "github"
+  	},
+  	"original": {
+    	"owner": "guibou",
+    	"repo": "nixGL",
+    	"type": "github"
+  	}
+	},
+	"nixpkgs": {
+  	"locked": {
+    	"lastModified": 1747467164,
+    	"narHash": "sha256-JBXbjJ0t6T6BbVc9iPVquQI9XSXCGQJD8c8SgnUquus=",
+    	"owner": "NixOS",
+    	"repo": "nixpkgs",
+    	"rev": "3fcbdcfc707e0aa42c541b7743e05820472bdaec",
+    	"type": "github"
+  	},
+  	"original": {
+    	"id": "nixpkgs",
+    	"type": "indirect"
+  	}
+	},
+	"nixpkgs_2": {
+  	"locked": {
+    	"lastModified": 1660551188,
+    	"narHash": "sha256-a1LARMMYQ8DPx1BgoI/UN4bXe12hhZkCNqdxNi6uS0g=",
+    	"owner": "nixos",
+    	"repo": "nixpkgs",
+    	"rev": "441dc5d512153039f19ef198e662e4f3dbb9fd65",
+    	"type": "github"
+  	},
+  	"original": {
+    	"owner": "nixos",
+    	"repo": "nixpkgs",
+    	"type": "github"
+  	}
+	},
+	"nixpkgs_3": {
+  	"locked": {
+    	"lastModified": 1747542820,
+    	"narHash": "sha256-GaOZntlJ6gPPbbkTLjbd8BMWaDYafhuuYRNrxCGnPJw=",
+    	"owner": "NixOS",
+    	"repo": "nixpkgs",
+    	"rev": "292fa7d4f6519c074f0a50394dbbe69859bb6043",
+    	"type": "github"
+  	},
+  	"original": {
+    	"owner": "NixOS",
+    	"ref": "nixos-unstable",
+    	"repo": "nixpkgs",
+    	"type": "github"
+  	}
+	},
+	"root": {
+  	"inputs": {
+    	"doomConfig": "doomConfig",
+    	"home-manager": "home-manager",
+    	"lazyvimConfig": "lazyvimConfig",
+    	"lazyvimStarter": "lazyvimStarter",
+    	"nix-doom": "nix-doom",
+    	"nixGL": "nixGL",
+    	"nixpkgs": "nixpkgs_3"
+  	}
+	},
+	"systems": {
+  	"locked": {
+    	"lastModified": 1681028828,
+    	"narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+    	"owner": "nix-systems",
+    	"repo": "default",
+    	"rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+    	"type": "github"
+  	},
+  	"original": {
+    	"owner": "nix-systems",
+    	"repo": "default",
+    	"type": "github"
+  	}
+	}
+  },
+  "root": "root",
+  "version": 7
+}
