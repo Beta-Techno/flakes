@@ -57,7 +57,13 @@ in
     # Clipboard support (needed for LazyVim)
     xclip
     wl-clipboard
-  ] ++ shells.buildInputs;  # Add all language tools from shells
+
+    # Language servers and tools
+    nodejs_20  # Use Node.js 20 explicitly
+    nodePackages.typescript-language-server
+    nodePackages.prettier
+    nodePackages.eslint
+  ];
 
   xdg.configFile = {
     "nvim" = {
