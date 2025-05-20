@@ -21,20 +21,8 @@ check_command() {
 # ── Install Nix if not present ───────────────────────────────
 if ! command -v nix >/dev/null 2>&1; then
   echo "+ installing Nix"
-  if [[ "$(uname)" == "Darwin" ]]; then
-    # macOS
-    sh <(curl -L https://nixos.org/nix/install) --daemon
-  else
-    # Linux
-    sh <(curl -L https://nixos.org/nix/install) --daemon
-  fi
-  
-  # Source Nix environment
-  if [[ -f /etc/profile.d/nix.sh ]]; then
-    . /etc/profile.d/nix.sh
-  elif [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
-    . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-  fi
+  sh <(curl -L https://nixos.org/nix/install) --daemon
+  . "$HOME/.nix-profile/etc/profile.d/nix.sh"
 fi
 
 # ── Check prerequisites ──────────────────────────────────────
@@ -73,22 +61,13 @@ fi
 # ── Check Home-Manager ───────────────────────────────────────
 if ! command -v home-manager >/dev/null 2>&1; then
   echo "+ installing Home-Manager"
-  nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
-  nix-channel --update
-  nix-shell '<home-manager>' -A install
+  nix profile install nixpkgs#home-manager
 fi
 
-# ── Clone flakes ────────────────────────────────────────────
-echo "+ cloning flakes"
-mkdir -p "$TOOLBOX_DIR"
-if [ ! -d "$TOOLBOX_DIR/.git" ]; then
-  if ! git clone "$REPO_URL_HTTPS" "$TOOLBOX_DIR"; then
-    die "Failed to clone repository. Please check your internet connection."
-  fi
-else
-  if ! (cd "$TOOLBOX_DIR" && git pull --ff-only); then
-    die "Failed to update repository. Please check your internet connection."
-  fi
+# ── Clone repository ─────────────────────────────────────────
+if [ ! -d "$TOOLBOX_DIR" ]; then
+  echo "+ cloning repository"
+  git clone https://github.com/Beta-Techno/flakes.git "$TOOLBOX_DIR"
 fi
 
 # ── Enable nix-command experimental feature ─────────────────
@@ -96,17 +75,15 @@ echo "+ enabling nix-command experimental feature"
 mkdir -p ~/.config/nix
 echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
 
-# ── Install CLI tools ───────────────────────────────────────
+# ── Install CLI tools ────────────────────────────────────────
 echo "+ installing CLI tools"
 for tool in auth setup sync-repos doctor activate; do
-  if ! nix profile install "$TOOLBOX_DIR#$tool"; then
-    die "Failed to install $tool. Please check your Nix configuration."
-  fi
+  nix profile install "$TOOLBOX_DIR#${tool}"
 done
 
-# ── Set up GitHub authentication ────────────────────────────
+# ── Set up GitHub authentication ─────────────────────────────
 echo "+ setting up GitHub authentication"
-if ! "$TOOLBOX_DIR#auth"; then
+if ! nix run "$TOOLBOX_DIR#auth"; then
   die "GitHub authentication failed. Please try again."
 fi
 
@@ -118,7 +95,7 @@ fi
 
 # ── Run setup ───────────────────────────────────────────────
 echo "+ running setup"
-if ! "$TOOLBOX_DIR#setup"; then
+if ! nix run "$TOOLBOX_DIR#setup"; then
   die "Setup failed. Please check the error messages above."
 fi
 

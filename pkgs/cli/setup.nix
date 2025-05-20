@@ -57,7 +57,12 @@ in
       mkdir -p "''${CONFIG_DIR}"
       
       # Store GitHub username for later use
-      git config --global --get user.email > "''${CONFIG_DIR}/username"
+      git_email="$(git config --global --get user.email || true)"
+      if [ -z "''${git_email}" ]; then
+        read -rp "Git user.email: " git_email
+        git config --global user.email "$git_email"
+      fi
+      echo "$git_email" > "''${CONFIG_DIR}/username"
 
       echo "✅  Setup complete"
     '';
