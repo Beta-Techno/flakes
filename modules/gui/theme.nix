@@ -10,11 +10,11 @@ in
   gtk = {
     enable = true;
     theme = {
-      name = "Yaru-dark";
+      name = lib.mkDefault "Yaru-dark";
       package = lib.mkDefault theme;
     };
     iconTheme = {
-      name = "Yaru";
+      name = lib.mkDefault "Yaru";
       package = lib.mkDefault theme;
     };
     font = {
@@ -28,8 +28,8 @@ in
     enable = true;
     platformTheme = lib.mkDefault "gtk";
     style = {
-      name = "yaru-dark";
-      package = theme;
+      name = lib.mkDefault "yaru-dark";
+      package = lib.mkDefault theme;
     };
   };
 
