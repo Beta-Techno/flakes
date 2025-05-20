@@ -32,9 +32,9 @@
     };
     "org/gnome/desktop/interface" = {
       color-scheme = "prefer-dark";
-      gtk-theme = "Adwaita-dark";
-      icon-theme = "Adwaita";
-      cursor-theme = "Adwaita";
+      gtk-theme = "Yaru-dark";
+      icon-theme = "Yaru";
+      cursor-theme = "Yaru";
       font-name = "JetBrainsMono Nerd Font 11";
       monospace-font-name = "JetBrainsMono Nerd Font 11";
       document-font-name = "JetBrainsMono Nerd Font 11";
@@ -100,7 +100,7 @@
     gnome-shell-extensions
     gnome-backgrounds
     gnome-themes-extra
-    adwaita-icon-theme
+    yaru-theme
     gnome-shell
     gnome-control-center
   ];
