@@ -17,12 +17,12 @@ in
   gtk = {
     enable = true;
     theme = {
-      name = lib.mkDefault "Yaru-dark";
-      package = lib.mkDefault theme;
+      name = "Yaru-dark";  # Plain Yaru-dark without color suffix
+      package = theme;
     };
     iconTheme = {
-      name = lib.mkDefault "Yaru";
-      package = lib.mkDefault theme;
+      name = "Yaru";  # Plain Yaru without color suffix
+      package = theme;
     };
     font = {
       name = "JetBrainsMono Nerd Font";
@@ -69,7 +69,6 @@ in
       document-font-name = "JetBrainsMono Nerd Font 11";
       enable-hot-corners = true;
       show-battery-percentage = true;
-      accent-color = "purple";
     };
 
     "org/gnome/shell/extensions/user-theme" = {
