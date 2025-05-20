@@ -2,9 +2,6 @@
 
 {
   home.packages = with pkgs; [
-    # Core
-    emacs
-
     # Dependencies
     ripgrep
     fd
