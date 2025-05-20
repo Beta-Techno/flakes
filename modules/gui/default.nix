@@ -8,5 +8,6 @@
     ./jetbrains
     ./dock.nix
     ./fonts.nix
+    ./theme.nix
   ];
 } 
