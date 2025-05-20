@@ -79,7 +79,7 @@
       natural-scroll = false;
     };
     "org/gnome/desktop/input-sources" = {
-      sources = [("xkb", "us")];
+      sources = [(lib.hm.gvariant.mkTuple ["xkb" "us"])];
       xkb-options = ["terminate:ctrl_alt_bksp"];
     };
     "org/gnome/desktop/wm/keybindings" = {
