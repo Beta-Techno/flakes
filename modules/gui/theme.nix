@@ -41,7 +41,7 @@ in
   };
 
   # ── Wallpaper Configuration ─────────────────────────────────────
-  xdg.dataFile."wallpapers/background.jpg".source = ./../../assets/wallpapers/fish.jpeg;
+  xdg.dataFile."backgrounds/fish.jpeg".source = ./../../assets/wallpapers/fish.jpeg;
 
   # ── GNOME Theme Settings ────────────────────────────────────────
   dconf.enable = true;
@@ -63,15 +63,17 @@ in
     };
 
     "org/gnome/desktop/background" = {
-      picture-uri = "file://${config.xdg.dataHome}/wallpapers/background.jpg";
-      picture-uri-dark = "file://${config.xdg.dataHome}/wallpapers/background.jpg";
+      picture-uri = "file://${config.xdg.dataHome}/backgrounds/fish.jpeg";
+      picture-uri-dark = "file://${config.xdg.dataHome}/backgrounds/fish.jpeg";
+      picture-options = "zoom";
       primary-color = "#000000";
       secondary-color = "#000000";
       color-shading-type = "solid";
     };
 
     "org/gnome/desktop/screensaver" = {
-      picture-uri = "file://${config.xdg.dataHome}/wallpapers/background.jpg";
+      picture-uri = "file://${config.xdg.dataHome}/backgrounds/fish.jpeg";
+      picture-options = "zoom";
       primary-color = "#000000";
       secondary-color = "#000000";
       color-shading-type = "solid";
