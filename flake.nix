@@ -34,6 +34,9 @@
                   else if pkg ? name then pkg.name
                   else "unknown";
             in builtins.elem name [ "vscode" "google-chrome" "postman" ];
+          permittedInsecurePackages = [
+            "nodejs-20.19.1"
+          ];
         };
       };
 
