@@ -1,12 +1,19 @@
 { lib, pkgs, config, ... }:
 
-{
-  # Only set the font through dconf
+let
+  preferDark = true;
+  accent = "purple";
+  themeBase = "Yaru-${accent}";
+  gtkTheme = themeBase + lib.optionalString preferDark "-dark";
+in {
+  # Set the font through dconf
   dconf.settings."org/gnome/desktop/interface" = {
     font-name = "JetBrainsMono Nerd Font 11";
     monospace-font-name = "JetBrainsMono Nerd Font 11";
     document-font-name = "JetBrainsMono Nerd Font 11";
     color-scheme = "prefer-dark";
+    gtk-theme = gtkTheme;
+    icon-theme = themeBase;
   };
 
   # Set the background
