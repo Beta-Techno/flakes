@@ -65,14 +65,16 @@ in
     "org/gnome/desktop/background" = {
       picture-uri = "file://${config.xdg.dataHome}/wallpapers/background.jpg";
       picture-uri-dark = "file://${config.xdg.dataHome}/wallpapers/background.jpg";
-      primary-color = "#3071AE";
+      primary-color = "#000000";
       secondary-color = "#000000";
+      color-shading-type = "solid";
     };
 
     "org/gnome/desktop/screensaver" = {
       picture-uri = "file://${config.xdg.dataHome}/wallpapers/background.jpg";
-      primary-color = "#3071AE";
+      primary-color = "#000000";
       secondary-color = "#000000";
+      color-shading-type = "solid";
     };
   };
 
