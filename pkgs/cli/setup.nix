@@ -15,7 +15,7 @@
       set -euo pipefail
 
       # Get the flake reference
-      FLAKE="''${flakeRef}"
+      FLAKE="${flakeRef}"
 
       # ── Helper functions ─────────────────────────────────────────
       die() {
