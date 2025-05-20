@@ -17,6 +17,6 @@ pkgs.mkShell {
     python3Packages.pytest-cov  # Coverage
     python3Packages.ipython  # Interactive shell
     python3Packages.jupyter  # Notebooks
-    python-lsp-server  # LSP server
+    python3Packages.python-lsp-server  # LSP server
   ];
 } 
