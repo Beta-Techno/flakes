@@ -179,7 +179,7 @@
             python3
             python3Packages.pip
             python3Packages.virtualenv
-            poetry-core
+            python3Packages.poetry-core
           ];
         };
         # CLI tools
