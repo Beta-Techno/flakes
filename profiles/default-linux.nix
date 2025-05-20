@@ -53,6 +53,20 @@ in
       enable = true;
       config = {
         common.default = "*";
+        # Explicitly set portal backends for each interface
+        "org.freedesktop.impl.portal.FileChooser" = "gtk";
+        "org.freedesktop.impl.portal.Screenshot" = "gtk";
+        "org.freedesktop.impl.portal.Settings" = "gtk";
+        "org.freedesktop.impl.portal.Wallpaper" = "gtk";
+        "org.freedesktop.impl.portal.Notification" = "gtk";
+        "org.freedesktop.impl.portal.Clipboard" = "gtk";
+        "org.freedesktop.impl.portal.Device" = "gtk";
+        "org.freedesktop.impl.portal.AppChooser" = "gtk";
+        "org.freedesktop.impl.portal.Background" = "gtk";
+        "org.freedesktop.impl.portal.Inhibit" = "gtk";
+        "org.freedesktop.impl.portal.Print" = "gtk";
+        "org.freedesktop.impl.portal.Session" = "gtk";
+        "org.freedesktop.impl.portal.Trash" = "gtk";
       };
       extraPortals = with pkgs; [
         xdg-desktop-portal-gtk
