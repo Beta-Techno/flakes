@@ -74,9 +74,9 @@ in
       description = "Whether KDE is installed";
     };
   };
-}
 
-# ── Darwin-specific options ─────────────────────────────────────
-options = lib.mkIf isDarwin {
-  # Add Darwin-specific options here if needed
-}; 
+  # ── Darwin-specific options ─────────────────────────────────────
+  config = lib.mkIf isDarwin {
+    # Add Darwin-specific options here if needed
+  };
+} 
