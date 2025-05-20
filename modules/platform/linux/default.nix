@@ -62,6 +62,11 @@
       pciutils
       usbutils
       lshw
+
+      # Modern replacements for common tools
+      eza  # Modern ls
+      bat  # Modern cat
+      fzf  # Fuzzy finder
     ] 
     ++ lib.optionals platform.hasAMD [
       # AMD GPU specific packages
