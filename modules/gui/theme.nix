@@ -55,16 +55,11 @@ in
   };
 
   # ── Wallpaper Configuration ─────────────────────────────────────
-  xdg.dataFile."backgrounds/fish.jpeg" = {
-    source = wallpaperPath;
-    onChange = ''
-      echo "Wallpaper file changed at $(date)"
-      echo "Source path: ${wallpaperPath}"
-      echo "Target path: ${config.xdg.dataHome}/backgrounds/fish.jpeg"
-      echo "XDG_DATA_HOME: $XDG_DATA_HOME"
-      ls -la ${config.xdg.dataHome}/backgrounds
-    '';
-  };
+  xdg.dataFile = lib.mkMerge [
+    {
+      "backgrounds/fish.jpeg".source = wallpaperPath;
+    }
+  ];
 
   # ── GNOME Theme Settings ────────────────────────────────────────
   dconf.enable = true;
