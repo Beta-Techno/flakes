@@ -4,7 +4,6 @@
   home.packages = with pkgs; [
     # Core
     emacs
-    emacsPackages.doom-emacs
 
     # Dependencies
     ripgrep
