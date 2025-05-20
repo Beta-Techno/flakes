@@ -4,8 +4,8 @@
   # ── Platform-specific settings ──────────────────────────────────
   nixpkgs.config.allowUnfree = true;
 
-  # ── System packages ────────────────────────────────────────────
-  environment.systemPackages = with pkgs; [
+  # ── Common Linux packages ───────────────────────────────────────
+  home.packages = with pkgs; [
     # Core utilities
     coreutils
     gnused
@@ -50,6 +50,17 @@
     nixos-rebuild
     nixos-generate-config
     nixos-enter
+
+    # X11 utilities
+    xorg.xrandr
+    xorg.xset
+    xorg.xsetroot
+    xorg.xrdb
+
+    # System utilities
+    pciutils
+    usbutils
+    lshw
   ] // lib.optionalAttrs platform.hasAMD [
     # AMD GPU specific packages
     rocm-opencl-runtime
@@ -98,18 +109,4 @@
       enable = true;
     };
   };
-
-  # ── Common Linux packages ───────────────────────────────────────
-  home.packages = with pkgs; [
-    # X11 utilities
-    xorg.xrandr
-    xorg.xset
-    xorg.xsetroot
-    xorg.xrdb
-
-    # System utilities
-    pciutils
-    usbutils
-    lshw
-  ];
 } 
