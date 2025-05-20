@@ -82,7 +82,7 @@ in
     gnome-shell-extensions
     gnomeExtensions.appindicator
     gnomeExtensions.tray-icons-reloaded
-    hardcode-tray
+    hardcode-tray-icons
   ];
 
   # Enable required extensions
