@@ -5,8 +5,8 @@
   home.packages = with pkgs; [
     kubectl
     kubectx
-    kubens
     k9s
+    kubernetes-helm
     stern
   ];
 
@@ -21,4 +21,10 @@
   # ── Kubernetes configuration ──────────────────────────────────
   home.file.".kube/config".source = config.lib.file.mkOutOfStoreSymlink
     "${config.home.homeDirectory}/.config/kube/config";
+
+  home.shellAliases = {
+    k = "kubectl";
+    kns = "kubens";
+    kctx = "kubectx";
+  };
 } 
