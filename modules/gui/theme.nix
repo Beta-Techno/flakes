@@ -3,6 +3,8 @@
 let
   # Theme package
   theme = pkgs.yaru-theme;
+  # Wallpaper path
+  wallpaperPath = ../../assets/wallpapers/fish.jpeg;
 in
 {
   # ── Theme configuration ─────────────────────────────────────────
@@ -14,6 +16,7 @@ in
     createBackgroundsDir = lib.hm.dag.entryAfter ["writeBoundary"] ''
       $DRY_RUN_CMD mkdir -p $VERBOSE_ARG ${config.xdg.dataHome}/backgrounds
       $DRY_RUN_CMD chmod $VERBOSE_ARG 755 ${config.xdg.dataHome}/backgrounds
+      echo "Created backgrounds directory at ${config.xdg.dataHome}/backgrounds"
     '';
   };
 
@@ -53,11 +56,12 @@ in
 
   # ── Wallpaper Configuration ─────────────────────────────────────
   xdg.dataFile."backgrounds/fish.jpeg" = {
-    source = ../../assets/wallpapers/fish.jpeg;
+    source = wallpaperPath;
     onChange = ''
       echo "Wallpaper file changed at $(date)"
+      echo "Source path: ${wallpaperPath}"
+      echo "Target path: ${config.xdg.dataHome}/backgrounds/fish.jpeg"
       echo "XDG_DATA_HOME: $XDG_DATA_HOME"
-      echo "Target directory: ${config.xdg.dataHome}/backgrounds"
       ls -la ${config.xdg.dataHome}/backgrounds
     '';
   };
