@@ -1,13 +1,5 @@
-{ config, pkgs, lib, hasAMD, ... }:
+{ config, pkgs, lib, ... }:
 
-let
-  inherit (import ../../lib/assertions.nix { inherit pkgs lib; })
-    hasSystemd
-    hasNvidia
-    hasGnome
-    hasKDE
-    isWSL;
-in
 {
   # ── Platform-specific settings ──────────────────────────────────
   nixpkgs.config.allowUnfree = true;
@@ -58,16 +50,8 @@ in
     nixos-rebuild
     nixos-generate-config
     nixos-enter
-  ] // lib.optionalAttrs hasAMD [
+  ] // lib.optionalAttrs config.hasAMD [
     # AMD GPU specific packages
-    rocm-opencl-runtime
-    rocm-opencl-icd
-    rocm-smi
-    rocm-device-libs
-    rocm-runtime
-    rocm-thunk
-    rocm-llvm
-    rocm-cmake
     rocm-opencl-runtime
     rocm-opencl-icd
     rocm-smi
@@ -79,12 +63,12 @@ in
   ];
 
   # ── Desktop environment detection ───────────────────────────────
-  imports = lib.optional hasGnome ./desktop/gnome.nix
-    ++ lib.optional hasKDE ./desktop/kde.nix
-    ++ lib.optional isWSL ./wsl.nix;
+  imports = lib.optional config.hasGnome ./desktop/gnome.nix
+    ++ lib.optional config.hasKDE ./desktop/kde.nix
+    ++ lib.optional config.isWSL ./wsl.nix;
 
   # ── Systemd user services ───────────────────────────────────────
-  systemd.user.services = lib.mkIf hasSystemd {
+  systemd.user.services = lib.mkIf config.hasSystemd {
     # Add systemd user services here
   };
 
@@ -101,13 +85,13 @@ in
       driSupport = true;
       driSupport32Bit = true;
     };
-  } // lib.optionalAttrs hasNvidia {
+  } // lib.optionalAttrs config.hasNvidia {
     nvidia = {
       package = config.boot.kernelPackages.nvidiaPackages.stable;
       modesetting.enable = true;
       powerManagement.enable = true;
     };
-  } // lib.optionalAttrs hasAMD {
+  } // lib.optionalAttrs config.hasAMD {
     amdgpu = {
       enable = true;
     };

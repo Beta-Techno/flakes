@@ -1,4 +1,4 @@
-{ pkgs, lib }:
+{ config, pkgs, lib, ... }:
 
 let
   # ── Platform detection ──────────────────────────────────────────
@@ -17,15 +17,44 @@ let
   # ── Desktop environment detection ───────────────────────────────
   hasGnome = isLinux && builtins.pathExists "/usr/bin/gnome-shell";
   hasKDE = isLinux && builtins.pathExists "/usr/bin/plasmashell";
+in
+{
+  # ── Platform detection ──────────────────────────────────────────
+  assertions = {
+    inherit isDarwin isLinux isWSL;
+  };
 
-in {
-  inherit
-    isDarwin
-    isLinux
-    isWSL
-    hasSystemd
-    hasNvidia
-    hasAMD
-    hasGnome
-    hasKDE;
+  # ── Linux-specific options ──────────────────────────────────────
+  options = lib.mkIf isLinux {
+    hasSystemd = lib.mkOption {
+      type = lib.types.bool;
+      default = hasSystemd;
+      readOnly = true;
+    };
+    hasNvidia = lib.mkOption {
+      type = lib.types.bool;
+      default = hasNvidia;
+      readOnly = true;
+    };
+    hasAMD = lib.mkOption {
+      type = lib.types.bool;
+      default = hasAMD;
+      readOnly = true;
+    };
+    hasGnome = lib.mkOption {
+      type = lib.types.bool;
+      default = hasGnome;
+      readOnly = true;
+    };
+    hasKDE = lib.mkOption {
+      type = lib.types.bool;
+      default = hasKDE;
+      readOnly = true;
+    };
+  };
+
+  # ── Darwin-specific options ─────────────────────────────────────
+  options = lib.mkIf isDarwin {
+    # Add Darwin-specific options here if needed
+  };
 } 
