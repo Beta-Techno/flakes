@@ -17,11 +17,11 @@ in
   gtk = {
     enable = true;
     theme = {
-      name = lib.mkDefault "Yaru-purple-dark";
+      name = lib.mkDefault "Yaru-dark";
       package = lib.mkDefault theme;
     };
     iconTheme = {
-      name = lib.mkDefault "Yaru-purple";
+      name = lib.mkDefault "Yaru";
       package = lib.mkDefault theme;
     };
     font = {
@@ -61,8 +61,8 @@ in
   dconf.settings = {
     "org/gnome/desktop/interface" = {
       color-scheme = "prefer-dark";
-      gtk-theme = "Yaru-purple-dark";
-      icon-theme = "Yaru-purple";
+      gtk-theme = "Yaru-dark";
+      icon-theme = "Yaru";
       cursor-theme = "Yaru";
       font-name = "JetBrainsMono Nerd Font 11";
       monospace-font-name = "JetBrainsMono Nerd Font 11";
@@ -73,7 +73,7 @@ in
     };
 
     "org/gnome/shell/extensions/user-theme" = {
-      name = "Yaru-purple-dark";
+      name = "Yaru-dark";
     };
 
     "org/gnome/desktop/background" = {
