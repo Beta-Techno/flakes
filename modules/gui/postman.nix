@@ -2,7 +2,7 @@
 
 {
   home.packages = with pkgs; [
-    (helpers.mkChromiumWrapper { pkg = postman; exe = "postman"; })
+    (helpers.wrapElectron postman "postman")
     (lib.lowPrio postman)  # icons / resources
   ];
 } 

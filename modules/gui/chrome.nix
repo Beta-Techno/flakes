@@ -1,19 +1,5 @@
 { config, pkgs, lib, helpers, ... }:
 
-let
-  # ── Chrome desktop entry ───────────────────────────────────────
-  chromeDesktopEntry = helpers.createDesktopEntry {
-    fileName = "google-chrome.desktop";   # Use canonical filename
-    name = "Google Chrome";
-    exec = "${helpers.chromeWrapped}/bin/google-chrome";
-    icon = "google-chrome";
-    categories = [ "Network" "WebBrowser" ];
-    mimeTypes = [
-      "x-scheme-handler/http"
-      "x-scheme-handler/https"
-    ];
-  };
-in
 {
   # ── Chrome package ────────────────────────────────────────────
   home.packages = with pkgs; [
@@ -26,13 +12,15 @@ in
     set -eu
     apps="${config.xdg.dataHome}/applications"
     mkdir -p "$apps"
-    install -Dm644 ${chromeDesktopEntry} "$apps/google-chrome.desktop"
+    cat > "$apps/google-chrome.desktop" <<EOF
+[Desktop Entry]
+Name=Google Chrome
+Exec=${helpers.chromeWrapped}/bin/google-chrome %U
+Icon=google-chrome
+Type=Application
+Categories=Network;WebBrowser;
+StartupNotify=true
+EOF
     ${pkgs.desktop-file-utils}/bin/update-desktop-database "$apps" || true
-
-    # Install Chrome sandbox executable
-    if [ ! -e /usr/local/bin/chrome-sandbox ]; then
-      echo "Installing Chrome sandbox executable..."
-      install -m 4755 ${pkgs.google-chrome}/libexec/chrome-sandbox /usr/local/bin/chrome-sandbox
-    fi
   '';
 } 
