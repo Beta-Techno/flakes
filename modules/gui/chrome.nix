@@ -1,11 +1,14 @@
 { config, pkgs, lib, helpers, ... }:
 
 let
+  # ── Chrome wrapper ────────────────────────────────────────────
+  chromeWrapped = helpers.chromeWrapped pkgs.google-chrome;
+
   # ── Chrome desktop entry ───────────────────────────────────────
   chromeDesktopEntry = helpers.createDesktopEntry {
     fileName = "google-chrome.desktop";   # Use canonical filename
     name = "Google Chrome";
-    exec = "${helpers.chromeWrapped}/bin/google-chrome";
+    exec = "${chromeWrapped}/bin/google-chrome";
     icon = "google-chrome";
     categories = [ "Network" "WebBrowser" ];
     mimeTypes = [
@@ -17,7 +20,7 @@ in
 {
   # ── Chrome package ────────────────────────────────────────────
   home.packages = with pkgs; [
-    helpers.chromeWrapped
+    chromeWrapped
     (lib.lowPrio google-chrome)  # icons / resources
   ];
 
