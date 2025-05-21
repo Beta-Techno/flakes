@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Ensure interactive stdin even when piped
+exec </dev/tty
+
 # ── Helper functions ─────────────────────────────────────────
 die() {
   echo "Error: $1" >&2
