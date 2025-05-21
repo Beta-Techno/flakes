@@ -49,6 +49,16 @@ if [ ! -d "$REPO_DIR" ]; then
 fi
 cd "$REPO_DIR"
 
+# ── Install Chrome SUID helper (root once) ──────────────────
+echo "+ provisioning Chrome sandbox helper..."
+if [ ! -u /usr/local/bin/chrome-sandbox ]; then
+  SANDBOX=$(nix eval --raw nixpkgs#google-chrome)/libexec/chrome-sandbox
+  echo "  → copying $(basename "$SANDBOX") to /usr/local/bin (needs sudo)"
+  sudo install -m 4755 -o root -g root "$SANDBOX" /usr/local/bin/chrome-sandbox
+else
+  echo "  → /usr/local/bin/chrome-sandbox already present; skipping"
+fi
+
 # ── Run the bootstrap process ───────────────────────────────
 echo "+ running bootstrap process..."
 

@@ -23,4 +23,13 @@ StartupNotify=true
 Actions=new-window;new-private-window;
 EOF
   '';
+
+  # ── Create systemd tmpfiles rule for Chrome sandbox ────────────
+  home.activation.createChromeSandboxRule = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    $DRY_RUN_CMD mkdir -p "$HOME/.config/systemd/tmpfiles.d"
+    $DRY_RUN_CMD cat > "$HOME/.config/systemd/tmpfiles.d/google-chrome-sandbox.conf" << EOF
+# Type Path        Mode UID  GID  Age Argument
+C     /usr/local/bin/chrome-sandbox 4755 root root - ${pkgs.google-chrome}/libexec/chrome-sandbox
+EOF
+  '';
 } 
