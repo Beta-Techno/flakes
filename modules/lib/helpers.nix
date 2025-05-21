@@ -7,34 +7,31 @@ let
   # ── Helper binary *inside* the Google-Chrome derivation ─────────
   chromeSandboxInStore = "${pkgs.google-chrome}/libexec/chrome-sandbox";
 
-  # ── Detect at runtime whether the set-uid helper is available ───
-  sandboxFlag = ''
+  # ── Chrome wrapper (uses namespace sandbox by default) ──────────
+  chromeWrapped = pkgs.writeShellScriptBin "google-chrome" ''
+    #!${pkgs.bash}/bin/bash
+    set -euo pipefail
+
     if [ -x /usr/local/bin/chrome-sandbox ]; then
-      echo --sandbox-executable=/usr/local/bin/chrome-sandbox
+      # We really do have a properly installed SUID helper → use it
+      exec env CHROME_DEVEL_SANDBOX=/usr/local/bin/chrome-sandbox \
+        ${pkgs.google-chrome}/bin/google-chrome-stable \
+        --sandbox-executable=/usr/local/bin/chrome-sandbox "$@"
     else
-      echo --disable-setuid-sandbox
+      # Force Chrome into the namespace sandbox and guarantee it won't
+      # fall back to the half-broken helper in the Nix store.
+      exec env CHROME_DEVEL_SANDBOX='' \
+        ${pkgs.google-chrome}/bin/google-chrome-stable \
+        --disable-setuid-sandbox "$@"
     fi
   '';
 
-  # ── Generic Chromium / Electron wrapper ─────────────────────────
-  mkChromiumWrapper = { pkg, exe }:
-    pkgs.writeShellScriptBin exe ''
-      #!${pkgs.bash}/bin/bash
-      set -euo pipefail
-      extra=$(${sandboxFlag})
-      exec ${pkg}/bin/${exe} "$extra" "$@"
-    '';
-
-  # ── Common Electron wrapper (keeps namespace sandbox) ──────────────────────
+  # ── Common Electron wrapper (keeps namespace sandbox) ───────────
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
-      exec ${pkg}/bin/${exe} --disable-setuid-sandbox "$@"
+      exec env CHROME_DEVEL_SANDBOX='' \
+        ${pkg}/bin/${exe} --disable-setuid-sandbox "$@"
     '';
-
-  # ── Chrome wrapper (uses installed SUID helper) ────────────────
-  chromeWrapped = pkgs.writeShellScriptBin "google-chrome" ''
-    exec ${pkgs.google-chrome}/bin/google-chrome-stable $(${sandboxFlag}) "$@"
-  '';
 
   # ── Get Alacritty SVG icon path ────────────────────────────────
   getAlacrittySvg = pkg:
@@ -69,7 +66,6 @@ let
 in {
   inherit
     nixBin
-    mkChromiumWrapper
     wrapElectron
     chromeWrapped
     getAlacrittySvg
