@@ -9,10 +9,10 @@ let
 
   # ── Detect at runtime whether the set-uid helper is available ───
   sandboxFlag = ''
-    if [ -x /usr/local/bin/chrome-sandbox ] && [ -u /usr/local/bin/chrome-sandbox ]; then
-      echo "--sandbox-executable=/usr/local/bin/chrome-sandbox"
+    if [ -x /usr/local/bin/chrome-sandbox ]; then
+      echo --sandbox-executable=/usr/local/bin/chrome-sandbox
     else
-      echo "--disable-setuid-sandbox"
+      echo --disable-setuid-sandbox
     fi
   '';
 
@@ -33,8 +33,7 @@ let
 
   # ── Chrome wrapper (uses installed SUID helper) ────────────────
   chromeWrapped = pkgs.writeShellScriptBin "google-chrome" ''
-    exec ${pkgs.google-chrome}/bin/google-chrome-stable \
-         --sandbox-executable=/usr/local/bin/chrome-sandbox "$@"
+    exec ${pkgs.google-chrome}/bin/google-chrome-stable $(${sandboxFlag}) "$@"
   '';
 
   # ── Get Alacritty SVG icon path ────────────────────────────────

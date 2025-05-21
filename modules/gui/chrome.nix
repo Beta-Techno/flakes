@@ -4,23 +4,23 @@
   # ── Chrome package ────────────────────────────────────────────
   home.packages = with pkgs; [
     helpers.chromeWrapped
-    (lib.lowPrio google-chrome)  # icons / resources
   ];
 
-  # ── Chrome launcher ────────────────────────────────────────────
-  home.activation.installChromeLauncher = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    set -eu
-    apps="${config.xdg.dataHome}/applications"
-    mkdir -p "$apps"
-    cat > "$apps/google-chrome.desktop" <<EOF
+  # ── Create desktop entry ────────────────────────────────────────
+  home.activation.createChromeDesktopEntry = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    $DRY_RUN_CMD mkdir -p "$HOME/.local/share/applications"
+    $DRY_RUN_CMD cat > "$HOME/.local/share/applications/google-chrome.desktop" << EOF
 [Desktop Entry]
-Name=Google Chrome
-Exec=${helpers.chromeWrapped}/bin/google-chrome %U
-Icon=google-chrome
+Version=1.0
 Type=Application
+Name=Google Chrome
+Comment=Access the Internet
+Exec=${helpers.chromeWrapped}/bin/google-chrome %U
+Icon=${pkgs.google-chrome}/share/icons/hicolor/256x256/apps/google-chrome.png
 Categories=Network;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;application/xml;application/rss+xml;application/rdf+xml;image/gif;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/ftp;x-scheme-handler/chrome;video/webm;application/x-extension-htm;application/x-extension-html;application/x-extension-shtml;application/xhtml+xml;application/x-extension-xhtml;application/x-extension-xht;
 StartupNotify=true
+Actions=new-window;new-private-window;
 EOF
-    ${pkgs.desktop-file-utils}/bin/update-desktop-database "$apps" || true
   '';
 } 
