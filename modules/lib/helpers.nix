@@ -25,6 +25,9 @@ let
       exec ${pkg}/bin/${exe} "$extra" "$@"
     '';
 
+  # ── Legacy Electron wrapper (for backward compatibility) ────────
+  wrapElectron = pkg: exe: mkChromiumWrapper { inherit pkg exe; };
+
   # ── Specific wrapper for Chrome ────────────────────────────────
   chromeWrapped = mkChromiumWrapper { pkg = pkgs.google-chrome; exe = "google-chrome"; };
 
@@ -62,6 +65,7 @@ in {
   inherit
     nixBin
     mkChromiumWrapper
+    wrapElectron
     chromeWrapped
     getAlacrittySvg
     createDesktopEntry

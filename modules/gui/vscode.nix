@@ -2,7 +2,7 @@
 
 {
   home.packages = with pkgs; [
-    (helpers.wrapElectron pkgs.vscode "code")
-    (lib.lowPrio pkgs.vscode)  # icons / resources
+    (helpers.mkChromiumWrapper { pkg = vscode; exe = "code"; })
+    (lib.lowPrio vscode)  # icons / resources
   ];
 } 
