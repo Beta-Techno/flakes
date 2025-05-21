@@ -6,6 +6,7 @@
     runtimeInputs = with pkgs; [
       nix
       home-manager
+      systemd
     ];
 
     text = ''
