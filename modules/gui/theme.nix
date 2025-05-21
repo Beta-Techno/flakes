@@ -18,7 +18,8 @@ in {
 
   # Set the background
   home.activation.copyWallpaper = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    $DRY_RUN_CMD install -Dm644 -t ${config.xdg.dataHome}/backgrounds ${./../../assets/wallpapers/fish.jpeg}
+    $DRY_RUN_CMD mkdir -p ${config.xdg.dataHome}/backgrounds
+    $DRY_RUN_CMD cp ${./../../assets/wallpapers/fish.jpeg} ${config.xdg.dataHome}/backgrounds/
   '';
 
   # Set the user avatar (both for session and login screen)
@@ -29,15 +30,11 @@ in {
     '';
   };
 
-  # Use AccountsService to set the avatar for GDM
+  # Use AccountsService D-Bus to set the avatar for GDM
   home.activation.avatar = lib.hm.dag.entryAfter ["linkGeneration"] ''
-    pic=${./../../assets/icons/fish.png}
-    uid=$(id -u)
-
-    # Ask AccountsService to copy & register the icon
     busctl --system call org.freedesktop.Accounts \
-           "/org/freedesktop/Accounts/User$uid" \
-           org.freedesktop.Accounts.User SetIconFile s "$pic" \
-      || echo "warning: could not set avatar"
+           /org/freedesktop/Accounts/User$(id -u) \
+           org.freedesktop.Accounts.User SetIconFile s \
+           ${./../../assets/icons/fish.png}
   '';
 }
