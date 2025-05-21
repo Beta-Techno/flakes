@@ -6,6 +6,7 @@ let
 
   # ── Chrome desktop entry ───────────────────────────────────────
   chromeDesktopEntry = helpers.createDesktopEntry {
+    fileName = "google-chrome.desktop";   # Use canonical filename
     name = "Google Chrome";
     exec = "${chromeWrapped}/bin/google-chrome";
     icon = "google-chrome";
@@ -21,6 +22,6 @@ in
 
   # ── Chrome launcher ────────────────────────────────────────────
   home.file."${config.xdg.dataHome}/applications/google-chrome.desktop" = {
-    source = "${chromeDesktopEntry}/Google Chrome.desktop";
+    source = "${chromeDesktopEntry}/google-chrome.desktop";
   };
 } 

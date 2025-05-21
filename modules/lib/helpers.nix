@@ -22,9 +22,9 @@ let
     "${pkg}/share/icons/hicolor/scalable/apps/Alacritty.svg";
 
   # ── Create desktop entry ────────────────────────────────────────
-  createDesktopEntry = { name, exec, icon, type ? "Application", categories ? [], startupNotify ? true }:
+  createDesktopEntry = { fileName ? "google-chrome.desktop", name, exec, icon, type ? "Application", categories ? [], startupNotify ? true }:
     pkgs.writeTextFile {
-      name = "${name}.desktop";
+      name = fileName;               # Use canonical filename (no spaces)
       text = ''
         [Desktop Entry]
         Name=${name}
