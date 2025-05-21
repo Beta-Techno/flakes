@@ -17,6 +17,12 @@ in {
   };
 
   # Set the background
+  dconf.settings."org/gnome/desktop/background" = {
+    picture-uri = "file://${config.xdg.dataHome}/backgrounds/fish.jpeg";
+    picture-uri-dark = "file://${config.xdg.dataHome}/backgrounds/fish.jpeg";
+    picture-options = "zoom";
+  };
+
   home.activation.copyWallpaper = lib.hm.dag.entryAfter ["writeBoundary"] ''
     $DRY_RUN_CMD mkdir -p ${config.xdg.dataHome}/backgrounds
     $DRY_RUN_CMD cp ${./../../assets/wallpapers/fish.jpeg} ${config.xdg.dataHome}/backgrounds/fish.jpeg
