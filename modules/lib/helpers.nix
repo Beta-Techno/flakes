@@ -33,7 +33,7 @@ let
 
   # ── Chrome wrapper (matches legacy approach) ────────────────
   chromeWrapped = pkgs.writeShellScriptBin "google-chrome" ''
-    exec ${pkgs.google-chrome}/bin/google-chrome-stable --disable-setuid-sandbox "$@"
+    exec ${pkgs.google-chrome}/bin/google-chrome-stable --sandbox-executable=/usr/local/bin/chrome-sandbox "$@"
   '';
 
   # ── Get Alacritty SVG icon path ────────────────────────────────

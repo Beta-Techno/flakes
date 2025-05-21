@@ -28,5 +28,11 @@ in
     mkdir -p "$apps"
     install -Dm644 ${chromeDesktopEntry} "$apps/google-chrome.desktop"
     ${pkgs.desktop-file-utils}/bin/update-desktop-database "$apps" || true
+
+    # Install Chrome sandbox executable
+    if [ ! -e /usr/local/bin/chrome-sandbox ]; then
+      echo "Installing Chrome sandbox executable..."
+      sudo install -m 4755 ${pkgs.google-chrome}/libexec/chrome-sandbox /usr/local/bin/chrome-sandbox
+    fi
   '';
 } 
