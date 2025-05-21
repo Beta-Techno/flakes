@@ -25,7 +25,6 @@ let
   createDesktopEntry = { name, exec, icon, type ? "Application", categories ? [], startupNotify ? true }:
     pkgs.writeTextFile {
       name = "${name}.desktop";
-      destination = "/share/applications/${name}.desktop";
       text = ''
         [Desktop Entry]
         Name=${name}
