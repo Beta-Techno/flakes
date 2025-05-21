@@ -25,11 +25,17 @@ let
       exec ${pkg}/bin/${exe} "$extra" "$@"
     '';
 
-  # ── Legacy Electron wrapper (for backward compatibility) ────────
-  wrapElectron = pkg: exe: mkChromiumWrapper { inherit pkg exe; };
+  # ── Common Electron wrapper (keeps namespace sandbox) ──────────────────────
+  wrapElectron = pkg: exe:
+    pkgs.writeShellScriptBin exe ''
+      exec ${pkg}/bin/${exe} --disable-setuid-sandbox "$@"
+    '';
 
-  # ── Specific wrapper for Chrome ────────────────────────────────
-  chromeWrapped = mkChromiumWrapper { pkg = pkgs.google-chrome; exe = "google-chrome"; };
+  # ── Chrome wrapper (uses legacy approach) ────────────────
+  chromeWrapped = pkg:
+    pkgs.writeShellScriptBin "google-chrome" ''
+      exec ${pkg}/bin/google-chrome-stable --disable-setuid-sandbox "$@"
+    '';
 
   # ── Get Alacritty SVG icon path ────────────────────────────────
   getAlacrittySvg = pkg:
