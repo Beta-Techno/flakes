@@ -1,13 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Try to reconnect to TTY, but don't fail if we can't
-if [ -t 0 ]; then
-  # We already have a TTY, no need to reconnect
-  :
-elif [ -e /dev/tty ]; then
-  # We're on Linux and can reconnect
-  exec </dev/tty
+# Re-connect all three FDs if we still have a terminal
+if ! [ -t 0 ] && [ -e /dev/tty ]; then
+  exec </dev/tty >/dev/tty 2>&1
 fi
 
 # ── Helper functions ─────────────────────────────────────────
