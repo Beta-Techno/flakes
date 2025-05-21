@@ -55,7 +55,17 @@ cd "$REPO_DIR"
 # ── Install Chrome SUID helper (root once) ──────────────────
 echo "+ provisioning Chrome sandbox helper..."
 if [ ! -u /usr/local/bin/chrome-sandbox ]; then
-  SANDBOX=$(nix eval --impure --raw nixpkgs#google-chrome)/libexec/chrome-sandbox
+  CHROME_ROOT=$(nix eval --impure --raw nixpkgs#google-chrome | tr -d '\n')
+
+  # helper moved location in newer builds; check both
+  if [ -e "$CHROME_ROOT/libexec/chrome-sandbox" ]; then
+    SANDBOX="$CHROME_ROOT/libexec/chrome-sandbox"
+  elif [ -e "$CHROME_ROOT/chrome-sandbox" ]; then
+    SANDBOX="$CHROME_ROOT/chrome-sandbox"
+  else
+    die "chrome-sandbox not found in google-chrome derivation"
+  fi
+
   echo "  → copying $(basename "$SANDBOX") to /usr/local/bin (needs sudo)"
   sudo install -m 4755 -o root -g root "$SANDBOX" /usr/local/bin/chrome-sandbox
 else
