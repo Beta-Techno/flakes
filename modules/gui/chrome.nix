@@ -32,7 +32,7 @@ in
     # Install Chrome sandbox executable
     if [ ! -e /usr/local/bin/chrome-sandbox ]; then
       echo "Installing Chrome sandbox executable..."
-      sudo install -m 4755 ${pkgs.google-chrome}/libexec/chrome-sandbox /usr/local/bin/chrome-sandbox
+      install -m 4755 ${pkgs.google-chrome}/libexec/chrome-sandbox /usr/local/bin/chrome-sandbox
     fi
   '';
 } 

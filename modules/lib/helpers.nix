@@ -31,9 +31,10 @@ let
       exec ${pkg}/bin/${exe} --disable-setuid-sandbox "$@"
     '';
 
-  # ── Chrome wrapper (matches legacy approach) ────────────────
+  # ── Chrome wrapper (uses installed SUID helper) ────────────────
   chromeWrapped = pkgs.writeShellScriptBin "google-chrome" ''
-    exec ${pkgs.google-chrome}/bin/google-chrome-stable --sandbox-executable=/usr/local/bin/chrome-sandbox "$@"
+    exec ${pkgs.google-chrome}/bin/google-chrome-stable \
+         --sandbox-executable=/usr/local/bin/chrome-sandbox "$@"
   '';
 
   # ── Get Alacritty SVG icon path ────────────────────────────────
