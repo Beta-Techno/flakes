@@ -20,10 +20,7 @@ in
   ];
 
   # ── Chrome launcher ────────────────────────────────────────────
-  home.activation = {
-    installChromeLauncher = helpers.installDesktopEntry {
-      name = "google-chrome";
-      desktopEntry = chromeDesktopEntry;
-    };
+  home.file."${config.xdg.dataHome}/applications/google-chrome.desktop" = {
+    source = "${chromeDesktopEntry}/Google-Chrome.desktop";
   };
 } 

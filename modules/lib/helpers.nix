@@ -36,16 +36,6 @@ let
       '';
     };
 
-  # ── Install desktop entry ───────────────────────────────────────
-  installDesktopEntry = { name, desktopEntry }:
-    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      set -eu
-      apps="$HOME/.local/share/applications"
-      mkdir -p "$apps"
-      cp ${desktopEntry} "$apps/${name}.desktop"
-      ${pkgs.desktop-file-utils}/bin/update-desktop-database "$apps" || true
-    '';
-
   # ── Install terminfo ────────────────────────────────────────────
   installTerminfo = { name, source }:
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -60,6 +50,5 @@ in {
     chromeWrapped
     getAlacrittySvg
     createDesktopEntry
-    installDesktopEntry
     installTerminfo;
 } 
