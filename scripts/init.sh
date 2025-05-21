@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "→ Allow unprivileged user-namespaces (needed by Chrome/Electron)…"
-sudo tee /etc/sysctl.d/60-apparmor-userns.conf >/dev/null <<'EOF'
-# Allow Chrome/Electron and other user-namespace tools to run without extra AppArmor rules
-kernel.apparmor_restrict_unprivileged_userns = 0
-EOF
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
 
-# Apply immediately without reboot (harmless if the service name differs)
-sudo systemctl restart systemd-sysctl.service 2>/dev/null || sudo sysctl -p /etc/sysctl.d/60-apparmor-userns.conf
-echo "✓ AppArmor user-namespace restriction disabled persistently"
+echo "+ downloading installer..."
+curl -fsSL https://raw.githubusercontent.com/Beta-Techno/flakes/main/scripts/install.sh \
+  -o "$tmp/install.sh"
+
+chmod +x "$tmp/install.sh"
+
+# run as current user; inner script keeps its own sudo calls
+echo "+ running installer..."
+exec "$tmp/install.sh" 

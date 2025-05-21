@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Re-connect all three FDs if we still have a terminal
-if ! [ -t 0 ] && [ -e /dev/tty ]; then
-  exec </dev/tty >/dev/tty 2>&1
-fi
-
 # ── Helper functions ─────────────────────────────────────────
 die() {
   echo "Error: $1" >&2
