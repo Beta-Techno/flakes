@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Ensure interactive stdin even when piped
-exec </dev/tty
+# Try to reconnect to TTY, but don't fail if we can't
+if [ -t 0 ]; then
+  # We already have a TTY, no need to reconnect
+  :
+elif [ -e /dev/tty ]; then
+  # We're on Linux and can reconnect
+  exec </dev/tty
+fi
 
 # ── Helper functions ─────────────────────────────────────────
 die() {
