@@ -29,12 +29,4 @@ in {
       chmod 644 $out
     '';
   };
-
-  # Use AccountsService D-Bus to set the avatar for GDM
-  home.activation.avatar = lib.hm.dag.entryAfter ["linkGeneration"] ''
-    busctl --system call org.freedesktop.Accounts \
-           /org/freedesktop/Accounts/User$(id -u) \
-           org.freedesktop.Accounts.User SetIconFile s \
-           ${./../../assets/icons/fish.png}
-  '';
 }
