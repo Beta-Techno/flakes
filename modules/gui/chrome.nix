@@ -25,7 +25,7 @@ in
     set -eu
     apps="${config.xdg.dataHome}/applications"
     mkdir -p "$apps"
-    install -Dm644 ${chromeDesktopEntry}/google-chrome.desktop "$apps/google-chrome.desktop"
+    install -Dm644 ${chromeDesktopEntry} "$apps/google-chrome.desktop"
     ${pkgs.desktop-file-utils}/bin/update-desktop-database "$apps" || true
   '';
 } 
