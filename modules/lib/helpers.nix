@@ -14,23 +14,18 @@ let
 
     if [ -x /usr/local/bin/chrome-sandbox ]; then
       # We really do have a properly installed SUID helper → use it
-      exec env CHROME_DEVEL_SANDBOX=/usr/local/bin/chrome-sandbox \
-        ${pkgs.google-chrome}/bin/google-chrome-stable \
-        --sandbox-executable=/usr/local/bin/chrome-sandbox "$@"
+      exec env CHROME_DEVEL_SANDBOX=/usr/local/bin/chrome-sandbox ${pkgs.google-chrome}/bin/google-chrome-stable --sandbox-executable=/usr/local/bin/chrome-sandbox "$@"
     else
       # Force Chrome into the namespace sandbox and guarantee it won't
       # fall back to the half-broken helper in the Nix store.
-      exec env CHROME_DEVEL_SANDBOX='' \
-        ${pkgs.google-chrome}/bin/google-chrome-stable \
-        --disable-setuid-sandbox "$@"
+      exec env CHROME_DEVEL_SANDBOX='' ${pkgs.google-chrome}/bin/google-chrome-stable --disable-setuid-sandbox "$@"
     fi
   '';
 
   # ── Common Electron wrapper (keeps namespace sandbox) ───────────
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
-      exec env CHROME_DEVEL_SANDBOX='' \
-        ${pkg}/bin/${exe} --disable-setuid-sandbox "$@"
+      exec env CHROME_DEVEL_SANDBOX='' ${pkg}/bin/${exe} --disable-setuid-sandbox "$@"
     '';
 
   # ── Get Alacritty SVG icon path ────────────────────────────────
