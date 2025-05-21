@@ -58,7 +58,7 @@
 
       # ── Activate configuration ───────────────────────────────────
       echo "+ activating Home-Manager configuration for $MACHINE"
-      nix run ".#homeConfigurations.${MACHINE}.activationPackage" --impure --accept-flake-config
+      nix run .#homeConfigurations.''${MACHINE}.activationPackage --impure
 
       echo "✅  Activation complete"
     '';
