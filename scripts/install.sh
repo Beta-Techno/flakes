@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# ── Allow unfree packages ───────────────────────────────────
+export NIXPKGS_ALLOW_UNFREE=1   # allow google-chrome derivation
+
 # ── Helper functions ─────────────────────────────────────────
 die() {
   echo "Error: $1" >&2
@@ -52,7 +55,7 @@ cd "$REPO_DIR"
 # ── Install Chrome SUID helper (root once) ──────────────────
 echo "+ provisioning Chrome sandbox helper..."
 if [ ! -u /usr/local/bin/chrome-sandbox ]; then
-  SANDBOX=$(nix eval --raw nixpkgs#google-chrome)/libexec/chrome-sandbox
+  SANDBOX=$(nix eval --impure --raw nixpkgs#google-chrome)/libexec/chrome-sandbox
   echo "  → copying $(basename "$SANDBOX") to /usr/local/bin (needs sudo)"
   sudo install -m 4755 -o root -g root "$SANDBOX" /usr/local/bin/chrome-sandbox
 else
