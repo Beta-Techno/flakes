@@ -19,7 +19,7 @@ in {
   # Set the background
   home.activation.copyWallpaper = lib.hm.dag.entryAfter ["writeBoundary"] ''
     $DRY_RUN_CMD mkdir -p ${config.xdg.dataHome}/backgrounds
-    $DRY_RUN_CMD cp ${./../../assets/wallpapers/fish.jpeg} ${config.xdg.dataHome}/backgrounds/
+    $DRY_RUN_CMD cp ${./../../assets/wallpapers/fish.jpeg} ${config.xdg.dataHome}/backgrounds/fish.jpeg
   '';
 
   # Set the user avatar (both for session and login screen)
