@@ -21,6 +21,6 @@ in
 
   # ── Chrome launcher ────────────────────────────────────────────
   home.file."${config.xdg.dataHome}/applications/google-chrome.desktop" = {
-    source = "${chromeDesktopEntry}/Google-Chrome.desktop";
+    source = "${chromeDesktopEntry}/Google Chrome.desktop";
   };
 } 
