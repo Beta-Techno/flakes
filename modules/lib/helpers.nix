@@ -4,23 +4,6 @@ let
   # ── Nix binary path ────────────────────────────────────────────
   nixBin = "${pkgs.nix}/bin/nix";
 
-  # ── Helper binary *inside* the Google-Chrome derivation ─────────
-  chromeSandboxInStore = "${pkgs.google-chrome}/libexec/chrome-sandbox";
-
-  # ── Chrome wrapper (uses namespace sandbox by default) ──────────
-  chromeWrapped = pkgs.writeShellScriptBin "google-chrome" ''
-    #!${pkgs.bash}/bin/bash
-    set -euo pipefail
-
-    if [ -x /usr/local/bin/chrome-sandbox ]; then
-      # We really do have a properly installed SUID helper → use it
-      exec env CHROME_DEVEL_SANDBOX=/usr/local/bin/chrome-sandbox "${pkgs.google-chrome}/bin/google-chrome-stable" --sandbox-executable=/usr/local/bin/chrome-sandbox "$@"
-    else
-      # unset CHROME_DEVEL_SANDBOX → guarantees no SUID attempt
-      exec env -u CHROME_DEVEL_SANDBOX "${pkgs.google-chrome}/bin/google-chrome-stable" --disable-setuid-sandbox "$@"
-    fi
-  '';
-
   # ── Common Electron wrapper (keeps namespace sandbox) ───────────
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
@@ -61,7 +44,6 @@ in {
   inherit
     nixBin
     wrapElectron
-    chromeWrapped
     getAlacrittySvg
     createDesktopEntry
     installTerminfo;

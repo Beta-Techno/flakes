@@ -3,7 +3,7 @@
 {
   # ── Chrome package ────────────────────────────────────────────
   home.packages = with pkgs; [
-    helpers.chromeWrapped
+    google-chrome
   ];
 
   # ── Create desktop entry ────────────────────────────────────────
@@ -15,7 +15,7 @@ Version=1.0
 Type=Application
 Name=Google Chrome
 Comment=Access the Internet
-Exec=${helpers.chromeWrapped}/bin/google-chrome %U
+Exec=${pkgs.google-chrome}/bin/google-chrome-stable %U
 Icon=${pkgs.google-chrome}/share/icons/hicolor/256x256/apps/google-chrome.png
 Categories=Network;WebBrowser;
 MimeType=text/html;text/xml;application/xhtml+xml;application/xml;application/rss+xml;application/rdf+xml;image/gif;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/ftp;x-scheme-handler/chrome;video/webm;application/x-extension-htm;application/x-extension-html;application/x-extension-shtml;application/xhtml+xml;application/x-extension-xhtml;application/x-extension-xht;
