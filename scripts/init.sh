@@ -13,3 +13,9 @@ chmod +x "$tmp/install.sh"
 # run as current user; inner script keeps its own sudo calls
 echo "+ running installer..."
 exec "$tmp/install.sh" 
+
+
+
+
+# TO RUN:
+# bash -c "$(curl -fsSL https://raw.githubusercontent.com/Beta-Techno/flakes/main/scripts/init.sh)"
