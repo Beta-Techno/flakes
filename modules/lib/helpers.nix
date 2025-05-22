@@ -24,30 +24,7 @@ let
   # ── Common Electron wrapper (keeps namespace sandbox) ───────────
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
-      #!${pkgs.bash}/bin/bash
-      set -euo pipefail
-
-      # Get the actual binary path from the package
-      BIN="${pkg}/bin/${exe}"
-
-      # If it's a shell script, read the actual binary path from it
-      if [ -f "$BIN" ] && [ "$(head -n1 "$BIN" | cut -c1-2)" = "#!" ]; then
-        # Extract the actual binary path from the wrapper
-        # First try to find the binary in the package's share directory
-        SHARE_BIN="${pkg}/share/$(basename "$exe")/$(basename "$exe")"
-        if [ -f "$SHARE_BIN" ]; then
-          BIN="$SHARE_BIN"
-        else
-          # If not found, try to extract from the wrapper
-          ACTUAL_BIN=$(grep -m1 'exec' "$BIN" | sed -E 's/.*exec.*"([^"]+)".*/\1/')
-          if [ -n "$ACTUAL_BIN" ]; then
-            BIN="$ACTUAL_BIN"
-          fi
-        fi
-      fi
-
-      # Run the binary with our flags
-      exec "$BIN" --disable-setuid-sandbox "$@"
+      exec ${pkg}/bin/${exe} --disable-setuid-sandbox "$@"
     '';
 
   # ── Get Alacritty SVG icon path ────────────────────────────────
