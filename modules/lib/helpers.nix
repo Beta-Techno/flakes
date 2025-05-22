@@ -24,7 +24,7 @@ let
   # ── Common Electron wrapper (keeps namespace sandbox) ───────────
   wrapElectron = pkg: exe:
     pkgs.writeShellScriptBin exe ''
-      exec ${pkg}/bin/${exe} --disable-setuid-sandbox "$@"
+      exec ${pkg}/bin/${exe} --no-sandbox "$@"
     '';
 
   # ── Get Alacritty SVG icon path ────────────────────────────────
