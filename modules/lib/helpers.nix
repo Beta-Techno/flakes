@@ -33,9 +33,16 @@ let
       # If it's a shell script, read the actual binary path from it
       if [ -f "$BIN" ] && [ "$(head -n1 "$BIN" | cut -c1-2)" = "#!" ]; then
         # Extract the actual binary path from the wrapper
-        ACTUAL_BIN=$(grep -m1 'exec' "$BIN" | sed -E 's/.*exec.*"([^"]+)".*/\1/')
-        if [ -n "$ACTUAL_BIN" ]; then
-          BIN="$ACTUAL_BIN"
+        # First try to find the binary in the package's share directory
+        SHARE_BIN="${pkg}/share/$(basename "$exe")/$(basename "$exe")"
+        if [ -f "$SHARE_BIN" ]; then
+          BIN="$SHARE_BIN"
+        else
+          # If not found, try to extract from the wrapper
+          ACTUAL_BIN=$(grep -m1 'exec' "$BIN" | sed -E 's/.*exec.*"([^"]+)".*/\1/')
+          if [ -n "$ACTUAL_BIN" ]; then
+            BIN="$ACTUAL_BIN"
+          fi
         fi
       fi
 
