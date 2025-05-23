@@ -1,15 +1,10 @@
 { config, pkgs, lib, helpers, ... }:
 
 let
-  # Create a wrapper for Chrome that uses the SUID sandbox
+  # Create a wrapper for Chrome that uses the system SUID helper
   chromeWrapped = pkgs.writeShellScriptBin "google-chrome" ''
-    if [ -x /usr/local/bin/chrome-sandbox ]; then
-      exec env CHROME_DEVEL_SANDBOX=/usr/local/bin/chrome-sandbox \
-           ${pkgs.google-chrome}/bin/google-chrome-stable \
-           --sandbox-executable=/usr/local/bin/chrome-sandbox "$@"
-    else
-      exec ${pkgs.google-chrome}/bin/google-chrome-stable --disable-setuid-sandbox "$@"
-    fi
+    exec ${pkgs.google-chrome}/bin/google-chrome-stable \
+         --sandbox-executable=/usr/local/bin/chrome-sandbox "$@"
   '';
 in {
   # ── Chrome package (wrapped + base) ────────────────────────────
