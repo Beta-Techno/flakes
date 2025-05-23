@@ -3,8 +3,8 @@
 let
   # ── Chrome wrapper (uses installed SUID helper) ────────────────
   chromeWrapped = pkgs.writeShellScriptBin "google-chrome" ''
-    exec ${pkgs.google-chrome}/bin/google-chrome-stable \
-         --sandbox-executable=/usr/local/bin/chrome-sandbox "$@"
+    exec env CHROME_DEVEL_SANDBOX=/usr/local/bin/chrome-sandbox \
+         ${pkgs.google-chrome}/bin/google-chrome-stable "$@"
   '';
 in {
   # ── Chrome package (wrapped + base) ────────────────────────────
