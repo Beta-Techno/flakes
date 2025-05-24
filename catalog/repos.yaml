@@ -1,15 +1,126 @@
 # catalog/repos.yaml
-- name: devdoc
-  url:  git@github.com:Beta-Techno/devdoc.git
-  kind: service        # <-- what it *is*
-  lang: rust           # <-- how it's built
-
-- name: qualia
-  url:  git@github.com:Beta-Techno/qualia.git
-  kind: service        # <-- what it *is*
-  lang: rust           # <-- how it's built
 
 - name: flakes
   url:  git@github.com:Beta-Techno/flakes.git
-  kind: tooling        # <-- what it *is*
-  lang: nix            # <-- how it's built
+  kind: infra
+  lang: nix
+
+- name: goo
+  url:  git@github.com:Beta-Techno/goo.git
+  kind: tools
+  lang: go
+
+- name: pion
+  url:  git@github.com:Beta-Techno/pion.git
+  kind: web
+  lang: static
+
+- name: tele
+  url:  git@github.com:Beta-Techno/tele.git
+  kind: web
+  lang: static
+
+- name: dog
+  url:  git@github.com:Beta-Techno/dog.git
+  kind: web
+  lang: static
+
+- name: dontaco
+  url:  git@github.com:Beta-Techno/dontaco.git
+  kind: web
+  lang: static
+
+- name: tyler-realty
+  url:  git@github.com:Beta-Techno/tyler-realty.git
+  kind: web
+  lang: static
+
+- name: civct
+  url:  git@github.com:Beta-Techno/civct.git
+  kind: web
+  lang: static
+
+- name: civct
+  url:  git@github.com:Beta-Techno/civct.git
+  kind: monolith
+  lang: aspnet
+
+- name: build
+  url:  git@github.com:Beta-Techno/build.git
+  kind: web
+  lang: next
+
+- name: codec
+  url:  git@github.com:Beta-Techno/codec.git
+  kind: web
+  lang: react
+
+- name: qualia
+  url:  git@github.com:Beta-Techno/qualia.git
+  kind: web
+  lang: react
+
+- name: redray
+  url:  git@github.com:Beta-Techno/redray.git
+  kind: web
+  lang: react
+
+- name: pos
+  url:  git@github.com:Beta-Techno/pos.git
+  kind: web
+  lang: svelte
+
+- name: comms
+  url:  git@github.com:Beta-Techno/comms.git
+  kind: web
+  lang: svelte
+
+- name: beta-pack
+  url:  git@github.com:Beta-Techno/beta-pack.git
+  kind: web
+  lang: npm
+
+- name: gate
+  url:  git@github.com:Beta-Techno/gate.git
+  kind: service
+  lang: go
+
+- name: aips
+  url:  git@github.com:Beta-Techno/aips.git
+  kind: service
+  lang: go
+
+- name: postal
+  url:  git@github.com:Beta-Techno/postal.git
+  kind: service
+  lang: go
+
+- name: bion
+  url:  git@github.com:Beta-Techno/bion.git
+  kind: service
+  lang: go
+
+- name: beam
+  url:  git@github.com:Beta-Techno/beam.git
+  kind: service
+  lang: go
+
+- name: socials
+  url:  git@github.com:Beta-Techno/socials.git
+  kind: service
+  lang: typescript
+
+- name: twil
+  url:  git@github.com:Beta-Techno/twil.git
+  kind: service
+  lang: typescript
+
+- name: codehub
+  url:  git@github.com:Beta-Techno/codehub.git
+  kind: service
+  lang: typescript
+
+- name: gogh
+  url:  git@github.com:Beta-Techno/gogh.git
+  kind: service
+  lang: typescript
