@@ -52,22 +52,7 @@ if [ ! -d "$REPO_DIR" ]; then
 fi
 cd "$REPO_DIR"
 
-# ── Install Chrome SUID helper (root once) ──────────────────
-# echo "+ provisioning Chrome sandbox helper..."
-# if [ ! -u /usr/local/bin/chrome-sandbox ]; then
-#   # Trim *all* trailing whitespace
-#   CHROME_ROOT=$(nix eval --impure --raw nixpkgs#google-chrome | tr -d '[:space:]')
-# 
-#   # Locate the helper (package layout differs by version)
-#   SANDBOX=$(find "$CHROME_ROOT" -maxdepth 2 -type f -name chrome-sandbox | head -n 1)
-# 
-#   [ -n "$SANDBOX" ] || die "chrome-sandbox not found in $CHROME_ROOT"
-# 
-#   echo "  → copying $(basename "$SANDBOX") to /usr/local/bin (needs sudo)"
-#   sudo install -m 4755 -o root -g root "$SANDBOX" /usr/local/bin/chrome-sandbox
-# else
-#   echo "  → /usr/local/bin/chrome-sandbox already present; skipping"
-# fi
+
 
 # ── Run the bootstrap process ───────────────────────────────
 echo "+ running bootstrap process..."
@@ -87,5 +72,10 @@ nix run .#activate
 # 4. Sync repositories
 echo "▶ Syncing repositories..."
 nix run .#sync-repos
+
+# After Home Manager activation
+echo "Setting up Chrome sandbox..."
+export NIXPKGS_ALLOW_UNFREE=1
+sudo chmod 4755 "$(nix build --impure --no-link --print-out-paths nixpkgs#google-chrome)/share/google/chrome/chrome-sandbox"
 
 echo "✅  Installation complete! Your development environment is ready." 
