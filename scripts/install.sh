@@ -57,6 +57,10 @@ cd "$REPO_DIR"
 # ── Run the bootstrap process ───────────────────────────────
 echo "+ running bootstrap process..."
 
+# Detect system architecture
+SYSTEM=$(nix eval --impure --expr 'builtins.currentSystem')
+echo "▶ Detected system: $SYSTEM"
+
 # 1. Authenticate with GitHub
 echo "▶ Authenticating with GitHub..."
 nix run .#auth
