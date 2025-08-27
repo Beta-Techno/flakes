@@ -60,7 +60,7 @@
       # ── Activate configuration ───────────────────────────────────
       echo "+ activating Home-Manager configuration for $MACHINE"
       SYSTEM=$(nix eval --impure --expr 'builtins.currentSystem')
-      nix run .#homeConfigurations.''${SYSTEM}.''${MACHINE}.activationPackage --impure
+      nix run .#homeConfigurations."''${SYSTEM}"."''${MACHINE}".activationPackage --impure
 
       echo "✅  Activation complete"
     '';

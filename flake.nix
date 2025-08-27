@@ -171,7 +171,7 @@
             echo "Building configuration for $USERNAME on $MACHINE..."
             export USERNAME
             SYSTEM=$(nix eval --impure --expr 'builtins.currentSystem')
-            nix run .#homeConfigurations.''${SYSTEM}.''${MACHINE}.activationPackage --impure
+            nix run .#homeConfigurations."''${SYSTEM}"."''${MACHINE}".activationPackage --impure
           '';
           # Development shells
           rust = pkgs.mkShell {
