@@ -1,12 +1,13 @@
 { config, pkgs, lib, helpers, ... }:
 
-lib.mkIf (pkgs.stdenv.isx86_64 || pkgs.stdenv.isDarwin) {
+let
   # ── Chrome wrapper (uses installed SUID helper) ────────────────
   chromeWrapped = pkgs.writeShellScriptBin "google-chrome" ''
     exec env CHROME_DEVEL_SANDBOX=/usr/local/bin/chrome-sandbox \
          ${pkgs.google-chrome}/bin/google-chrome-stable "$@"
   '';
-
+in
+{
   # ── Chrome package (wrapped + base) ────────────────────────────
   home.packages = with pkgs; [
     chromeWrapped
