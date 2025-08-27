@@ -1,7 +1,7 @@
-{ platform, lib, ... }:
+{ lib, pkgs, ... }:
 
 {
   imports = lib.flatten [
-    (lib.optional platform.isLinux ./linux)
+    (lib.optional pkgs.stdenv.isLinux ./linux)
   ];
 } 

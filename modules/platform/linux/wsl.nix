@@ -1,4 +1,4 @@
-{ platform, pkgs, lib, ... }:
+{ pkgs, lib, ... }:
 
 {
   # ── WSL-specific settings ──────────────────────────────────────
