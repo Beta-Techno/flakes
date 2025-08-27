@@ -1,4 +1,4 @@
-{ platform, pkgs, lib, ... }:
+{ pkgs, lib, ... }:
 
 {
   # ── Platform-specific settings ──────────────────────────────────
@@ -60,28 +60,17 @@
       pciutils
       usbutils
       lshw
-    ] 
-    ++ lib.optionals platform.hasAMD [
-      # AMD GPU specific packages
-      rocm-opencl-runtime
-      rocm-opencl-icd
-      rocm-smi
-      rocm-device-libs
-      rocm-runtime
-      rocm-thunk
-      rocm-llvm
-      rocm-cmake
     ];
 
   # ── Desktop environment detection ───────────────────────────────
   imports = lib.flatten [
-    (lib.optional platform.hasGnome ./desktop/gnome.nix)
-    (lib.optional platform.hasKDE ./desktop/kde.nix)
-    (lib.optional platform.isWSL ./wsl.nix)
+    (lib.optional (builtins.pathExists "/usr/bin/gnome-shell") ./desktop/gnome.nix)
+    (lib.optional (builtins.pathExists "/usr/bin/plasmashell") ./desktop/kde.nix)
+    (lib.optional (builtins.pathExists "/proc/version" && builtins.readFile "/proc/version" != "" && builtins.match ".*Microsoft.*" (builtins.readFile "/proc/version") != null) ./wsl.nix)
   ];
 
   # ── Systemd user services ───────────────────────────────────────
-  systemd.user.services = lib.mkIf platform.hasSystemd {
+  systemd.user.services = lib.mkIf (builtins.pathExists "/run/systemd/system") {
     # Add systemd user services here
   };
 

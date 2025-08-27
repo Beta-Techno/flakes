@@ -48,25 +48,7 @@
         }
       );
 
-      # Platform detection probes (using the current system's pkgs)
-      platform = forAllSystems (system:
-        let pkgs = pkgsFor.${system};
-        in {
-          isDarwin = pkgs.stdenv.isDarwin;
-          isLinux = pkgs.stdenv.isLinux;
-          isWSL = pkgs.stdenv.isLinux && builtins.pathExists "/proc/version" && 
-                  builtins.readFile "/proc/version" != "" && 
-                  builtins.match ".*Microsoft.*" (builtins.readFile "/proc/version") != null;
-          hasSystemd = pkgs.stdenv.isLinux && !(pkgs.stdenv.isLinux && builtins.pathExists "/proc/version" && 
-                      builtins.readFile "/proc/version" != "" && 
-                      builtins.match ".*Microsoft.*" (builtins.readFile "/proc/version") != null);
-          hasNvidia = pkgs.stdenv.isLinux && builtins.pathExists "/proc/driver/nvidia";
-          hasAMD = pkgs.stdenv.isLinux && builtins.pathExists "/sys/class/drm/card0/device/vendor" && 
-                   builtins.readFile "/sys/class/drm/card0/device/vendor" == "0x1002\n";
-          hasGnome = pkgs.stdenv.isLinux && builtins.pathExists "/usr/bin/gnome-shell";
-          hasKDE = pkgs.stdenv.isLinux && builtins.pathExists "/usr/bin/plasmashell";
-        }
-      );
+
     in
     {
       # Expose configurations for nix eval and home.file use
@@ -75,7 +57,6 @@
 
       homeConfigurations = forAllSystems (system:
         let pkgs = pkgsFor.${system};
-            platformConfig = platform.${system};
         in {
           macbook-air = home-manager.lib.homeManagerConfiguration {
             inherit pkgs;
@@ -87,7 +68,6 @@
             extraSpecialArgs = {
               username = if builtins.getEnv "USERNAME" != "" then builtins.getEnv "USERNAME" else builtins.getEnv "USER";
               inherit (inputs) lazyvimStarter lazyvimConfig doomConfig nixGL;
-              inherit platformConfig;
             };
           };
           macbook-pro = home-manager.lib.homeManagerConfiguration {
@@ -100,7 +80,6 @@
             extraSpecialArgs = {
               username = if builtins.getEnv "USERNAME" != "" then builtins.getEnv "USERNAME" else builtins.getEnv "USER";
               inherit (inputs) lazyvimStarter lazyvimConfig doomConfig nixGL;
-              inherit platformConfig;
             };
           };
         }
