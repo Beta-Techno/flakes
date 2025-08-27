@@ -1,9 +1,9 @@
-{ config, pkgs, lib, platform, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   # ── MacBook Air specific settings ───────────────────────────────
   # macOS settings
-  targets.darwin.defaults = lib.mkIf platform.isDarwin {
+  targets.darwin.defaults = lib.mkIf pkgs.stdenv.isDarwin {
     # Dock settings for lower resolution display
     "com.apple.dock" = {
       tilesize = 48;  # Smaller icons for lower resolution
@@ -20,7 +20,7 @@
   };
 
   # Linux settings (if applicable)
-  dconf.settings = lib.mkIf platform.isLinux {
+  dconf.settings = lib.mkIf pkgs.stdenv.isLinux {
     "org/gnome/shell/extensions/dash-to-dock" = {
       dash-max-icon-size = 24;  # Smaller icons for lower resolution
     };
