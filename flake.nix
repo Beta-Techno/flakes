@@ -75,7 +75,7 @@
 
       homeConfigurations = forAllSystems (system:
         let pkgs = pkgsFor.${system};
-            platform = platform.${system};
+            platformConfig = platform.${system};
         in {
           macbook-air = home-manager.lib.homeManagerConfiguration {
             inherit pkgs;
@@ -87,7 +87,7 @@
             extraSpecialArgs = {
               username = if builtins.getEnv "USERNAME" != "" then builtins.getEnv "USERNAME" else builtins.getEnv "USER";
               inherit (inputs) lazyvimStarter lazyvimConfig doomConfig nixGL;
-              inherit platform;
+              inherit platformConfig;
             };
           };
           macbook-pro = home-manager.lib.homeManagerConfiguration {
@@ -100,7 +100,7 @@
             extraSpecialArgs = {
               username = if builtins.getEnv "USERNAME" != "" then builtins.getEnv "USERNAME" else builtins.getEnv "USER";
               inherit (inputs) lazyvimStarter lazyvimConfig doomConfig nixGL;
-              inherit platform;
+              inherit platformConfig;
             };
           };
         }
