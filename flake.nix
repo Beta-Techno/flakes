@@ -108,26 +108,7 @@
 
       packages = forAllSystems (system:
         let pkgs = pkgsFor.${system};
-        in {
-          detect-machine = pkgs.writeShellScriptBin "detect-machine" ''
-            set -euo pipefail
-            if [ -f /sys/class/dmi/id/product_name ]; then
-              PRODUCT_NAME=$(cat /sys/class/dmi/id/product_name)
-              case "$PRODUCT_NAME" in
-                "MacBookAir6,2")
-                  echo "macbook-air"
-                  ;;
-                "MacBookPro12,1")
-                  echo "macbook-pro"
-                  ;;
-                *)
-                  echo "unknown"
-                  ;;
-              esac
-            else
-              echo "unknown"
-            fi
-          '';
+
           bootstrap = pkgs.writeShellScriptBin "bootstrap" ''
             set -euo pipefail
 
@@ -154,7 +135,20 @@
             fi
 
             # Detect machine type
-            MACHINE=$(${self.packages.${system}.detect-machine}/bin/detect-machine)
+            detect_machine() {
+              if [ -f /sys/class/dmi/id/product_name ]; then
+                PRODUCT_NAME=$(cat /sys/class/dmi/id/product_name)
+                case "$PRODUCT_NAME" in
+                  "MacBookAir6,2") echo "macbook-air" ;;
+                  "MacBookPro12,1") echo "macbook-pro" ;;
+                  *) echo "unknown" ;;
+                esac
+              else
+                echo "unknown"
+              fi
+            }
+
+            MACHINE=$(detect_machine)
             
             if [ "$MACHINE" = "unknown" ]; then
               echo "Unknown machine type. Please specify manually:"
@@ -166,9 +160,9 @@
                 2) MACHINE="macbook-pro" ;;
                 *) echo "Invalid choice"; exit 1 ;;
               esac
-            else
-              echo "Detected $MACHINE"
             fi
+
+            echo "Detected $MACHINE"
 
             # Set username (fall back to current user if not specified)
             USERNAME="''${USERNAME:-$USER}"
@@ -176,7 +170,8 @@
             # Build and activate the configuration
             echo "Building configuration for $USERNAME on $MACHINE..."
             export USERNAME
-            nix run .#homeConfigurations.''${MACHINE}.activationPackage --impure
+            SYSTEM=$(nix eval --impure --expr 'builtins.currentSystem')
+            nix run .#homeConfigurations.''${SYSTEM}.''${MACHINE}.activationPackage --impure
           '';
           # Development shells
           rust = pkgs.mkShell {
