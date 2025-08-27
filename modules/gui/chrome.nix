@@ -1,16 +1,12 @@
 { config, pkgs, lib, helpers, ... }:
 
-let
-  # ── Chrome wrapper (uses installed SUID helper) ────────────────
-  chromeWrapped = pkgs.writeShellScriptBin "google-chrome" ''
-    exec env CHROME_DEVEL_SANDBOX=/usr/local/bin/chrome-sandbox \
-         ${pkgs.google-chrome}/bin/google-chrome-stable "$@"
-  '';
-in
-{
+lib.mkIf (pkgs.stdenv.isx86_64 || pkgs.stdenv.isDarwin) {
   # ── Chrome package (wrapped + base) ────────────────────────────
   home.packages = with pkgs; [
-    chromeWrapped
+    (pkgs.writeShellScriptBin "google-chrome" ''
+      exec env CHROME_DEVEL_SANDBOX=/usr/local/bin/chrome-sandbox \
+           ${pkgs.google-chrome}/bin/google-chrome-stable "$@"
+    '')
     (lib.lowPrio google-chrome)
   ];
 
@@ -20,7 +16,7 @@ in
     $DRY_RUN_CMD cat > "$HOME/.local/share/applications/google-chrome.desktop" << EOF
 [Desktop Entry]
 Name=Google Chrome
-Exec=${chromeWrapped}/bin/google-chrome %U
+Exec=google-chrome %U
 Icon=google-chrome
 Type=Application
 Categories=Network;WebBrowser;
