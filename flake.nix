@@ -108,7 +108,7 @@
 
       packages = forAllSystems (system:
         let pkgs = pkgsFor.${system};
-
+        in {
           bootstrap = pkgs.writeShellScriptBin "bootstrap" ''
             set -euo pipefail
 
