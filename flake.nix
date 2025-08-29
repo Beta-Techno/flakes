@@ -55,6 +55,7 @@
       lazyvimConfig = inputs.lazyvimConfig;
       doomConfig = inputs.doomConfig;
 
+      # Home-Manager configurations (for Ubuntu/macOS)
       homeConfigurations = forAllSystems (system:
         let pkgs = pkgsFor.${system};
         in {
@@ -62,7 +63,7 @@
             inherit pkgs;
             modules = [
               ./profiles/default-linux.nix
-              ./hosts/macbook-air.nix
+              ./home/hosts/macbook-air.nix
               nix-doom.hmModule
             ];
             extraSpecialArgs = {
@@ -74,7 +75,7 @@
             inherit pkgs;
             modules = [
               ./profiles/default-linux.nix
-              ./hosts/macbook-pro.nix
+              ./home/hosts/macbook-pro.nix
               nix-doom.hmModule
             ];
             extraSpecialArgs = {
@@ -84,6 +85,28 @@
           };
         }
       );
+
+      # NixOS configurations (for NixOS machines)
+      nixosConfigurations = {
+        # Server configurations
+        web-01 = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [ ./nixos/hosts/servers/web-01.nix ];
+          specialArgs = { inherit inputs; };
+        };
+        db-01 = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [ ./nixos/hosts/servers/db-01.nix ];
+          specialArgs = { inherit inputs; };
+        };
+        
+        # Workstation configurations
+        nick-laptop = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [ ./nixos/hosts/workstations/nick-laptop.nix ];
+          specialArgs = { inherit inputs; };
+        };
+      };
 
       packages = forAllSystems (system:
         let pkgs = pkgsFor.${system};
