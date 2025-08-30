@@ -75,7 +75,7 @@ install_git() {
     
     if ! command -v git >/dev/null 2>&1; then
         log "INFO" "Git not found, installing..."
-        nix-env -iA nixpkgs.git
+        nix-env -i git
         log "SUCCESS" "Git installed"
     else
         log "SUCCESS" "Git already installed"
