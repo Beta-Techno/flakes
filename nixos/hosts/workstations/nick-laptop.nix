@@ -90,14 +90,12 @@
 
   # Hardware-specific configuration for MacBook Pro 2015
   hardware = {
-    # Enable OpenGL
+    # Enable OpenGL with Intel video acceleration
     opengl = {
       enable = true;
       driSupport32Bit = true;
+      extraPackages = with pkgs; [ intel-media-driver vaapiIntel ];
     };
-    
-    # Intel graphics (MacBook Pro 2015 has Intel integrated graphics)
-    opengl.intelAcceleratedVideoPlayback = true;
     
     # MacBook Pro specific settings
     cpu.intel.updateMicrocode = true;
