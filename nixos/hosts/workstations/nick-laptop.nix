@@ -16,7 +16,7 @@
   };
 
   # Home-Manager configuration for the user
-  home-manager.users.nick = {
+  home-manager.users.nbg = {
     imports = [
       # Reuse your existing Home-Manager modules
       ../../../profiles/default-linux.nix
@@ -25,11 +25,11 @@
       ../../../modules/gui
       ../../../modules/tools
     ];
-    extraSpecialArgs = { username = "nick"; };
+    extraSpecialArgs = { username = "nbg"; };
   };
 
-  # Create the user
-  users.users.nick = {
+  # Create the user (if it doesn't exist)
+  users.users.nbg = {
     isNormalUser = true;
     extraGroups = [ "wheel" "docker" "video" "audio" "networkmanager" ];
     shell = pkgs.zsh;
