@@ -113,7 +113,7 @@
     pulse.enable = true;
   };
 
-  # System packages (merged from both definitions)
+  # System packages (simplified for testing)
   environment.systemPackages = with pkgs; [
     # Development tools
     git
@@ -121,21 +121,6 @@
     tmux
     htop
     tree
-    
-    # GUI applications
-    firefox
-    chromium
-    vscode
-    gimp
-    inkscape
-    
-    # Media
-    vlc
-    spotify
-    
-    # System tools
-    gnome-tweaks
-    gnome.gnome-software
     
     # Brightness control
     brightnessctl
