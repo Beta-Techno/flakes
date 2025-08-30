@@ -15,6 +15,22 @@
     useDHCP = true;
   };
 
+  # File systems (configured for your system)
+  fileSystems."/" = {
+    device = "/dev/sda1";
+    fsType = "ext4";
+  };
+
+  fileSystems."/boot" = {
+    device = "/dev/sda11";
+    fsType = "vfat";
+  };
+
+  fileSystems."/nix/store" = {
+    device = "/dev/sda2";
+    fsType = "ext4";
+  };
+
   # Home-Manager configuration for the user
   home-manager.users.nbg = {
     home = {
@@ -80,11 +96,21 @@
       driSupport32Bit = true;
     };
     
-    # Enable pulseaudio
-    pulseaudio = {
-      enable = true;
-      support32Bit = true;
+    # NVIDIA configuration (if you have NVIDIA GPU)
+    nvidia = {
+      open = true;  # Use open source drivers for newer GPUs
+      modesetting.enable = true;
+      powerManagement.enable = true;
     };
+  };
+
+  # Sound configuration (use PipeWire instead of PulseAudio)
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
   };
 
   # System packages specific to this workstation

@@ -26,8 +26,7 @@
     videoDrivers = [ "nvidia" ]; # Change to "modesetting" for Intel/AMD
   };
 
-  # Enable sound
-  hardware.pulseaudio.enable = true;
+  # Enable sound (PipeWire is configured in the host file)
 
   # Enable Bluetooth
   hardware.bluetooth.enable = true;

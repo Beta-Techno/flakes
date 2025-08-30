@@ -4,6 +4,13 @@
   # Enable flakes
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  # Boot configuration (configured for your system)
+  boot.loader.grub = {
+    enable = true;
+    device = "/dev/sda";  # Your boot device
+    useOSProber = true;
+  };
+
   # Basic system configuration
   time.timeZone = "UTC";
   i18n.defaultLocale = "en_US.UTF-8";
