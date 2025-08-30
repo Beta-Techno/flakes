@@ -45,27 +45,6 @@
   # Enable flatpak
   services.flatpak.enable = true;
 
-  # System packages for workstation
-  environment.systemPackages = with pkgs; [
-    # GUI applications
-    firefox
-    chromium
-    vscode
-    gimp
-    inkscape
-    
-    # Development tools
-    git
-    vim
-    tmux
-    htop
-    tree
-    
-    # Media
-    vlc
-    spotify
-  ];
-
   # Enable fonts
   fonts.packages = with pkgs; [
     noto-fonts

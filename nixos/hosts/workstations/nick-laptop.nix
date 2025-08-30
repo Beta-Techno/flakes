@@ -103,11 +103,6 @@
     cpu.intel.updateMicrocode = true;
   };
 
-  # Enable brightness control tools
-  environment.systemPackages = with pkgs; [
-    brightnessctl
-  ];
-
   # Kernel parameters for backlight control
   boot.kernelParams = [ "acpi_backlight=video" ];
 
@@ -120,7 +115,7 @@
     pulse.enable = true;
   };
 
-  # System packages specific to this workstation
+  # System packages (merged from both definitions)
   environment.systemPackages = with pkgs; [
     # Development tools
     git
@@ -143,6 +138,9 @@
     # System tools
     gnome.gnome-tweaks
     gnome.gnome-software
+    
+    # Brightness control
+    brightnessctl
   ];
 
   # Enable flatpak for additional applications
