@@ -90,11 +90,11 @@
 
   # Hardware-specific configuration for MacBook Pro 2015
   hardware = {
-    # Enable OpenGL with Intel video acceleration
-    opengl = {
+    # Enable graphics with Intel video acceleration
+    graphics = {
       enable = true;
-      driSupport32Bit = true;
-      extraPackages = with pkgs; [ intel-media-driver vaapiIntel ];
+      enable32Bit = true;
+      extraPackages = with pkgs; [ intel-media-driver vaapiIntel vaapiVdpau libvdpau-va-gl ];
     };
     
     # MacBook Pro specific settings
@@ -134,7 +134,7 @@
     spotify
     
     # System tools
-    gnome.gnome-tweaks
+    gnome-tweaks
     gnome.gnome-software
     
     # Brightness control

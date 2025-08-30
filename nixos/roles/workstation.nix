@@ -10,25 +10,20 @@
   system.stateVersion = "23.11";
 
   # Enable GUI
-  services.xserver = {
-    enable = true;
-    
-    # Desktop environment
-    desktopManager = {
-      gnome.enable = true;
-      xfce.enable = false;
-    };
-    
-    # Display manager
-    displayManager.gdm.enable = true;
-    
-    # Video drivers
-    videoDrivers = [ "intel" ]; # Intel driver for MacBook Pro 2015
-  };
+  services.xserver.enable = true;
+  
+  # Desktop environment
+  services.desktopManager.gnome.enable = true;
+  
+  # Display manager
+  services.displayManager.gdm.enable = true;
+  
+  # Video drivers
+  services.xserver.videoDrivers = [ "intel" ]; # Intel driver for MacBook Pro 2015
 
   # Enable sound (PipeWire is configured in the host file)
   # Disable PulseAudio to avoid conflicts with PipeWire
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
 
   # Enable Bluetooth
   hardware.bluetooth.enable = true;
