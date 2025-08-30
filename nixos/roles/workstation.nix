@@ -23,10 +23,12 @@
     displayManager.gdm.enable = true;
     
     # Video drivers
-    videoDrivers = [ "modesetting" ]; # Generic driver that works with most GPUs
+    videoDrivers = [ "intel" ]; # Intel driver for MacBook Pro 2015
   };
 
   # Enable sound (PipeWire is configured in the host file)
+  # Disable PulseAudio to avoid conflicts with PipeWire
+  hardware.pulseaudio.enable = false;
 
   # Enable Bluetooth
   hardware.bluetooth.enable = true;

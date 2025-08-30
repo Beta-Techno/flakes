@@ -101,12 +101,15 @@
     
     # MacBook Pro specific settings
     cpu.intel.updateMicrocode = true;
-    
-    # Enable backlight control
-    backlight = {
-      enable = true;
-      device = "intel_backlight";
-    };
+  };
+
+  # Enable brightness control tools
+  environment.systemPackages = with pkgs; [
+    brightnessctl
+  ];
+
+  # Kernel parameters for backlight control
+  boot.kernelParams = [ "acpi_backlight=video" ];
   };
 
   # Sound configuration (use PipeWire instead of PulseAudio)
