@@ -17,7 +17,6 @@
     desktopManager = {
       gnome.enable = true;
       xfce.enable = false;
-      plasma5.enable = false;
     };
     
     # Display manager
@@ -28,7 +27,6 @@
   };
 
   # Enable sound
-  sound.enable = true;
   hardware.pulseaudio.enable = true;
 
   # Enable Bluetooth
