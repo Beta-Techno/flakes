@@ -17,12 +17,43 @@
 
   # Home-Manager configuration for the user
   home-manager.users.nbg = {
-    imports = [
-      # Core modules (simplified for NixOS)
-      ../../../modules/core/base.nix
-      ../../../modules/tools
-      ../../../modules/terminal
-      ../../../modules/gui
+    home = {
+      username = "nbg";
+      homeDirectory = "/home/nbg";
+      stateVersion = "24.05";
+    };
+    
+    # Basic configuration
+    fonts.fontconfig.enable = true;
+    
+    # Shell configuration
+    programs.zsh = {
+      enable = true;
+      oh-my-zsh = {
+        enable = true;
+        theme = "agnoster";
+      };
+    };
+    
+    # Common shell aliases
+    home.shellAliases = {
+      k = "kubectl";
+      dcu = "docker compose up -d";
+      dcd = "docker compose down";
+    };
+    
+    # System packages (will be installed in user environment)
+    home.packages = with pkgs; [
+      git
+      vim
+      tmux
+      htop
+      tree
+      ripgrep
+      fzf
+      jq
+      curl
+      wget
     ];
   };
 
