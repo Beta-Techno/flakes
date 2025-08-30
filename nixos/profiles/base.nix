@@ -4,6 +4,9 @@
   # Enable flakes
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  # Allow unfree packages (needed for NVIDIA drivers, etc.)
+  nixpkgs.config.allowUnfree = true;
+
   # Boot configuration (configured for your system)
   boot.loader.grub = {
     enable = true;

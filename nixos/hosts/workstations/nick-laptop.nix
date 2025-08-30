@@ -88,7 +88,7 @@
   programs.zsh.enable = true;
   users.defaultUserShell = pkgs.zsh;
 
-  # Hardware-specific configuration
+  # Hardware-specific configuration for MacBook Pro 2015
   hardware = {
     # Enable OpenGL
     opengl = {
@@ -96,11 +96,16 @@
       driSupport32Bit = true;
     };
     
-    # NVIDIA configuration (if you have NVIDIA GPU)
-    nvidia = {
-      open = true;  # Use open source drivers for newer GPUs
-      modesetting.enable = true;
-      powerManagement.enable = true;
+    # Intel graphics (MacBook Pro 2015 has Intel integrated graphics)
+    opengl.intelAcceleratedVideoPlayback = true;
+    
+    # MacBook Pro specific settings
+    cpu.intel.updateMicrocode = true;
+    
+    # Enable backlight control
+    backlight = {
+      enable = true;
+      device = "intel_backlight";
     };
   };
 

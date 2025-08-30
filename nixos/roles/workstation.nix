@@ -23,7 +23,7 @@
     displayManager.gdm.enable = true;
     
     # Video drivers
-    videoDrivers = [ "nvidia" ]; # Change to "modesetting" for Intel/AMD
+    videoDrivers = [ "modesetting" ]; # Generic driver that works with most GPUs
   };
 
   # Enable sound (PipeWire is configured in the host file)
