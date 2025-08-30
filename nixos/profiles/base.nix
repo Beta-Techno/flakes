@@ -8,10 +8,14 @@
   nixpkgs.config.allowUnfree = true;
 
   # Boot configuration (configured for your system)
-  boot.loader.grub = {
+  boot.loader.systemd-boot = {
     enable = true;
-    device = "/dev/sda";  # Your boot device
-    useOSProber = true;
+    configurationLimit = 10;
+  };
+  
+  boot.loader.efi = {
+    canTouchEfiVariables = true;
+    efiSysMountPoint = "/boot";
   };
 
   # Basic system configuration
