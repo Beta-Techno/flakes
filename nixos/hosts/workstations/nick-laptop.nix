@@ -25,7 +25,6 @@
       ../../../modules/gui
       ../../../modules/tools
     ];
-    extraSpecialArgs = { username = "nbg"; };
   };
 
   # Create the user (if it doesn't exist)
