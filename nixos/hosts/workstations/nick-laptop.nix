@@ -110,7 +110,6 @@
 
   # Kernel parameters for backlight control
   boot.kernelParams = [ "acpi_backlight=video" ];
-  };
 
   # Sound configuration (use PipeWire instead of PulseAudio)
   security.rtkit.enable = true;
