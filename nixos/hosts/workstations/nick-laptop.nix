@@ -18,12 +18,11 @@
   # Home-Manager configuration for the user
   home-manager.users.nbg = {
     imports = [
-      # Reuse your existing Home-Manager modules
-      ../../../profiles/default-linux.nix
-      ../../../modules/editors
+      # Core modules (simplified for NixOS)
+      ../../../modules/core/base.nix
+      ../../../modules/tools
       ../../../modules/terminal
       ../../../modules/gui
-      ../../../modules/tools
     ];
   };
 
