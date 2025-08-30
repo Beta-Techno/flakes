@@ -127,8 +127,19 @@ setup_deployment() {
     
     # Create symlink for easy access
     sudo mkdir -p /usr/local/bin
-    sudo ln -sf "$INSTALL_PATH/scripts/deploy.sh" /usr/local/bin/deploy
-    log "SUCCESS" "Deploy script symlinked to /usr/local/bin/deploy"
+    log "INFO" "Checking for deploy script at: $INSTALL_PATH/scripts/deploy.sh"
+    if [[ -f "$INSTALL_PATH/scripts/deploy.sh" ]]; then
+        log "INFO" "Deploy script found, creating symlink..."
+        if sudo ln -sf "$INSTALL_PATH/scripts/deploy.sh" /usr/local/bin/deploy; then
+            log "SUCCESS" "Deploy script symlinked to /usr/local/bin/deploy"
+        else
+            log "WARNING" "Failed to create symlink, but deploy script is available at $INSTALL_PATH/scripts/deploy.sh"
+        fi
+    else
+        log "WARNING" "Deploy script not found at $INSTALL_PATH/scripts/deploy.sh"
+        log "INFO" "Current directory: $(pwd)"
+        log "INFO" "Files in scripts directory: $(ls -la scripts/ 2>/dev/null || echo 'scripts directory not found')"
+    fi
 }
 
 test_configuration() {
