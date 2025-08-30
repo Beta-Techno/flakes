@@ -105,6 +105,17 @@ clone_repository() {
     # Set proper permissions
     sudo chown -R "$(whoami)" "$INSTALL_PATH"
     log "SUCCESS" "Repository permissions set"
+    
+    # Debug: Show what was actually cloned
+    log "INFO" "Verifying cloned repository..."
+    log "INFO" "Install path exists: $([[ -d "$INSTALL_PATH" ]] && echo 'YES' || echo 'NO')"
+    log "INFO" "Files in install path: $(ls -la "$INSTALL_PATH" 2>/dev/null || echo 'Cannot list files')"
+    if [[ -d "$INSTALL_PATH/scripts" ]]; then
+        log "INFO" "Scripts directory exists: YES"
+        log "INFO" "Files in scripts directory: $(ls -la "$INSTALL_PATH/scripts" 2>/dev/null || echo 'Cannot list scripts')"
+    else
+        log "WARNING" "Scripts directory does not exist!"
+    fi
 }
 
 setup_deployment() {
@@ -125,21 +136,20 @@ setup_deployment() {
         log "SUCCESS" "Setup script made executable"
     fi
     
-    # Create symlink for easy access
-    sudo mkdir -p /usr/local/bin
-    log "INFO" "Checking for deploy script at: $INSTALL_PATH/scripts/deploy.sh"
-    log "INFO" "Current directory: $(pwd)"
-    log "INFO" "Files in scripts directory: $(ls -la scripts/ 2>/dev/null || echo 'scripts directory not found')"
-    
-    if [[ -f "scripts/deploy.sh" ]]; then
-        log "INFO" "Deploy script found, creating symlink..."
-        if sudo ln -sf "$(pwd)/scripts/deploy.sh" /usr/local/bin/deploy; then
-            log "SUCCESS" "Deploy script symlinked to /usr/local/bin/deploy"
+    # Try to create symlink for easy access (optional)
+    log "INFO" "Attempting to create deploy symlink..."
+    if sudo mkdir -p /usr/local/bin 2>/dev/null; then
+        if [[ -f "scripts/deploy.sh" ]]; then
+            if sudo ln -sf "$(pwd)/scripts/deploy.sh" /usr/local/bin/deploy 2>/dev/null; then
+                log "SUCCESS" "Deploy script symlinked to /usr/local/bin/deploy"
+            else
+                log "INFO" "Symlink creation skipped (not critical)"
+            fi
         else
-            log "WARNING" "Failed to create symlink, but deploy script is available at $(pwd)/scripts/deploy.sh"
+            log "INFO" "Deploy script not found, skipping symlink"
         fi
     else
-        log "WARNING" "Deploy script not found at scripts/deploy.sh"
+        log "INFO" "Could not create /usr/local/bin, skipping symlink"
     fi
 }
 
@@ -189,24 +199,28 @@ ${GREEN}╚═══════════════════════
 ${BLUE}Next Steps:${NC}
 1. Review your configuration:
    cd $INSTALL_PATH
-   nixos-rebuild build --flake .#nick-laptop --dry-run
+   nixos-rebuild build --flake .#nick-laptop
 
 2. Deploy your first configuration:
-   deploy nick-laptop --dry-run
+   $INSTALL_PATH/scripts/deploy.sh nick-laptop --dry-run
 
 3. If everything looks good, deploy:
-   deploy nick-laptop
+   $INSTALL_PATH/scripts/deploy.sh nick-laptop
 
 ${BLUE}Available Commands:${NC}
-- deploy --list-hosts          # Show available configurations
-- deploy nick-laptop --dry-run # Test deployment
-- deploy web-01 --verbose      # Deploy with verbose output
-- deploy db-01 --rollback      # Rollback if needed
+- $INSTALL_PATH/scripts/deploy.sh --list-hosts          # Show available configurations
+- $INSTALL_PATH/scripts/deploy.sh nick-laptop --dry-run # Test deployment
+- $INSTALL_PATH/scripts/deploy.sh web-01 --verbose      # Deploy with verbose output
+- $INSTALL_PATH/scripts/deploy.sh db-01 --rollback      # Rollback if needed
 
 ${BLUE}Available Hosts:${NC}
 - nick-laptop    - Development workstation
 - web-01         - Web server  
 - db-01          - Database server
+
+${BLUE}Useful Aliases (add to your shell config):${NC}
+- alias deploy='$INSTALL_PATH/scripts/deploy.sh'
+- alias test-deploy='$INSTALL_PATH/scripts/deploy.sh --dry-run'
 
 ${YELLOW}Important:${NC}
 - Always test with --dry-run first

@@ -153,11 +153,12 @@ create_backup() {
     local host="$1"
     log "INFO" "Creating backup of current configuration..."
     
-    mkdir -p "$BACKUP_DIR"
+    sudo mkdir -p "$BACKUP_DIR"
     local backup_file="$BACKUP_DIR/${host}-$(date +%Y%m%d-%H%M%S).nix"
     
     if [[ -f /etc/nixos/configuration.nix ]]; then
-        cp /etc/nixos/configuration.nix "$backup_file"
+        sudo cp /etc/nixos/configuration.nix "$backup_file"
+        sudo chown "$(whoami):$(id -gn)" "$backup_file"
         log "SUCCESS" "Backup created: $backup_file"
     else
         log "WARNING" "No existing configuration.nix found to backup"
