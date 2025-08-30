@@ -126,6 +126,7 @@ setup_deployment() {
     fi
     
     # Create symlink for easy access
+    sudo mkdir -p /usr/local/bin
     sudo ln -sf "$INSTALL_PATH/scripts/deploy.sh" /usr/local/bin/deploy
     log "SUCCESS" "Deploy script symlinked to /usr/local/bin/deploy"
 }
