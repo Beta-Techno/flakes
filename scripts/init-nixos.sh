@@ -103,7 +103,7 @@ clone_repository() {
     fi
     
     # Set proper permissions
-    sudo chown -R "$USER:$USER" "$INSTALL_PATH"
+    sudo chown -R "$(whoami):$(id -gn)" "$INSTALL_PATH"
     log "SUCCESS" "Repository permissions set"
 }
 
