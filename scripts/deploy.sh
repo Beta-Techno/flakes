@@ -170,9 +170,9 @@ build_configuration() {
     log "INFO" "Building configuration for $host..."
     
     if [[ "$VERBOSE" == "true" ]]; then
-        nixos-rebuild build --flake "$FLAKE_ROOT#$host" --verbose
+        sudo nixos-rebuild build --flake "$FLAKE_ROOT#$host" --verbose
     else
-        nixos-rebuild build --flake "$FLAKE_ROOT#$host"
+        sudo nixos-rebuild build --flake "$FLAKE_ROOT#$host"
     fi
     
     if [[ $? -eq 0 ]]; then
@@ -188,9 +188,9 @@ deploy_configuration() {
     log "INFO" "Deploying configuration for $host..."
     
     if [[ "$VERBOSE" == "true" ]]; then
-        nixos-rebuild switch --flake "$FLAKE_ROOT#$host" --verbose
+        sudo nixos-rebuild switch --flake "$FLAKE_ROOT#$host" --verbose
     else
-        nixos-rebuild switch --flake "$FLAKE_ROOT#$host"
+        sudo nixos-rebuild switch --flake "$FLAKE_ROOT#$host"
     fi
     
     if [[ $? -eq 0 ]]; then
