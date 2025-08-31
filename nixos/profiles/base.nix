@@ -7,16 +7,10 @@
   # Allow unfree packages (needed for NVIDIA drivers, etc.)
   nixpkgs.config.allowUnfree = true;
 
-  # Boot configuration (configured for your system)
-  boot.loader.systemd-boot = {
-    enable = true;
-    configurationLimit = 10;
-  };
-  
-  boot.loader.efi = {
-    canTouchEfiVariables = true;
-    efiSysMountPoint = "/boot";
-  };
+  # Boot configuration - DISABLED for macOS systems
+  # macOS uses rEFInd boot manager, we should not configure boot loaders
+  # boot.loader.systemd-boot.enable = false;
+  # boot.loader.grub.enable = false;
 
   # Basic system configuration
   time.timeZone = "UTC";
