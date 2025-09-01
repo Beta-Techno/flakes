@@ -156,17 +156,17 @@
     btop
     
     # CLI tools from our flake
-    (import ../../pkgs/cli/activate.nix { inherit pkgs; }).program
-    (import ../../pkgs/cli/auth.nix { inherit pkgs; }).program
-    (import ../../pkgs/cli/setup.nix { inherit pkgs; }).program
-    (import ../../pkgs/cli/sync-repos.nix { inherit pkgs; }).program
-    (import ../../pkgs/cli/doctor.nix { inherit pkgs; }).program
+    (import ../../../pkgs/cli/activate.nix { inherit pkgs; }).program
+    (import ../../../pkgs/cli/auth.nix { inherit pkgs; }).program
+    (import ../../../pkgs/cli/setup.nix { inherit pkgs; }).program
+    (import ../../../pkgs/cli/sync-repos.nix { inherit pkgs; }).program
+    (import ../../../pkgs/cli/doctor.nix { inherit pkgs; }).program
   ];
   
   # User packages - Development environment (globally available for user)
   users.users.nbg.packages = with pkgs; [
     # The combined development shell (all tools available globally)
-    (import ../../pkgs/shells/default.nix { inherit pkgs; })
+    (import ../../../pkgs/shells/default.nix { inherit pkgs; })
   ];
 
   # Enable automatic updates - DISABLED for safety
