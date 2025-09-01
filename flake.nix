@@ -176,29 +176,11 @@
             nix run .#homeConfigurations."''${SYSTEM}"."''${MACHINE}".activationPackage --impure
           '';
           # Development shells
-          rust = pkgs.mkShell {
-            buildInputs = with pkgs; [
-              rustc
-              cargo
-              rustfmt
-              clippy
-            ];
-          };
-          go = pkgs.mkShell {
-            buildInputs = with pkgs; [
-              go
-              gopls
-              gotools
-            ];
-          };
-          python = pkgs.mkShell {
-            buildInputs = with pkgs; [
-              python3
-              python3Packages.pip
-              python3Packages.virtualenv
-              python3Packages.poetry-core
-            ];
-          };
+          rust = (import ./pkgs/shells/rust.nix { inherit pkgs; });
+          go = (import ./pkgs/shells/go.nix { inherit pkgs; });
+          python = (import ./pkgs/shells/python.nix { inherit pkgs; });
+          nodejs = (import ./pkgs/shells/nodejs.nix { inherit pkgs; });
+          dev-shell = (import ./pkgs/shells/default.nix { inherit pkgs; });
           # CLI tools
           auth = (import ./pkgs/cli/auth.nix { inherit pkgs; }).program;
           setup = (import ./pkgs/cli/setup.nix { 
