@@ -164,10 +164,10 @@
   ];
   
   # User packages - Development environment (globally available for user)
-  users.users.nbg.packages = with pkgs; [
-    # The combined development shell (all tools available globally)
-    (import ../../../pkgs/shells/default.nix { inherit pkgs; })
-  ];
+  # Use toolsets for clean, DRY package management
+  users.users.nbg.packages = let 
+    t = import ../../../nix/toolsets.nix { inherit pkgs lib; };
+  in t.devAll;
 
   # Enable automatic updates - DISABLED for safety
   # system.autoUpgrade = {

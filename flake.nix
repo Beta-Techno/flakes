@@ -175,12 +175,15 @@
             SYSTEM=$(nix eval --impure --expr 'builtins.currentSystem')
             nix run .#homeConfigurations."''${SYSTEM}"."''${MACHINE}".activationPackage --impure
           '';
-          # Development shells
-          rust = (import ./pkgs/shells/rust.nix { inherit pkgs; });
-          go = (import ./pkgs/shells/go.nix { inherit pkgs; });
-          python = (import ./pkgs/shells/python.nix { inherit pkgs; });
-          nodejs = (import ./pkgs/shells/nodejs.nix { inherit pkgs; });
-          dev-shell = (import ./pkgs/shells/default.nix { inherit pkgs; });
+          # Installable toolchain bundles
+          toolchain-all = pkgs.buildEnv { 
+            name = "toolchain-all";  
+            paths = (import ./nix/toolsets.nix { inherit pkgs lib; }).devAll; 
+          };
+          toolchain-ci = pkgs.buildEnv { 
+            name = "toolchain-ci";   
+            paths = (import ./nix/toolsets.nix { inherit pkgs lib; }).ciLean; 
+          };
           # CLI tools
           auth = (import ./pkgs/cli/auth.nix { inherit pkgs; }).program;
           setup = (import ./pkgs/cli/setup.nix { 
@@ -189,6 +192,22 @@
           sync-repos = (import ./pkgs/cli/sync-repos.nix { inherit pkgs; }).program;
           doctor = (import ./pkgs/cli/doctor.nix { inherit pkgs; }).program;
           activate = (import ./pkgs/cli/activate.nix { inherit pkgs; }).program;
+        }
+      );
+      
+      # Development shells (proper ephemeral environments)
+      devShells = forAllSystems (system:
+        let 
+          pkgs = pkgsFor.${system};
+          lib = nixpkgs.lib;
+          t = import ./nix/toolsets.nix { inherit pkgs lib; };
+        in {
+          default = pkgs.mkShell { packages = t.devAll; };
+          server = pkgs.mkShell { packages = t.common ++ t.go ++ t.rust; };
+          go = pkgs.mkShell { packages = t.common ++ t.go; };
+          rust = pkgs.mkShell { packages = t.common ++ t.rust; };
+          node = pkgs.mkShell { packages = t.common ++ t.node; };
+          python = pkgs.mkShell { packages = t.common ++ t.python; };
         }
       );
     };
