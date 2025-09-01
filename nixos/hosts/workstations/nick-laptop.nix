@@ -56,19 +56,7 @@
       dcd = "docker compose down";
     };
     
-    # System packages (will be installed in user environment)
-    home.packages = with pkgs; [
-      git
-      vim
-      tmux
-      htop
-      tree
-      ripgrep
-      fzf
-      jq
-      curl
-      wget
-    ];
+
   };
 
   # Create the user (if it doesn't exist)
@@ -111,7 +99,7 @@
     pulse.enable = true;
   };
 
-  # System packages (simplified for testing)
+  # System packages - Full development environment
   environment.systemPackages = with pkgs; [
     # Development tools
     git
@@ -119,13 +107,127 @@
     tmux
     htop
     tree
+    ripgrep
+    fzf
+    jq
+    curl
+    wget
     
-    # Brightness control
+    # Python development
+    python3
+    python3Packages.pip
+    python3Packages.virtualenv
+    python3Packages.poetry-core
+    ruff
+    black
+    mypy
+    python3Packages.pylint
+    python3Packages.pytest
+    python3Packages.pytest-cov
+    python3Packages.ipython
+    python3Packages.jupyter
+    python3Packages.python-lsp-server
+    
+    # Rust development
+    rustc
+    cargo
+    rust-analyzer
+    rustfmt
+    clippy
+    cargo-edit
+    cargo-outdated
+    cargo-udeps
+    cargo-watch
+    cargo-expand
+    cargo-audit
+    cargo-deny
+    cargo-msrv
+    cargo-nextest
+    cargo-tarpaulin
+    
+    # Go development
+    go
+    gopls
+    gotools
+    
+    # Node.js development
+    nodejs
+    nodePackages.npm
+    nodePackages.yarn
+    
+    # Additional development tools
+    gcc
+    gnumake
+    cmake
+    pkg-config
+    
+    # System utilities
     brightnessctl
+    htop
+    tree
+    ripgrep
+    fzf
+    jq
+    curl
+    wget
+    unzip
+    zip
+    rsync
+    sshfs
+    fuse
+    
+    # Network tools
+    inetutils
+    mtr
+    iperf3
+    nmap
+    
+    # Container tools
+    docker
+    docker-compose
+    kubectl
+    helm
+    
+    # Version control
+    git
+    git-lfs
+    gh  # GitHub CLI
+    
+    # Text editors
+    vim
+    neovim
+    emacs
+    
+    # Terminal tools
+    tmux
+    zsh
+    oh-my-zsh
+    
+    # File management
+    ranger
+    mc
+    ncdu
+    duf
+    
+    # Monitoring
+    htop
+    iotop
+    nethogs
+    btop
   ];
 
   # Enable flatpak for additional applications
   # services.flatpak.enable = true; # Already enabled in workstation role
+  
+  # Add CLI tools to system packages
+  environment.systemPackages = environment.systemPackages ++ [
+    # CLI tools from our flake
+    (import ../../pkgs/cli/activate.nix { inherit pkgs; }).program
+    (import ../../pkgs/cli/auth.nix { inherit pkgs; }).program
+    (import ../../pkgs/cli/setup.nix { inherit pkgs; }).program
+    (import ../../pkgs/cli/sync-repos.nix { inherit pkgs; }).program
+    (import ../../pkgs/cli/doctor.nix { inherit pkgs; }).program
+  ];
 
   # Enable automatic updates - DISABLED for safety
   # system.autoUpgrade = {
