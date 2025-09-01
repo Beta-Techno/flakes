@@ -166,7 +166,7 @@
   # User packages - Development environment (globally available for user)
   # Use toolsets for clean, DRY package management
   users.users.nbg.packages = let 
-    t = import ../../../nix/toolsets.nix { inherit pkgs lib; };
+    t = import ../../../nix/toolsets.nix { inherit pkgs; lib = pkgs.lib; };
   in t.devAll;
 
   # Enable automatic updates - DISABLED for safety
