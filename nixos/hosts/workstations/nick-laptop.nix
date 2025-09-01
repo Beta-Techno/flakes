@@ -99,7 +99,7 @@
     pulse.enable = true;
   };
 
-  # System packages - Only system-wide utilities
+  # System packages - All system-wide utilities and CLI tools
   environment.systemPackages = with pkgs; [
     # System utilities (hardware control, system management)
     brightnessctl
@@ -154,13 +154,7 @@
     iotop
     nethogs
     btop
-  ];
-
-  # Enable flatpak for additional applications
-  # services.flatpak.enable = true; # Already enabled in workstation role
-  
-  # Add CLI tools to system packages
-  environment.systemPackages = environment.systemPackages ++ [
+    
     # CLI tools from our flake
     (import ../../pkgs/cli/activate.nix { inherit pkgs; }).program
     (import ../../pkgs/cli/auth.nix { inherit pkgs; }).program
