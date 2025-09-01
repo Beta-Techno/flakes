@@ -178,11 +178,11 @@
           # Installable toolchain bundles
           toolchain-all = pkgs.buildEnv { 
             name = "toolchain-all";  
-            paths = (import ./nix/toolsets.nix { inherit pkgs lib; }).devAll; 
+            paths = (import ./nix/toolsets.nix { inherit pkgs; lib = pkgs.lib; }).devAll; 
           };
           toolchain-ci = pkgs.buildEnv { 
             name = "toolchain-ci";   
-            paths = (import ./nix/toolsets.nix { inherit pkgs lib; }).ciLean; 
+            paths = (import ./nix/toolsets.nix { inherit pkgs; lib = pkgs.lib; }).ciLean; 
           };
           # CLI tools
           auth = (import ./pkgs/cli/auth.nix { inherit pkgs; }).program;
