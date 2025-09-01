@@ -10,10 +10,10 @@
   networking.hostName = "nick-laptop";
   networking.domain = "example.com";
 
-  # Network configuration
-  networking.interfaces.wlan0 = {
-    useDHCP = true;
-  };
+  # Network configuration - DISABLED to prevent WiFi issues
+  # networking.interfaces.wlan0 = {
+  #   useDHCP = true;
+  # };
 
   # File systems (configured for your actual system)
   fileSystems."/" = {
