@@ -99,69 +99,9 @@
     pulse.enable = true;
   };
 
-  # System packages - Full development environment
+  # System packages - Only system-wide utilities
   environment.systemPackages = with pkgs; [
-    # Development tools
-    git
-    vim
-    tmux
-    htop
-    tree
-    ripgrep
-    fzf
-    jq
-    curl
-    wget
-    
-    # Python development
-    python3
-    python3Packages.pip
-    python3Packages.virtualenv
-    python3Packages.poetry-core
-    ruff
-    black
-    mypy
-    python3Packages.pylint
-    python3Packages.pytest
-    python3Packages.pytest-cov
-    python3Packages.ipython
-    python3Packages.jupyter
-    python3Packages.python-lsp-server
-    
-    # Rust development
-    rustc
-    cargo
-    rust-analyzer
-    rustfmt
-    clippy
-    cargo-edit
-    cargo-outdated
-    cargo-udeps
-    cargo-watch
-    cargo-expand
-    cargo-audit
-    cargo-deny
-    cargo-msrv
-    cargo-nextest
-    cargo-tarpaulin
-    
-    # Go development
-    go
-    gopls
-    gotools
-    
-    # Node.js development
-    nodejs
-    nodePackages.npm
-    nodePackages.yarn
-    
-    # Additional development tools
-    gcc
-    gnumake
-    cmake
-    pkg-config
-    
-    # System utilities
+    # System utilities (hardware control, system management)
     brightnessctl
     htop
     tree
@@ -227,6 +167,12 @@
     (import ../../pkgs/cli/setup.nix { inherit pkgs; }).program
     (import ../../pkgs/cli/sync-repos.nix { inherit pkgs; }).program
     (import ../../pkgs/cli/doctor.nix { inherit pkgs; }).program
+  ];
+  
+  # User packages - Development environment (globally available for user)
+  users.users.nbg.packages = with pkgs; [
+    # The combined development shell (all tools available globally)
+    (import ../../pkgs/shells/default.nix { inherit pkgs; })
   ];
 
   # Enable automatic updates - DISABLED for safety
