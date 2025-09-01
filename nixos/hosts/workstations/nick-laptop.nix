@@ -15,21 +15,19 @@
     useDHCP = true;
   };
 
-  # File systems (configured for your system)
+  # File systems (configured for your actual system)
   fileSystems."/" = {
-    device = "/dev/sda1";
+    device = "/dev/sda2";  # Root filesystem (same as /nix/store)
     fsType = "ext4";
   };
 
   fileSystems."/boot" = {
-    device = "/dev/sda11";
+    device = "/dev/sda1";  # Boot partition (vfat)
     fsType = "vfat";
   };
 
-  fileSystems."/nix/store" = {
-    device = "/dev/sda2";
-    fsType = "ext4";
-  };
+  # Note: /nix/store is a subvolume of the root filesystem
+  # No separate mount point needed
 
   # Home-Manager configuration for the user
   home-manager.users.nbg = {
@@ -127,12 +125,12 @@
   ];
 
   # Enable flatpak for additional applications
-  services.flatpak.enable = true;
+  # services.flatpak.enable = true; # Already enabled in workstation role
 
-  # Enable automatic updates
-  system.autoUpgrade = {
-    enable = true;
-    channel = "https://nixos.org/channels/nixos-23.11";
-  };
+  # Enable automatic updates - DISABLED for safety
+  # system.autoUpgrade = {
+  #   enable = true;
+  #   channel = "https://nixos.org/channels/nixos-23.11";
+  # };
 }
 
