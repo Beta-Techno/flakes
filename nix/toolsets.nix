@@ -52,7 +52,6 @@ let
     nodejs_22 
     nodePackages.npm 
     nodePackages.yarn 
-    nodePackages.corepack 
     nodePackages.typescript
   ];
   
