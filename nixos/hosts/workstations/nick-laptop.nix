@@ -167,7 +167,7 @@
   # Use toolsets for clean, DRY package management
   users.users.nbg.packages = let 
     t = import ../../../nix/toolsets.nix { inherit pkgs; lib = pkgs.lib; };
-  in t.devAll;
+  in t.common ++ t.rust ++ t.go ++ t.node ++ t.network ++ t.container ++ t.editors ++ t.terminal ++ t.filemgmt ++ t.monitoring;
 
   # Enable automatic updates - DISABLED for safety
   # system.autoUpgrade = {
