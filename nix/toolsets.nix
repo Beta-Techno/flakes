@@ -6,7 +6,7 @@ let
     gnumake 
     cmake 
     pkg-config 
-    openssl.dev 
+    openssl
     vim 
     tmux 
     htop 
@@ -20,7 +20,7 @@ let
     zip 
     rsync 
     sshfs 
-    fuse
+    fuse3
   ];
   
   rust = with pkgs; [ 
@@ -49,10 +49,9 @@ let
   ];
   
   node = with pkgs; [ 
-    nodejs_22 
-    nodePackages.npm 
-    nodePackages.yarn 
-    nodePackages.typescript
+    nodejs_22
+    corepack
+    typescript
   ];
   
   python = let py = pkgs.python312; in [
@@ -94,7 +93,6 @@ let
   terminal = with pkgs; [
     tmux
     zsh
-    oh-my-zsh
   ];
   
   filemgmt = with pkgs; [

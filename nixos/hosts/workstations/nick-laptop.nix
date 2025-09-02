@@ -56,7 +56,11 @@
       dcd = "docker compose down";
     };
     
-
+    # User packages - Development environment (globally available for user)
+    # Use toolsets for clean, DRY package management
+    home.packages = let 
+      t = import ../../../nix/toolsets.nix { inherit pkgs; lib = pkgs.lib; };
+    in t.devAll;
   };
 
   # Create the user (if it doesn't exist)
@@ -141,7 +145,6 @@
     # Terminal tools
     tmux
     zsh
-    oh-my-zsh
     
     # File management
     ranger
@@ -163,11 +166,7 @@
     (import ../../../pkgs/cli/doctor.nix { inherit pkgs; }).program
   ];
   
-  # User packages - Development environment (globally available for user)
-  # Use toolsets for clean, DRY package management
-  users.users.nbg.packages = let 
-    t = import ../../../nix/toolsets.nix { inherit pkgs; lib = pkgs.lib; };
-  in t.common ++ t.rust ++ t.go ++ t.node ++ t.network ++ t.container ++ t.editors ++ t.terminal ++ t.filemgmt ++ t.monitoring;
+
 
   # Enable automatic updates - DISABLED for safety
   # system.autoUpgrade = {
