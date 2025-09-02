@@ -77,6 +77,8 @@
   # Enable zsh as default shell
   programs.zsh.enable = true;
   users.defaultUserShell = pkgs.zsh;
+  
+
 
   # Hardware-specific configuration for MacBook Pro 2015
   hardware = {
@@ -118,7 +120,6 @@
     zip
     rsync
     sshfs
-    fuse
     
     # Network tools
     inetutils
@@ -153,7 +154,6 @@
     duf
     
     # Monitoring
-    htop
     iotop
     nethogs
     btop
@@ -173,5 +173,7 @@
   #   enable = true;
   #   channel = "https://nixos.org/channels/nixos-23.11";
   # };
+  
+
 }
 
