@@ -157,7 +157,7 @@
     # Text editors
     vim
     neovim
-    emacs
+    # emacs removed - provided by Doom Emacs module
     
     # Terminal tools
     tmux

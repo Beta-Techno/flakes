@@ -86,7 +86,7 @@ let
   editors = with pkgs; [
     vim
     neovim
-    emacs
+    # emacs removed - provided by Doom Emacs module
   ];
   
   terminal = with pkgs; [
