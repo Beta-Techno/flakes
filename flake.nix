@@ -62,7 +62,7 @@
           macbook-air = home-manager.lib.homeManagerConfiguration {
             inherit pkgs;
             modules = [
-              ./profiles/default-linux.nix
+              ./profiles/default-darwin.nix
               ./home/hosts/macbook-air.nix
               nix-doom.hmModule
             ];
@@ -74,7 +74,7 @@
           macbook-pro = home-manager.lib.homeManagerConfiguration {
             inherit pkgs;
             modules = [
-              ./profiles/default-linux.nix
+              ./profiles/default-darwin.nix
               ./home/hosts/macbook-pro.nix
               nix-doom.hmModule
             ];

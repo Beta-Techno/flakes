@@ -1,14 +1,9 @@
 { config, pkgs, lib, inputs, ... }:
 
 {
-    imports = [
+  imports = [ 
     ../../roles/workstation.nix
     inputs.home-manager.nixosModules.home-manager
-    # GUI applications and themes
-    ../../modules/gui/chrome.nix
-    ../../modules/gui/vscode.nix
-    ../../modules/gui/theme.nix
-    ../../modules/gui/fonts.nix
   ];
 
   # Host-specific configuration
@@ -67,11 +62,21 @@
       t = import ../../../nix/toolsets.nix { inherit pkgs; lib = pkgs.lib; };
     in t.devAll;
     
-    # Editor configurations
+    # ✅ merge all HM module imports here
     imports = [
+      # editors (phase 2)
       ../../../modules/editors/lazyvim.nix
       ../../../modules/editors/doom.nix
+
+      # GUI (phase 3) – use the aggregator
+      ../../../modules/gui
     ];
+
+    # pass args to editor modules
+    _module.args = {
+      inherit (inputs) lazyvimStarter lazyvimConfig doomConfig;
+      username = "nbg";
+    };
   };
 
   # Create the user (if it doesn't exist)
@@ -175,6 +180,8 @@
     (import ../../../pkgs/cli/setup.nix { inherit pkgs; }).program
     (import ../../../pkgs/cli/sync-repos.nix { inherit pkgs; }).program
     (import ../../../pkgs/cli/doctor.nix { inherit pkgs; }).program
+    
+
   ];
   
 

@@ -1,18 +1,27 @@
 { lib, pkgs, nixGL, helpers, ... }:
 
 let
-  nixBin = "${nixGL.packages.${pkgs.system}.nixGLIntel}/bin/nixGLIntel";
-  # ── Alacritty wrapper (runs through nixGLIntel) ────────────────────────────
-  alacrittyWrapped = pkgs.writeShellScriptBin "alacritty" ''
-    ${nixBin} ${pkgs.alacritty}/bin/alacritty "$@"
-  '';
+  isNonNixOSLinux = pkgs.stdenv.isLinux && !(builtins.pathExists "/etc/NIXOS");
+
+  nixGLBin =
+    if isNonNixOSLinux then
+      "${nixGL.packages.${pkgs.system}.nixGLIntel}/bin/nixGLIntel"
+    else null;
+
+  alacrittyPkg =
+    if isNonNixOSLinux then
+      pkgs.writeShellScriptBin "alacritty" ''
+        exec ${nixGLBin} ${pkgs.alacritty}/bin/alacritty "$@"
+      ''
+    else
+      pkgs.alacritty;
 
   alacrittySvg = helpers.getAlacrittySvg pkgs.alacritty;
 in
 {
   programs.alacritty = {
     enable = true;
-    package = alacrittyWrapped;
+    package = alacrittyPkg;
 
     settings = {
       env = {

@@ -40,10 +40,6 @@
   # Enable flatpak
   services.flatpak.enable = true;
 
-  # Advanced system services
-  services.prometheus.exporters.node.enable = true;
-  services.grafana.enable = true;
-
   # Enable fonts
   fonts.packages = with pkgs; [
     noto-fonts

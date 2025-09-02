@@ -1,8 +1,5 @@
-{ config, pkgs, lib, helpers, ... }:
-
+{ config, pkgs, lib, ... }:
 {
-  home.packages = with pkgs; [
-    (helpers.wrapElectron postman "postman")
-    (lib.lowPrio postman)  # icons / resources
-  ];
+  nixpkgs.config.allowUnfree = lib.mkDefault true;
+  home.packages = [ pkgs.postman ];
 } 

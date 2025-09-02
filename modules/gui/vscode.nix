@@ -1,8 +1,5 @@
-{ config, pkgs, lib, helpers, ... }:
-
+{ config, pkgs, lib, ... }:
 {
-  home.packages = with pkgs; [
-    (helpers.wrapElectron vscode "code")
-    (lib.lowPrio vscode)  # icons / resources
-  ];
+  nixpkgs.config.allowUnfree = lib.mkDefault true;
+  home.packages = [ pkgs.vscode ];  # or pkgs.vscodium without unfree
 } 

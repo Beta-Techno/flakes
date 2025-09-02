@@ -74,9 +74,5 @@
     # Add systemd user services here
   };
 
-  # ── X11 configuration ───────────────────────────────────────────
-  xsession = {
-    enable = true;
-    windowManager.command = "i3";
-  };
+
 } 
