@@ -36,9 +36,14 @@ let
     # Remove any existing extras from plugins directory
     rm -f $out/lua/plugins/*extras*.lua
 
-    # Copy our custom plugin files
-    cp -R ${lazyvimConfig}/lua/plugins/* $out/lua/plugins/
-    cp -R ${lazyvimConfig}/lua/config/* $out/lua/config/
+    # Copy our custom plugin files (only if they exist and are not empty)
+    if [ -d "${lazyvimConfig}/lua/plugins" ] && [ "$(ls -A ${lazyvimConfig}/lua/plugins)" ]; then
+      cp -R ${lazyvimConfig}/lua/plugins/* $out/lua/plugins/
+    fi
+    
+    if [ -d "${lazyvimConfig}/lua/config" ] && [ "$(ls -A ${lazyvimConfig}/lua/config)" ]; then
+      cp -R ${lazyvimConfig}/lua/config/* $out/lua/config/
+    fi
   '';
 in
 {
