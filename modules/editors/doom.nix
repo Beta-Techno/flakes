@@ -10,14 +10,10 @@
     zstd
   ];
 
-  # Enable Doom Emacs
-  programs = {
-    doom-emacs = {
-      enable = true;
-      doomDir = doomConfig;
-      emacs = pkgs.emacs30-pgtk;
-      doomLocalDir = "/home/${username}/.local/share/doom";
-    };
+  # Enable Emacs (Doom will be configured via home.file)
+  programs.emacs = {
+    enable = true;
+    package = pkgs.emacs30-pgtk;
   };
 
   # Use the templates from home/editors/doom
