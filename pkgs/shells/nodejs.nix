@@ -2,8 +2,8 @@
 
 {
   buildInputs = with pkgs; [
-    # Node.js toolchain
-    nodejs_20
+    # Node.js toolchain (match toolsets)
+    nodejs_22
     nodePackages.npm
     nodePackages.yarn
     nodePackages.pnpm

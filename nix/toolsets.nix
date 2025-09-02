@@ -50,7 +50,6 @@ let
   
   node = with pkgs; [
     nodejs_22
-    corepack
     nodePackages.typescript
   ];
   

@@ -63,8 +63,7 @@ in
     xclip
     wl-clipboard
 
-    # Language servers and tools
-    nodejs_20  # Use Node.js 20 explicitly
+    # Language servers and tools (Node comes from toolsets.nix)
     nodePackages.typescript-language-server
     nodePackages.prettier
     nodePackages.eslint
