@@ -41,17 +41,17 @@ let
     cargo-tarpaulin
   ];
   
-  go = with pkgs; [ 
-    go 
-    gopls 
-    gotools 
+  goTools = with pkgs; [
+    pkgs.go
+    gopls
+    gotools
     delve
   ];
   
-  node = with pkgs; [ 
+  node = with pkgs; [
     nodejs_22
     corepack
-    typescript
+    nodePackages.typescript
   ];
   
   python = let py = pkgs.python312; in [
@@ -109,13 +109,16 @@ let
     btop
   ];
 in {
-  inherit common rust go node python network container editors terminal filemgmt monitoring;
+  inherit common rust node python network container editors terminal filemgmt monitoring;
+  
+  # Export the renamed lists under non-conflicting names
+  go = goTools;
   
   # Full development environment
   devAll = lib.concatLists [ 
     common 
     rust 
-    go 
+    goTools
     node 
     python 
     network 
