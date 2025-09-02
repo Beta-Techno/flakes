@@ -32,7 +32,7 @@ in {
   home.file.".face" = {
     source = ./../../assets/icons/fish.png;
     onChange = ''
-      chmod 644 $target
+      chmod 644 $HOME/.face
     '';
   };
 }

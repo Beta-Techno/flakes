@@ -112,6 +112,22 @@
   # Kernel parameters for backlight control
   boot.kernelParams = [ "acpi_backlight=video" ];
 
+  # Network configuration - ensure WiFi works
+  networking = {
+    # Enable NetworkManager for WiFi management
+    networkmanager.enable = true;
+    
+    # Enable wireless networking
+    wireless.enable = false; # Disable wpa_supplicant, use NetworkManager instead
+    
+    # Firewall configuration
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [ 22 80 443 8080 3000 5000 ];
+      allowedUDPPorts = [ 53 67 68 ];
+    };
+  };
+
   # Sound configuration (use PipeWire instead of PulseAudio)
   security.rtkit.enable = true;
   services.pipewire = {
@@ -142,6 +158,7 @@
     mtr
     iperf3
     nmap
+    networkmanagerapplet  # WiFi management GUI
     
     # Container tools
     docker
