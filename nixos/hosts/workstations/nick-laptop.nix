@@ -107,20 +107,32 @@
     
     # MacBook Pro specific settings
     cpu.intel.updateMicrocode = true;
+
+    # --- Wi-Fi firmware & driver (Broadcom BCM43602 on MacBookPro12,1) ---
+    # Be explicit so a fresh install always has the right bits available.
+    enableRedistributableFirmware = true;
+    firmware = [ pkgs.linux-firmware ];
   };
 
   # Kernel parameters for backlight control
   boot.kernelParams = [ "acpi_backlight=video" ];
+  # Make sure the Broadcom driver is loaded early.
+  boot.kernelModules = [ "brcmfmac" ];
 
   # Network configuration - ensure WiFi works
   networking = {
-    # Enable NetworkManager for WiFi management
-    networkmanager.enable = true;
-    
-    # Enable wireless networking
-    wireless.enable = false; # Disable wpa_supplicant, use NetworkManager instead
-    
-    # Firewall configuration
+    # Use NetworkManager (it will run its own supplicant)
+    networkmanager = {
+      enable = true;
+      # Good default for Broadcom; iwd is great but wpa_supplicant is safest here.
+      wifi.backend = "wpa_supplicant";
+      wifi.powersave = true;
+      # Set your regulatory domain if you want: e.g. "US", "GB", "DE", ...
+      # settings.wifi.country = "US";
+    };
+    # Do NOT enable the old global wireless service at the same time.
+    wireless.enable = false;
+
     firewall = {
       enable = true;
       allowedTCPPorts = [ 22 80 443 8080 3000 5000 ];
@@ -202,6 +214,19 @@
   ];
   
 
+
+  # Unblock wifi/bluetooth at boot in case firmware ships soft-blocked.
+  systemd.services.unblock-rfkill = {
+    description = "Unblock rfkill (WiFi/Bluetooth)";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.util-linux}/bin/rfkill unblock all";
+    };
+  };
+
+  # Enable NetworkManager applet for non-GNOME sessions
+  programs.nm-applet.enable = true;
 
   # Enable automatic updates - DISABLED for safety
   # system.autoUpgrade = {

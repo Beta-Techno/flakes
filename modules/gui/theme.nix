@@ -31,8 +31,5 @@ in {
   # Set the user avatar (both for session and login screen)
   home.file.".face" = {
     source = ./../../assets/icons/fish.png;
-    onChange = ''
-      chmod 644 $HOME/.face
-    '';
   };
 }
