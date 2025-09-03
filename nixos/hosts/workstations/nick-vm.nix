@@ -18,6 +18,17 @@
   # System configuration
   # Note: system.stateVersion is defined in the workstation role (23.11)
 
+  # File systems for VM
+  fileSystems."/" = {
+    device = "/dev/vda1";  # Root filesystem (typical for VM)
+    fsType = "ext4";
+  };
+
+  fileSystems."/boot" = {
+    device = "/dev/vda2";  # Boot partition (typical for VM)
+    fsType = "vfat";
+  };
+
   # VM-specific hardware configuration
   hardware = {
     # Enable redistributable firmware for virtual devices
@@ -26,7 +37,6 @@
     # Virtual graphics support
     opengl = {
       enable = true;
-      driSupport = true;
       driSupport32Bit = true;
     };
   };
