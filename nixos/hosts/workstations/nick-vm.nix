@@ -8,6 +8,9 @@
     # Development workstation profile
     ../../roles/workstation.nix
     
+    # Home-Manager NixOS module (required for home-manager.users)
+    inputs.home-manager.nixosModules.home-manager
+    
     # Platform-specific modules (system-level only)
     ../../../modules/platform/linux/desktop/gnome.nix
   ];
