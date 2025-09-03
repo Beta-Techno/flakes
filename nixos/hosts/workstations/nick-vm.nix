@@ -53,9 +53,9 @@
       "iommu=off"
     ];
     
-    # Use systemd-boot for UEFI VM
-    loader.systemd-boot.enable = true;
-    loader.efi.canTouchEfiVariables = true;
+    # Skip bootloader installation for VM (Proxmox handles boot)
+    # loader.systemd-boot.enable = false;
+    # loader.efi.canTouchEfiVariables = false;
   };
 
   # Network configuration for VM
