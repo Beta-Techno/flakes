@@ -226,6 +226,7 @@
     # Pass required arguments to modules
     _module.args = {
       inherit (inputs) nixGL;
+      helpers = import ../../../modules/lib/helpers.nix { inherit pkgs lib; };
     };
   };
 
