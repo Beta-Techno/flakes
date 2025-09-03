@@ -35,9 +35,9 @@
     enableRedistributableFirmware = true;
     
     # Virtual graphics support
-    opengl = {
+    graphics = {
       enable = true;
-      driSupport32Bit = true;
+      enable32Bit = true;
     };
   };
 
@@ -84,17 +84,8 @@
     xserver = {
       enable = true;
       
-      # Use GNOME desktop
-      desktopManager.gnome.enable = true;
-      
-      # Use GDM display manager
-      displayManager.gdm.enable = true;
-      
       # Virtual graphics configuration
       videoDrivers = [ "modesetting" "vmware" "virtio" ];
-      
-      # Enable touchpad support (if VM has it)
-      libinput.enable = true;
     };
     
     # Enable PipeWire for audio
