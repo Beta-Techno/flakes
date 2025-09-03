@@ -6,7 +6,7 @@ let
   themeBase = "Yaru-${accent}";
   gtkTheme = themeBase + lib.optionalString preferDark "-dark";
 in {
-  # Set the font through dconf (system-level)
+  # Set the font through dconf (user-level)
   dconf.settings."org/gnome/desktop/interface" = {
     font-name = "JetBrainsMono Nerd Font 11";
     monospace-font-name = "JetBrainsMono Nerd Font 11";
@@ -16,7 +16,7 @@ in {
     icon-theme = themeBase;
   };
 
-  # Set the background (system-level, using absolute path)
+  # Set the background (user-level, using absolute path)
   dconf.settings."org/gnome/desktop/background" = {
     picture-uri = "file:///home/nbg/.local/share/backgrounds/fish.jpeg";
     picture-uri-dark = "file:///home/nbg/.local/share/backgrounds/fish.jpeg";
