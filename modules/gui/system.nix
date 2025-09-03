@@ -5,9 +5,8 @@
     ./vscode.nix 
     ./postman.nix 
     ./jetbrains 
-    ./dock.nix 
     ./fonts.nix 
     ./chrome.nix 
-    # Note: theme.nix is NOT imported here - it's Home-Manager only
+    # Note: theme.nix and dock.nix are NOT imported here - they're Home-Manager only
   ];
 }
