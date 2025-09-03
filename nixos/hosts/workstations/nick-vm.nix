@@ -9,19 +9,19 @@
     ../../roles/workstation.nix
     
     # GUI modules
-    ../../modules/gui/default.nix
+    ../../../modules/gui/default.nix
     
     # Terminal configuration
-    ../../modules/terminal/default.nix
+    ../../../modules/terminal/default.nix
     
     # Editor configurations
-    ../../modules/editors/default.nix
+    ../../../modules/editors/default.nix
     
     # Development tools
-    ../../modules/tools/default.nix
+    ../../../modules/tools/default.nix
     
     # Platform-specific modules
-    ../../modules/platform/linux/desktop/gnome.nix
+    ../../../modules/platform/linux/desktop/gnome.nix
   ];
 
   # System configuration
