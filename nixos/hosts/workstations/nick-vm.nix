@@ -53,9 +53,11 @@
       "iommu=off"
     ];
     
-    # Skip bootloader installation for VM (Proxmox handles boot)
-    # loader.systemd-boot.enable = false;
-    # loader.efi.canTouchEfiVariables = false;
+    # Override bootloader configuration from base profile for VM
+    # Proxmox handles boot, so disable bootloader installation
+    loader.systemd-boot.enable = false;
+    loader.efi.canTouchEfiVariables = false;
+    loader.efi.efiSysMountPoint = null;  # Don't try to mount /boot
   };
 
   # Network configuration for VM
