@@ -208,14 +208,11 @@
     # Home-Manager version
     home.stateVersion = "25.11";
     
-    # Home directory packages (development shells)
-    home.packages = with pkgs; [
-      # Development shells
-      (import ../../../pkgs/shells/go.nix { inherit pkgs; }).buildInputs
-      (import ../../../pkgs/shells/nodejs.nix { inherit pkgs; }).buildInputs
-      (import ../../../pkgs/shells/python.nix { inherit pkgs; }).buildInputs
-      (import ../../../pkgs/shells/rust.nix { inherit pkgs; }).buildInputs
-    ];
+    # Home directory packages (development environment)
+    # Use toolsets for clean, DRY package management (same as nick-laptop)
+    home.packages = let 
+      t = import ../../../nix/toolsets.nix { inherit pkgs; lib = pkgs.lib; };
+    in t.devAll;
 
     # Development shell aliases
     home.shellAliases = {
