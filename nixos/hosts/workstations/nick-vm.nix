@@ -225,8 +225,9 @@
 
     # Pass required arguments to modules
     _module.args = {
-      inherit (inputs) nixGL;
+      inherit (inputs) nixGL lazyvimStarter lazyvimConfig doomConfig;
       helpers = import ../../../modules/lib/helpers.nix { inherit pkgs lib; };
+      username = "nbg";
     };
   };
 
