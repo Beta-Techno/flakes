@@ -88,6 +88,7 @@ Examples:
 
 Available Hosts:
   - nick-laptop          Development workstation
+  - nick-vm              Development VM (Proxmox)
   - web-01              Web server
   - db-01               Database server
 
@@ -98,6 +99,7 @@ EOF
 list_hosts() {
     log "INFO" "Available host configurations:"
     echo "  nick-laptop    - Development workstation"
+    echo "  nick-vm        - Development VM (Proxmox)"
     echo "  web-01         - Web server"
     echo "  db-01          - Database server"
     echo ""
@@ -107,7 +109,7 @@ list_hosts() {
 validate_host() {
     local host="$1"
     case "$host" in
-        "nick-laptop"|"web-01"|"db-01")
+        "nick-laptop"|"nick-vm"|"web-01"|"db-01")
             return 0
             ;;
         *)

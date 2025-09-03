@@ -3,10 +3,10 @@
 {
   imports = [
     # Base system configuration
-    ../profiles/base.nix
+    ../../profiles/base.nix
     
     # Development workstation profile
-    ../roles/workstation.nix
+    ../../roles/workstation.nix
     
     # GUI modules
     ../../modules/gui/default.nix
