@@ -8,8 +8,8 @@
     # Development workstation profile
     ../../roles/workstation.nix
     
-    # GUI modules
-    ../../../modules/gui/default.nix
+    # System-level GUI modules (excludes Home-Manager-only components)
+    ../../../modules/gui/system.nix
     
     # Terminal configuration
     ../../../modules/terminal/default.nix
