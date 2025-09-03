@@ -106,6 +106,11 @@
           modules = [ ./nixos/hosts/workstations/nick-laptop.nix ];
           specialArgs = { inherit inputs; };
         };
+        nick-vm = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [ ./nixos/hosts/workstations/nick-vm.nix ];
+          specialArgs = { inherit inputs; };
+        };
       };
 
       packages = forAllSystems (system:
