@@ -221,7 +221,7 @@ EOF
       cat > ~/.local/share/applications/alacritty.desktop << EOF
 [Desktop Entry]
 Name=Alacritty
-Exec=${alacrittyWrapped}/bin/alacritty
+Exec=${alacrittyPkg}/bin/alacritty
 Icon=${alacrittySvg}
 Type=Application
 Categories=TerminalEmulator;
