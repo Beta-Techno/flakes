@@ -6,7 +6,7 @@
     kubectl
     kubectx
     k9s
-    kubernetes-helm
+    # Note: kubernetes-helm is provided by toolsets.nix as 'helm'
     stern
   ];
 
