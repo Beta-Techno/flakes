@@ -33,12 +33,7 @@
       openssl
       zlib
       libffi
-      python3
-      rustc
-      cargo
-      go
-      gopls
-      gotools
+      # Note: python3, rustc, cargo, go, gopls, gotools are provided by toolsets.nix
       shellcheck
       shfmt
       nixpkgs-fmt
