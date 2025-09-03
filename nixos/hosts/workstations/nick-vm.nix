@@ -19,17 +19,16 @@
   # Note: system.stateVersion is defined in the workstation role (23.11)
 
   # File systems for VM
-  # Note: These are only used when actually deployed to VM
-  # On physical hardware, filesystems are inherited from base profile
-  # fileSystems."/" = {
-  #   device = "/dev/vda1";  # Root filesystem (typical for VM)
-  #   fsType = "ext4";
-  # };
+  # Note: These are minimal definitions for testing on physical hardware
+  # When actually deployed to VM, these will be overridden by the VM's actual devices
+  fileSystems."/" = {
+    device = "/dev/disk/by-label/nixos";  # Use label-based mounting (more flexible)
+    fsType = "ext4";
+    options = [ "defaults" "noatime" ];
+  };
 
-  # fileSystems."/boot" = {
-  #   device = "/dev/vda2";  # Boot partition (typical for VM)
-  #   fsType = "vfat";
-  # };
+  # Don't override /boot - let the base profile handle it
+  # This prevents conflicts while testing on physical hardware
 
   # VM-specific hardware configuration
   hardware = {
