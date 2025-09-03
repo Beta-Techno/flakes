@@ -16,7 +16,7 @@
   ];
 
   # System configuration
-  system.stateVersion = "25.11";
+  # Note: system.stateVersion is defined in the workstation role (23.11)
 
   # VM-specific hardware configuration
   hardware = {
