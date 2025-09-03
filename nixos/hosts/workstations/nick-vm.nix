@@ -1,4 +1,4 @@
-{ config, pkgs, lib, inputs, ... }:
+in the { config, pkgs, lib, inputs, ... }:
 
 {
   imports = [
@@ -8,19 +8,7 @@
     # Development workstation profile
     ../../roles/workstation.nix
     
-    # System-level GUI modules (excludes Home-Manager-only components)
-    ../../../modules/gui/system.nix
-    
-    # Terminal configuration
-    ../../../modules/terminal/default.nix
-    
-    # Editor configurations
-    ../../../modules/editors/default.nix
-    
-    # Development tools
-    ../../../modules/tools/default.nix
-    
-    # Platform-specific modules
+    # Platform-specific modules (system-level only)
     ../../../modules/platform/linux/desktop/gnome.nix
   ];
 
@@ -171,6 +159,18 @@
     nethogs
     btop
     
+    # GUI applications (system-level)
+    vscode
+    postman
+    google-chrome
+    
+    # JetBrains tools (system-level, like nick-laptop)
+    jetbrains.datagrip
+    jetbrains.rider
+    
+    # Fonts (system-level)
+    nerd-fonts.jetbrains-mono
+    
     # CLI tools from our flake
     (import ../../../pkgs/cli/activate.nix { inherit pkgs; }).program
     (import ../../../pkgs/cli/auth.nix { inherit pkgs; }).program
@@ -182,23 +182,26 @@
   # Home-Manager configuration
   home-manager.users.nbg = { pkgs, ... }: {
     imports = [
-      # GUI modules
-      ../../modules/gui/default.nix
+      # GUI modules (contains theme, dock, and other user preferences)
+      ../../../modules/gui/default.nix
       
-      # Terminal configuration
-      ../../modules/terminal/default.nix
+      # Terminal configuration (contains Alacritty user config)
+      ../../../modules/terminal/default.nix
       
-      # Editor configurations
-      ../../modules/editors/default.nix
+      # Editor configurations (contains LazyVim and Doom Emacs user config)
+      ../../../modules/editors/default.nix
       
-      # Development tools
-      ../../modules/tools/default.nix
+      # Development tools (contains user-specific tool configs)
+      ../../../modules/tools/default.nix
+      
+      # Platform-specific modules (contains user-specific platform configs)
+      ../../../modules/platform/linux/default.nix
     ];
     
     # Home-Manager version
     home.stateVersion = "25.11";
     
-    # Home directory packages
+    # Home directory packages (development shells)
     home.packages = with pkgs; [
       # Development shells
       (import ../../../pkgs/shells/go.nix { inherit pkgs; }).buildInputs
