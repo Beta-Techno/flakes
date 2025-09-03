@@ -97,11 +97,7 @@ in {
     close = ["<Super>q"];
   };
 
-  # ── Dock / sidebar configuration ────────────────────────────────
-  dconf.settings."org/gnome/shell/extensions/dash-to-dock" = {
-    dock-position = "LEFT";
-    autohide = false;
-  };
+  # Note: Dock configuration is already defined above in the GNOME-specific user settings section
 
   # Set the user avatar (both for session and login screen)
   home.file.".face" = {
