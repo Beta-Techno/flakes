@@ -225,6 +225,11 @@
       gp = "git pull";
       gc = "git commit -m";
     };
+
+    # Pass required arguments to modules
+    _module.args = {
+      inherit (inputs) nixGL;
+    };
   };
 
   # Virtualization optimizations
