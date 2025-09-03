@@ -55,9 +55,9 @@
     
     # Override bootloader configuration from base profile for VM
     # Proxmox handles boot, so disable bootloader installation
-    loader.systemd-boot.enable = false;
-    loader.efi.canTouchEfiVariables = false;
-    loader.efi.efiSysMountPoint = null;  # Don't try to mount /boot
+    loader.systemd-boot.enable = lib.mkForce false;
+    loader.efi.canTouchEfiVariables = lib.mkForce false;
+    loader.efi.efiSysMountPoint = lib.mkForce null;  # Don't try to mount /boot
   };
 
   # Network configuration for VM
