@@ -19,15 +19,17 @@
   # Note: system.stateVersion is defined in the workstation role (23.11)
 
   # File systems for VM
-  fileSystems."/" = {
-    device = "/dev/vda1";  # Root filesystem (typical for VM)
-    fsType = "ext4";
-  };
+  # Note: These are only used when actually deployed to VM
+  # On physical hardware, filesystems are inherited from base profile
+  # fileSystems."/" = {
+  #   device = "/dev/vda1";  # Root filesystem (typical for VM)
+  #   fsType = "ext4";
+  # };
 
-  fileSystems."/boot" = {
-    device = "/dev/vda2";  # Boot partition (typical for VM)
-    fsType = "vfat";
-  };
+  # fileSystems."/boot" = {
+  #   device = "/dev/vda2";  # Boot partition (typical for VM)
+  #   fsType = "vfat";
+  # };
 
   # VM-specific hardware configuration
   hardware = {
