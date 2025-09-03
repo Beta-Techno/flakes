@@ -100,17 +100,11 @@
     isNormalUser = true;
     extraGroups = [ "wheel" "docker" "video" "audio" "networkmanager" ];
     shell = pkgs.zsh;
-    
-    # Development aliases
-    shellInit = ''
-      # Development shortcuts
-      alias dcu="docker compose up -d"
-      alias dcd="docker compose down"
-      alias gs="git status"
-      alias gp="git pull"
-      alias gc="git commit -m"
-    '';
   };
+
+  # Enable zsh as default shell
+  programs.zsh.enable = true;
+  users.defaultUserShell = pkgs.zsh;
 
   # System packages for VM
   environment.systemPackages = with pkgs; [
@@ -212,6 +206,15 @@
       (import ../../../pkgs/shells/python.nix { inherit pkgs; }).buildInputs
       (import ../../../pkgs/shells/rust.nix { inherit pkgs; }).buildInputs
     ];
+
+    # Development shell aliases
+    home.shellAliases = {
+      dcu = "docker compose up -d";
+      dcd = "docker compose down";
+      gs = "git status";
+      gp = "git pull";
+      gc = "git commit -m";
+    };
   };
 
   # Virtualization optimizations
