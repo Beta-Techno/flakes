@@ -18,25 +18,8 @@
     useDHCP = true;
   };
 
-  # Database-specific configuration
-  services.postgresql = {
-    settings = {
-      # Connection settings
-      max_connections = 200;
-      shared_buffers = "512MB";
-      effective_cache_size = "2GB";
-      
-      # Write-ahead logging
-      wal_level = "replica";
-      max_wal_senders = 3;
-      wal_keep_segments = 8;
-      
-      # Replication
-      hot_standby = true;
-      max_standby_archive_delay = "30s";
-      max_standby_streaming_delay = "30s";
-    };
-  };
+  # Database-specific configuration is handled by the db-server role
+  # Additional PostgreSQL settings can be added here if needed
 
   # PostgreSQL configuration is handled by the postgres profile
   # Additional databases can be added here if needed
