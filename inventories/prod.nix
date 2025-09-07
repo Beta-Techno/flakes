@@ -6,7 +6,7 @@
     role = "netbox";
     ip = "10.0.0.10";
     hostModule = ./../nixos/hosts/servers/netbox-01.nix;
-    modules = [ ./../nixos/disko/netbox-01.nix ];
+    modules = [ ];
   };
 
   # Infrastructure services host (monitoring)
@@ -15,7 +15,7 @@
     role = "infra";
     ip = "10.0.0.11";
     hostModule = ./../nixos/hosts/servers/infrastructure-01.nix;
-    modules = [ ./../nixos/disko/infrastructure-01.nix ];
+    modules = [ ];
   };
 
   # Media services host
@@ -24,7 +24,7 @@
     role = "media";
     ip = "10.0.0.12";
     hostModule = ./../nixos/hosts/servers/media-01.nix;
-    modules = [ ./../nixos/disko/media-01.nix ];
+    modules = [ ];
   };
 
   # Database server host
@@ -33,7 +33,7 @@
     role = "db-server";
     ip = "10.0.0.13";
     hostModule = ./../nixos/hosts/servers/db-server-01.nix;
-    modules = [ ./../nixos/disko/db-server-01.nix ];
+    modules = [ ];
   };
 
   # Applications host
@@ -42,7 +42,7 @@
     role = "apps";
     ip = "10.0.0.14";
     hostModule = ./../nixos/hosts/servers/applications-01.nix;
-    modules = [ ./../nixos/disko/applications-01.nix ];
+    modules = [ ];
   };
 
   # Development workstations (keep existing)
