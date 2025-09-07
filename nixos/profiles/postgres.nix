@@ -43,9 +43,7 @@
   services.postgresql.ensureUsers = [
     {
       name = "myapp";
-      ensurePermissions = {
-        "DATABASE myapp" = "ALL PRIVILEGES";
-      };
+      ensureDBOwnership = true;
     }
   ];
 
