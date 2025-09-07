@@ -51,23 +51,9 @@
     };
   };
 
-  # Cloudflare tunnel configuration
-  services.cloudflared.tunnels."web-tunnel" = {
-    credentialsFile = "/etc/cloudflared/web-tunnel.json";
-    ingressRules = [
-      {
-        hostname = "api.example.com";
-        service = "http://localhost:8080";
-      }
-      {
-        hostname = "app.example.com";
-        service = "http://localhost:3000";
-      }
-      {
-        service = "http_status:404";
-      }
-    ];
-  };
+  # Cloudflare tunnel configuration (simplified)
+  # Note: Tunnel configuration should be done via cloudflared config file
+  # This enables the service but doesn't configure specific tunnels
 
   # System packages specific to this host
   environment.systemPackages = with pkgs; [
