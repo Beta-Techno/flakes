@@ -38,31 +38,8 @@
     };
   };
 
-  # Create application databases
-  services.postgresql.ensureDatabases = [ 
-    "myapp_production"
-    "myapp_staging" 
-    "myapp_development"
-  ];
-  
-  services.postgresql.ensureUsers = [
-    {
-      name = "myapp";
-      ensurePermissions = {
-        "DATABASE myapp_production" = "ALL PRIVILEGES";
-        "DATABASE myapp_staging" = "ALL PRIVILEGES";
-        "DATABASE myapp_development" = "ALL PRIVILEGES";
-      };
-    }
-    {
-      name = "backup";
-      ensurePermissions = {
-        "DATABASE myapp_production" = "CONNECT";
-        "DATABASE myapp_staging" = "CONNECT";
-        "DATABASE myapp_development" = "CONNECT";
-      };
-    }
-  ];
+  # PostgreSQL configuration is handled by the postgres profile
+  # Additional databases can be added here if needed
 
   # Backup configuration
   services.borgbackup.repos."db-backup" = {
