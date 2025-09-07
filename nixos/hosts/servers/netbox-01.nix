@@ -10,15 +10,18 @@
   networking.nameservers = [ "1.1.1.1" "9.9.9.9" ];
 
   # Disk layout (if using disko)
-  disko.devices = (import ../../disko/netbox-01.nix { inherit lib; }).disko.devices;
+  # disko.devices = (import ../../disko/netbox-01.nix { inherit lib; }).disko.devices;
 
-  # Bootloader: BIOS/MBR with GRUB (for Proxmox VMs)
-  # Override base.nix systemd-boot configuration
+  # Bootloader: Proxmox handles boot directly from disk
+  # Override base.nix bootloader configuration for VM
   boot.loader.systemd-boot.enable = lib.mkForce false;
+  boot.loader.grub.enable = lib.mkForce false;  # Disable grub as well
   boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
+  boot.loader.efi.efiSysMountPoint = lib.mkForce null;  # Don't try to mount /boot 
 
-  # Let disko handle GRUB configuration automatically
-  boot.loader.grub.enable = true;
+  # Disable bootloader requirement for VM environment
+  # Proxmox handles boot directly from disk
+  boot.loader.grub.devices = lib.mkForce [ ];  # Empty list disables grub requirement
 
   # Pin system state version
   system.stateVersion = "24.11";
