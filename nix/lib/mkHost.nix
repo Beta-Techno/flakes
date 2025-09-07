@@ -19,7 +19,7 @@ nixpkgs.lib.nixosSystem {
     (import ./../../nixos/roles/${cfg.role}.nix)
     
     # Optional: disk layout (if using disko)
-    # (nix-disko.nixosModules.disko)
+    (nix-disko.nixosModules.disko)
     
     # Host-specific module from inventory (explicit path)
     hostModule
