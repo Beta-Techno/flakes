@@ -8,7 +8,6 @@
     ../profiles/nginx.nix
     ../profiles/postgres.nix
     ../profiles/prom.nix
-    ../services/applications/template/default.nix
   ];
 
   # Application-specific configuration
@@ -20,12 +19,45 @@
     8000  # API apps
   ];
 
-  # Application storage
-  fileSystems."/var/lib/applications" = {
-    device = "/dev/disk/by-label/applications";
-    fsType = "ext4";
-    options = [ "defaults" "noatime" ];
+  # Enable Docker for your containerized applications
+  virtualisation.docker.enable = true;
+  users.users.root.extraGroups = [ "docker" ];
+
+  # Example: Simple web application container
+  # Replace this with your actual GitHub repo container
+  virtualisation.oci-containers.containers.myapp = {
+    image = "nginx:alpine";
+    ports = [ "3000:80" ];
+    
+    volumes = [
+      "/var/lib/applications/html:/usr/share/nginx/html:ro"
+    ];
+    
+    environment = {
+      TZ = "UTC";
+    };
+    
+    extraOptions = [
+      "--restart=unless-stopped"
+    ];
   };
+
+  # Create application directories and welcome page
+  systemd.tmpfiles.rules = [
+    "d /var/lib/applications 0755 root root"
+    "d /var/lib/applications/html 0755 root root"
+    "f /var/lib/applications/html/index.html 0644 root root - <!DOCTYPE html>
+<html>
+<head>
+    <title>My Application</title>
+</head>
+<body>
+    <h1>Welcome to My Application</h1>
+    <p>This is a placeholder for your GitHub repo container.</p>
+    <p>Replace the myapp container with your actual application.</p>
+</body>
+</html>"
+  ];
 
   # System packages for application development
   environment.systemPackages = with pkgs; [
@@ -34,7 +66,6 @@
     nodejs
     python3
     go
-    rustc
     
     # Database tools
     postgresql_15
@@ -44,8 +75,7 @@
     htop
     iotop
     
-    # Network tools
-    nmap
-    tcpdump
+    # Docker tools
+    docker-compose
   ];
 }

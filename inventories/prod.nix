@@ -1,6 +1,15 @@
 # Production inventory - defines all production hosts
 {
-  # Infrastructure services host
+  # Netbox host (isolated)
+  netbox-01 = {
+    system = "x86_64-linux";
+    role = "netbox";
+    ip = "10.0.0.10";
+    hostModule = ./../nixos/hosts/servers/netbox-01.nix;
+    modules = [ ./../nixos/disko/netbox-01.nix ];
+  };
+
+  # Infrastructure services host (monitoring)
   infrastructure-01 = {
     system = "x86_64-linux";
     role = "infra";

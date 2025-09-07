@@ -1,4 +1,4 @@
-# Infrastructure role - bundles infrastructure services
+# Infrastructure role - monitoring and observability
 { config, pkgs, lib, ... }:
 
 {
@@ -6,39 +6,38 @@
     ../profiles/base.nix
     ../profiles/docker-daemon.nix
     ../profiles/nginx.nix
-    ../profiles/cloudflared-system.nix
     ../profiles/prom.nix
     ../profiles/loki.nix
     ../profiles/grafana.nix
-    ../services/infrastructure/netbox/default.nix
-    ../services/infrastructure/keycloak/default.nix
   ];
 
   # Infrastructure-specific configuration
   networking.firewall.allowedTCPPorts = [
     80    # HTTP
     443   # HTTPS
-    8080  # Netbox
-    8081  # Keycloak
     9090  # Prometheus
     3000  # Grafana
+    3100  # Loki
   ];
 
-  # Shared storage for infrastructure services
-  fileSystems."/var/lib/infrastructure" = {
-    device = "/dev/disk/by-label/infrastructure";
-    fsType = "ext4";
-    options = [ "defaults" "noatime" ];
+  # Enable Docker for containerized services
+  virtualisation.docker.enable = true;
+  users.users.root.extraGroups = [ "docker" ];
+
+  # Nginx reverse proxy for monitoring services
+  services.nginx.virtualHosts."monitoring.local" = {
+    locations."/" = {
+      proxyPass = "http://localhost:3000";  # Grafana
+      proxyWebsockets = true;
+    };
+    locations."/prometheus/" = {
+      proxyPass = "http://localhost:9090/";
+      proxyWebsockets = true;
+    };
   };
 
   # System packages for infrastructure management
   environment.systemPackages = with pkgs; [
-    # Infrastructure tools
-    netbox
-    keycloak
-    prometheus
-    grafana
-    
     # Monitoring tools
     htop
     iotop
@@ -47,6 +46,8 @@
     # Network tools
     nmap
     tcpdump
-    wireshark-cli
+    
+    # Docker tools
+    docker-compose
   ];
 }
