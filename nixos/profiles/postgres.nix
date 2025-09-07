@@ -17,7 +17,7 @@
       default_statistics_target = "100";
       
       # Logging
-      log_min_duration_statement = "1000";
+      log_min_duration_statement = 1000;
       log_checkpoints = true;
       log_connections = true;
       log_disconnections = true;
