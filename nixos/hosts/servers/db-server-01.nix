@@ -10,7 +10,7 @@
   networking.nameservers = [ "1.1.1.1" "9.9.9.9" ];
 
   # Disk layout (if using disko)
-  disko.devices = (import ../../disko/db-server-01.nix).disko.devices;
+  disko.devices = (import ../../disko/db-server-01.nix { inherit lib; }).disko.devices;
 
   # Database-specific overrides
   services.postgresql.settings = {

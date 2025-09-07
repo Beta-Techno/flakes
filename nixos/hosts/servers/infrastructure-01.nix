@@ -10,7 +10,7 @@
   networking.nameservers = [ "1.1.1.1" "9.9.9.9" ];
 
   # Disk layout (if using disko)
-  disko.devices = (import ../../disko/infrastructure-01.nix).disko.devices;
+  disko.devices = (import ../../disko/infrastructure-01.nix { inherit lib; }).disko.devices;
 
   # Infrastructure-specific overrides
   services.nginx.virtualHosts."infra.local" = {
