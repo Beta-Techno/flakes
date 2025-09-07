@@ -12,6 +12,18 @@
   # Disk layout (if using disko)
   disko.devices = (import ../../disko/netbox-01.nix { inherit lib; }).disko.devices;
 
+  # Bootloader: BIOS/MBR with GRUB (for Proxmox VMs)
+  boot.loader.systemd-boot.enable = false;
+  boot.loader.efi.canTouchEfiVariables = false;
+
+  boot.loader.grub = {
+    enable = true;
+    devices = [ "/dev/sda" ];
+  };
+
+  # Pin system state version
+  system.stateVersion = "24.11";
+
   # Netbox-specific overrides
   services.nginx.virtualHosts."netbox.local" = {
     locations."/" = {
