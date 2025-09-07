@@ -24,8 +24,8 @@ nixpkgs.lib.nixosSystem {
     # Host-specific module from inventory (explicit path)
     hostModule
     
-    # Late bindings - set hostname from inventory
-    ({ ... }: { networking.hostName = name; })
+    # Late bindings - set hostname from inventory (configurable)
+    ({ lib, ... }: { networking.hostName = lib.mkDefault (cfg.hostname or name); })
     
     # Home-Manager integration (for development workstations)
     home-manager.nixosModules.home-manager

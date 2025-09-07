@@ -5,6 +5,7 @@
     system = "x86_64-linux";
     role = "netbox";
     ip = "10.0.0.10";
+    hostname = "nixos";  # Keep current hostname for testing
     hostModule = ./../nixos/hosts/servers/netbox-01.nix;
     modules = [ ];
   };
