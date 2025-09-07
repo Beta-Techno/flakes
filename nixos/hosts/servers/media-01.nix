@@ -10,7 +10,7 @@
   networking.nameservers = [ "1.1.1.1" "9.9.9.9" ];
 
   # Disk layout (if using disko)
-  disko.devices = import ../../disko/media-01.nix;
+  disko.devices = (import ../../disko/media-01.nix).disko.devices;
 
   # Media-specific overrides
   services.nginx.virtualHosts."media.local" = {
