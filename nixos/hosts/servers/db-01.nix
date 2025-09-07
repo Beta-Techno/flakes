@@ -39,7 +39,7 @@
     postgresql_15
     pgcli
     pg_top
-    pg_repack
+    postgresqlPackages.pg_repack
     
     # Monitoring
     htop
