@@ -13,8 +13,9 @@
   disko.devices = (import ../../disko/netbox-01.nix { inherit lib; }).disko.devices;
 
   # Bootloader: BIOS/MBR with GRUB (for Proxmox VMs)
-  boot.loader.systemd-boot.enable = false;
-  boot.loader.efi.canTouchEfiVariables = false;
+  # Override base.nix systemd-boot configuration
+  boot.loader.systemd-boot.enable = lib.mkForce false;
+  boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
 
   boot.loader.grub = {
     enable = true;
