@@ -7,6 +7,12 @@
   networking.hostName = "db-01";
   networking.domain = "example.com";
 
+  # Root filesystem definition
+  fileSystems."/" = {
+    device = "/dev/disk/by-label/nixos";
+    fsType = "ext4";
+  };
+
   # Network configuration
   networking.interfaces.eth0 = {
     useDHCP = true;
