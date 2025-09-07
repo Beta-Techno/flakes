@@ -19,9 +19,13 @@
       flake = false;
     };
     nixGL.url = "github:guibou/nixGL";
+    # New inputs for infrastructure
+    sops-nix.url = "github:Mic92/sops-nix";
+    deploy-rs.url = "github:serokell/deploy-rs";
+    nix-disko.url = "github:nix-community/disko";
   };
 
-  outputs = { self, nixpkgs, home-manager, nix-doom, nixGL, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, nix-doom, nixGL, sops-nix, deploy-rs, nix-disko, ... }@inputs:
     let
       # Support multiple systems
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
@@ -87,31 +91,37 @@
       );
 
       # NixOS configurations (for NixOS machines)
-      nixosConfigurations = {
-        # Server configurations
-        web-01 = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [ ./nixos/hosts/servers/web-01.nix ];
-          specialArgs = { inherit inputs; };
-        };
-        db-01 = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [ ./nixos/hosts/servers/db-01.nix ];
-          specialArgs = { inherit inputs; };
-        };
-        
-        # Workstation configurations
-        nick-laptop = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [ ./nixos/hosts/workstations/nick-laptop.nix ];
-          specialArgs = { inherit inputs; };
-        };
-        nick-vm = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [ ./nixos/hosts/workstations/nick-vm.nix ];
-          specialArgs = { inherit inputs; };
-        };
-      };
+      nixosConfigurations = 
+        let
+          # Import inventories
+          inventories = {
+            prod = import ./inventories/prod.nix;
+            staging = import ./inventories/staging.nix;
+          };
+          
+          # Import mkHost function
+          mkHost = import ./nix/lib/mkHost.nix { inherit inputs; };
+          
+          # Create configurations from inventory
+          inventoryConfigs = nixpkgs.lib.mapAttrs (name: cfg: mkHost name cfg) inventories.prod;
+          
+          # Legacy configurations (keep existing ones working)
+          legacyConfigs = {
+            # Server configurations
+            web-01 = nixpkgs.lib.nixosSystem {
+              system = "x86_64-linux";
+              modules = [ ./nixos/hosts/servers/web-01.nix ];
+              specialArgs = { inherit inputs; };
+            };
+            db-01 = nixpkgs.lib.nixosSystem {
+              system = "x86_64-linux";
+              modules = [ ./nixos/hosts/servers/db-01.nix ];
+              specialArgs = { inherit inputs; };
+            };
+          };
+        in
+        # Merge inventory-driven and legacy configurations
+        inventoryConfigs // legacyConfigs;
 
       packages = forAllSystems (system:
         let pkgs = pkgsFor.${system};

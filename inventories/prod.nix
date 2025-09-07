@@ -1,0 +1,55 @@
+# Production inventory - defines all production hosts
+{
+  # Infrastructure services host
+  infrastructure-01 = {
+    system = "x86_64-linux";
+    role = "infra";
+    ip = "10.0.0.11";
+    hostModule = ./../nixos/hosts/servers/infrastructure-01.nix;
+    modules = [ ./../nixos/disko/infrastructure-01.nix ];
+  };
+
+  # Media services host
+  media-01 = {
+    system = "x86_64-linux";
+    role = "media";
+    ip = "10.0.0.12";
+    hostModule = ./../nixos/hosts/servers/media-01.nix;
+    modules = [ ./../nixos/disko/media-01.nix ];
+  };
+
+  # Database server host
+  db-server-01 = {
+    system = "x86_64-linux";
+    role = "db-server";
+    ip = "10.0.0.13";
+    hostModule = ./../nixos/hosts/servers/db-server-01.nix;
+    modules = [ ./../nixos/disko/db-server-01.nix ];
+  };
+
+  # Applications host
+  applications-01 = {
+    system = "x86_64-linux";
+    role = "apps";
+    ip = "10.0.0.14";
+    hostModule = ./../nixos/hosts/servers/applications-01.nix;
+    modules = [ ./../nixos/disko/applications-01.nix ];
+  };
+
+  # Development workstations (keep existing)
+  nick-laptop = {
+    system = "x86_64-linux";
+    role = "workstation";
+    ip = "10.0.0.20";
+    hostModule = ./../nixos/hosts/workstations/nick-laptop.nix;
+    modules = [ ];
+  };
+
+  nick-vm = {
+    system = "x86_64-linux";
+    role = "workstation";
+    ip = "10.0.0.21";
+    hostModule = ./../nixos/hosts/workstations/nick-vm.nix;
+    modules = [ ];
+  };
+}
