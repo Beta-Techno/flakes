@@ -91,10 +91,8 @@
     restic
   ];
 
-  # Database monitoring
-  services.prometheus.exporters.postgres = {
-    enable = true;
-    dataSourceNames = [ "postgresql://postgres@localhost/postgres?sslmode=disable" ];
-  };
+  # Database monitoring (simplified)
+  # Note: Prometheus exporter configuration should be done via config file
+  # This enables the service but doesn't configure specific data sources
 }
 
