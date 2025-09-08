@@ -11,15 +11,15 @@
 
   # Boot configuration for VM (BIOS + GRUB like nick-vm)
   boot.loader = {
-    # We are BIOS/MBR on Proxmox; do not use EFI/systemd-boot
-    systemd-boot.enable = false;
-    efi.canTouchEfiVariables = false;
+    # We are BIOS/MBR on Proxmox; explicitly override base.nix defaults
+    systemd-boot.enable = lib.mkForce false;
+    efi.canTouchEfiVariables = lib.mkForce false;
 
     grub = {
-      enable = true;
-      version = 2;           # optional (default)
-      device = "/dev/sda";   # install GRUB to MBR of the main disk
-      useOSProber = false;   # optional
+      enable = lib.mkForce true;
+      version = 2;
+      device = "/dev/sda";
+      useOSProber = false;
     };
   };
 
