@@ -9,6 +9,13 @@
   networking.defaultGateway = "10.0.0.1";
   networking.nameservers = [ "1.1.1.1" "9.9.9.9" ];
 
+  # File systems for VM (like nick-vm)
+  fileSystems."/" = {
+    device = "/dev/disk/by-label/nixos";  # Use label-based mounting (more flexible)
+    fsType = "ext4";
+    options = [ "defaults" "noatime" ];
+  };
+
   # Bootloader: BIOS GRUB for Proxmox VMs (like nick-vm)
   boot.loader.systemd-boot.enable = lib.mkForce false;
   boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
