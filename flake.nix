@@ -118,6 +118,15 @@
               modules = [ ./nixos/hosts/servers/db-01.nix ];
               specialArgs = { inherit inputs; };
             };
+            # Test netbox-01 as legacy config
+            netbox-01-legacy = nixpkgs.lib.nixosSystem {
+              system = "x86_64-linux";
+              modules = [ 
+                ./nixos/roles/netbox.nix
+                ./nixos/hosts/servers/netbox-01.nix
+              ];
+              specialArgs = { inherit inputs; };
+            };
           };
         in
         # Merge inventory-driven and legacy configurations
