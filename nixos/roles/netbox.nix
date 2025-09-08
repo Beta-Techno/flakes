@@ -9,15 +9,19 @@
     ../profiles/postgres.nix
   ];
 
-  # Bootloader: Proxmox handles boot directly from disk (like nick-vm)
-  boot.loader.systemd-boot.enable = lib.mkForce false;
-  boot.loader.grub.enable = lib.mkForce false;  # Disable grub as well
-  boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
-  boot.loader.efi.efiSysMountPoint = lib.mkForce null;  # Don't try to mount /boot 
-  
-  # Disable bootloader requirement for VM environment
-  # Proxmox handles boot directly from disk
-  boot.loader.grub.devices = lib.mkForce [ ];  # Empty list disables grub requirement
+  # Boot configuration for VM (like nick-vm)
+  boot = {
+    # Override bootloader configuration from base profile for VM
+    # Proxmox handles boot, so disable bootloader installation
+    loader.systemd-boot.enable = lib.mkForce false;
+    loader.grub.enable = lib.mkForce false;  # Disable grub as well
+    loader.efi.canTouchEfiVariables = lib.mkForce false;
+    loader.efi.efiSysMountPoint = lib.mkForce null;  # Don't try to mount /boot 
+    
+    # Disable bootloader requirement for VM environment
+    # Proxmox handles boot directly from disk
+    loader.grub.devices = lib.mkForce [ ];  # Empty list disables grub requirement
+  };
 
   # Netbox-specific configuration
   networking.firewall.allowedTCPPorts = [
