@@ -7,21 +7,8 @@
     ../profiles/docker-daemon.nix
     ../profiles/nginx.nix
     ../profiles/postgres.nix
+    ../profiles/boot/bios-grub.nix
   ];
-
-  # Boot configuration for VM (BIOS + GRUB like nick-vm)
-  boot.loader = {
-    # We are BIOS/MBR on Proxmox; explicitly override base.nix defaults
-    systemd-boot.enable = lib.mkForce false;
-    efi.canTouchEfiVariables = lib.mkForce false;
-
-    grub = {
-      enable = lib.mkForce true;
-      version = 2;
-      device = "/dev/sda";
-      useOSProber = false;
-    };
-  };
 
   # Netbox-specific configuration
   networking.firewall.allowedTCPPorts = [

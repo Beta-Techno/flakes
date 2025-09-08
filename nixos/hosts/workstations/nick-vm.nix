@@ -8,6 +8,9 @@
     # Development workstation profile
     ../../roles/workstation.nix
     
+    # BIOS GRUB boot profile for Proxmox VMs
+    ../../profiles/boot/bios-grub.nix
+    
     # Home-Manager NixOS module (required for home-manager.users)
     inputs.home-manager.nixosModules.home-manager
     
@@ -54,16 +57,7 @@
       "iommu=off"
     ];
     
-    # Override bootloader configuration from base profile for VM
-    # Proxmox handles boot, so disable bootloader installation
-    loader.systemd-boot.enable = lib.mkForce false;
-    loader.grub.enable = lib.mkForce false;  # Disable grub as well
-    loader.efi.canTouchEfiVariables = lib.mkForce false;
-    loader.efi.efiSysMountPoint = lib.mkForce null;  # Don't try to mount /boot 
-    
-    # Disable bootloader requirement for VM environment
-    # Proxmox handles boot directly from disk
-    loader.grub.devices = lib.mkForce [ ];  # Empty list disables grub requirement
+    # Bootloader configuration is handled by bios-grub.nix profile
   };
 
   # Network configuration for VM

@@ -7,16 +7,11 @@
   # Allow unfree packages (needed for NVIDIA drivers, etc.)
   nixpkgs.config.allowUnfree = true;
 
-  # Boot configuration for NixOS
-  boot.loader.systemd-boot = {
-    enable = true;
-    configurationLimit = 10;
-  };
-  
-  boot.loader.efi = {
-    canTouchEfiVariables = true;
-    efiSysMountPoint = "/boot";
-  };
+  # Boot configuration - let roles/hosts choose their bootloader
+  # Make base not pick a loader to avoid conflicts
+  boot.loader.systemd-boot.enable = lib.mkDefault false;
+  boot.loader.grub.enable = lib.mkDefault false;
+  boot.loader.efi.canTouchEfiVariables = lib.mkDefault false;
 
   # Basic system configuration
   time.timeZone = "UTC";
