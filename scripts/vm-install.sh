@@ -193,8 +193,7 @@ fi
 
 # ── Install the selected host from the flake ───────────────────────────────
 log "Installing NixOS (this can take a while)…"
-nixos-install --root "$MNT" --flake "$FLAKE_DIR#$HOST" --no-root-passwd \
-  --extra-experimental-features "nix-command flakes"
+nixos-install --root "$MNT" --flake "$FLAKE_DIR#$HOST" --no-root-passwd
 
 ok "Install finished."
 
