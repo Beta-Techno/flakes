@@ -60,6 +60,6 @@
     role = "workstation";
     ip = "10.0.0.21";
     hostModule = ./../nixos/hosts/workstations/nick-vm.nix;
-    modules = [ ];
+    modules = [ ./../nixos/disko/workstation-vm.nix ];
   };
 }

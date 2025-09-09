@@ -8,8 +8,8 @@
     # Development workstation profile
     ../../roles/workstation.nix
     
-    # BIOS GRUB boot profile for Proxmox VMs
-    ../../profiles/boot/bios-grub.nix
+    # UEFI systemd-boot for Proxmox VMs
+    ../../profiles/boot/uefi-sdboot.nix
     
     # Home-Manager NixOS module (required for home-manager.users)
     inputs.home-manager.nixosModules.home-manager
@@ -21,17 +21,7 @@
   # System configuration
   # Note: system.stateVersion is defined in the workstation role (23.11)
 
-  # File systems for VM
-  # Note: These are minimal definitions for testing on physical hardware
-  # When actually deployed to VM, these will be overridden by the VM's actual devices
-  fileSystems."/" = {
-    device = "/dev/disk/by-label/nixos";  # Use label-based mounting (more flexible)
-    fsType = "ext4";
-    options = [ "defaults" "noatime" ];
-  };
-
-  # Don't override /boot - let the base profile handle it
-  # This prevents conflicts while testing on physical hardware
+  # Mounts are provided by disko (no fileSystems.* here)
 
   # VM-specific hardware configuration
   hardware = {
@@ -57,8 +47,12 @@
       "iommu=off"
     ];
     
-    # Bootloader configuration is handled by bios-grub.nix profile
+    # Bootloader configuration is handled by uefi-sdboot.nix profile
   };
+
+  # Guest/trim niceties
+  services.qemuGuest.enable = true;
+  services.fstrim.enable = true;
 
   # Network configuration for VM
   networking = {

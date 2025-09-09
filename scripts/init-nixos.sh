@@ -166,8 +166,8 @@ test_configuration() {
     fi
     
     # Test building a configuration
-    log "INFO" "Testing build of nick-laptop configuration..."
-    if nixos-rebuild build --flake .#nick-laptop; then
+    log "INFO" "Testing build of nick-vm configuration..."
+    if nixos-rebuild build --flake .#nick-vm; then
         log "SUCCESS" "Configuration builds successfully"
     else
         log "WARNING" "Configuration build failed (this might be expected on first run)"
@@ -199,17 +199,17 @@ ${GREEN}╚═══════════════════════
 ${BLUE}Next Steps:${NC}
 1. Review your configuration:
    cd $INSTALL_PATH
-   nixos-rebuild build --flake .#nick-laptop
+   nixos-rebuild build --flake .#nick-vm
 
 2. Deploy your first configuration:
-   $INSTALL_PATH/scripts/deploy.sh nick-laptop --dry-run
+   $INSTALL_PATH/scripts/deploy.sh nick-vm --dry-run
 
 3. If everything looks good, deploy:
-   $INSTALL_PATH/scripts/deploy.sh nick-laptop
+   $INSTALL_PATH/scripts/deploy.sh nick-vm
 
 ${BLUE}Available Commands:${NC}
 - $INSTALL_PATH/scripts/deploy.sh --list-hosts          # Show available configurations
-- $INSTALL_PATH/scripts/deploy.sh nick-laptop --dry-run # Test deployment
+- $INSTALL_PATH/scripts/deploy.sh nick-vm --dry-run # Test deployment
 - $INSTALL_PATH/scripts/deploy.sh web-01 --verbose      # Deploy with verbose output
 - $INSTALL_PATH/scripts/deploy.sh db-01 --rollback      # Rollback if needed
 
