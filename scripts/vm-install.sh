@@ -121,7 +121,7 @@ if [ "$BOOT_MODE" = "bios" ]; then
               format = "ext4";
               mountpoint = "/";
               mountOptions = [ "noatime" ];
-              label = "${LABEL}";
+              extraArgs = [ "-L" "${LABEL}" ];
             };
           };
         };
@@ -152,7 +152,7 @@ else
               format = "ext4";
               mountpoint = "/";
               mountOptions = [ "noatime" ];
-              label = "${LABEL}";
+              extraArgs = [ "-L" "${LABEL}" ];
             };
           };
         };
