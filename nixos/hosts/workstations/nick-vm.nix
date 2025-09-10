@@ -42,7 +42,8 @@
     
     # Kernel parameters for VM optimization
     kernelParams = [
-      "console=ttyS0"
+      "console=tty0"   # VGA console (for Proxmox display)
+      "console=ttyS0"  # Serial console (for debugging)
       "nokaslr"
       "iommu=off"
     ];
