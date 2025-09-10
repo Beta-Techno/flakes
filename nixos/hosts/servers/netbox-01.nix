@@ -30,6 +30,22 @@
   # Pin system state version
   system.stateVersion = "24.11";
 
+  # Create your login on this server
+  users.users.nbg = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" "docker" ];
+    shell = pkgs.zsh;
+    
+    # One-time password (change this after first login!)
+    initialPassword = "TempPass1@3$";
+    
+    # Add your SSH key here for secure access
+    openssh.authorizedKeys.keys = [
+      # Replace with your actual SSH public key
+      # "ssh-ed25519 AAAA...your_key..."
+    ];
+  };
+
   # Netbox-specific overrides
   services.nginx.virtualHosts."netbox.local" = {
     locations."/" = {
