@@ -7,7 +7,7 @@
     ../profiles/docker-daemon.nix
     ../profiles/nginx.nix
     ../profiles/postgres.nix
-    ../profiles/boot/bios-grub.nix
+    # Bootloader is hardware-specific; pick it in the host file
   ];
 
   # Netbox-specific configuration
@@ -24,7 +24,7 @@
 
   # Netbox container
   virtualisation.oci-containers.containers.netbox = {
-    image = "netboxcommunity/netbox:v4.0.0";
+    image = "netboxcommunity/netbox:v4.3.7";
     ports = [ "8080:8080" ];
     
     environment = {

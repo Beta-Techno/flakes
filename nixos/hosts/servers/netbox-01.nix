@@ -16,7 +16,8 @@
     options = [ "defaults" "noatime" ];
   };
 
-  # Bootloader configuration is handled by the netbox role
+  # Bootloader configuration for VM (UEFI + systemd-boot)
+  imports = [ ../../profiles/boot/uefi-sdboot.nix ];
 
   # Pin system state version
   system.stateVersion = "24.11";
@@ -31,8 +32,7 @@
 
   # System-specific packages
   environment.systemPackages = with pkgs; [
-    # Netbox-specific tools
-    netbox
+    # Netbox-specific tools (using container, not packaged version)
     postgresql_15
     pgcli
   ];
