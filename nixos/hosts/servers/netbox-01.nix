@@ -30,6 +30,9 @@
   # Pin system state version
   system.stateVersion = "24.11";
 
+  # Enable zsh for the user
+  programs.zsh.enable = true;
+
   # Create your login on this server
   users.users.nbg = {
     isNormalUser = true;
