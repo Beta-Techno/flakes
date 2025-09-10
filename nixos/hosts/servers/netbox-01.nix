@@ -2,12 +2,8 @@
 { config, lib, pkgs, ... }:
 
 {
-  # Network configuration
-  networking.interfaces.ens18.ipv4.addresses = [
-    { address = "10.0.0.10"; prefixLength = 24; }
-  ];
-  networking.defaultGateway = "10.0.0.1";
-  networking.nameservers = [ "1.1.1.1" "9.9.9.9" ];
+  # Network configuration (DHCP for simplicity and reliability)
+  networking.useDHCP = true;
 
   # Filesystems (UEFI needs a real ESP mounted at /boot)
   fileSystems."/" = {
