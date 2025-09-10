@@ -21,7 +21,19 @@
   # System configuration
   # Note: system.stateVersion is defined in the workstation role (23.11)
 
-  # Mounts are provided by disko (no fileSystems.* here)
+  # Force root and ESP mounts by LABEL (matches your disko spec)
+  # This overrides disko-generated mounts to ensure stage-1 finds the correct devices
+  fileSystems."/" = lib.mkForce {
+    device  = "/dev/disk/by-label/nixos";  # disko sets -L nixos
+    fsType  = "ext4";
+    options = [ "noatime" ];
+  };
+
+  fileSystems."/boot" = lib.mkForce {
+    device  = "/dev/disk/by-label/EFI";    # disko sets -n EFI on the ESP
+    fsType  = "vfat";
+    options = [ "fmask=0077" "dmask=0077" ];
+  };
 
   # VM-specific hardware configuration
   hardware = {
@@ -46,6 +58,7 @@
       "console=ttyS0"  # Serial console (for debugging)
       "nokaslr"
       "iommu=off"
+      "libata.force=noncq"  # Reduce ATA spam from virtual devices
     ];
     
     # Bootloader configuration is handled by uefi-sdboot.nix profile
