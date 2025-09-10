@@ -33,20 +33,20 @@
     
     environment = {
       TZ = "UTC";
-      DB_HOST = "localhost"; # now correct, because network=host
+      DB_HOST = "127.0.0.1";
       DB_PORT = "5432";
       DB_NAME = "netbox";
       DB_USER = "netbox";
       DB_PASSWORD = "netbox123";
-      REDIS_HOST = "localhost";
+      REDIS_HOST = "127.0.0.1";
       REDIS_PORT = "6379";
       SECRET_KEY = "netbox-secret-key-change-me";
     };
     
     extraOptions = [
-      "--restart=unless-stopped"
       "--network=host"
-      "--health-cmd=curl -f http://localhost:8080/health/ || exit 1"
+      # Healthcheck without curl, runs inside the container:
+      "--health-cmd=python -c 'import urllib.request,sys; sys.exit(0 if urllib.request.urlopen(\"http://127.0.0.1:8080/health/\").status==200 else 1)'"
       "--health-interval=30s"
       "--health-timeout=10s"
       "--health-retries=3"
@@ -108,8 +108,12 @@
 
   # Ensure PostgreSQL starts before NetBox container
   systemd.services.docker-netbox = {
-    after = [ "postgresql.service" ];
-    requires = [ "postgresql.service" ];
+    after = [ "docker.service" "postgresql.service" "redis.service" ];
+    requires = [ "docker.service" "postgresql.service" "redis.service" ];
+    serviceConfig = {
+      Restart = "always";
+      RestartSec = 5;
+    };
   };
 
   # Nginx reverse proxy for Netbox
