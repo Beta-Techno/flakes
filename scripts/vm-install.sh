@@ -199,7 +199,8 @@ fi
 
 # ── Install the selected host from the flake ───────────────────────────────
 log "Installing NixOS (this can take a while)…"
-nixos-install --root "$MNT" --flake "$FLAKE_DIR#$HOST" --no-root-passwd
+# Use --no-root-passwd and --no-channel-copy to avoid prompts
+nixos-install --root "$MNT" --flake "$FLAKE_DIR#$HOST" --no-root-passwd --no-channel-copy
 
 ok "Install finished."
 
