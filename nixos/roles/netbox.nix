@@ -22,18 +22,22 @@
   virtualisation.docker.enable = true;
   users.users.root.extraGroups = [ "docker" ];
 
+  # Enable Redis for NetBox
+  services.redis.enable = true;
+
   # Netbox container
   virtualisation.oci-containers.containers.netbox = {
     image = "netboxcommunity/netbox:v4.3.7";
-    ports = [ "8080:8080" ];
+    # Using host networking; container binds directly to host ports
+    # (so no need for explicit port mappings)
     
     environment = {
       TZ = "UTC";
-      DB_HOST = "localhost";
+      DB_HOST = "localhost"; # now correct, because network=host
       DB_PORT = "5432";
       DB_NAME = "netbox";
       DB_USER = "netbox";
-      DB_PASSWORD = "netbox123";  # Simple password for now
+      DB_PASSWORD = "netbox123";
       REDIS_HOST = "localhost";
       REDIS_PORT = "6379";
       SECRET_KEY = "netbox-secret-key-change-me";
@@ -41,6 +45,7 @@
     
     extraOptions = [
       "--restart=unless-stopped"
+      "--network=host"
       "--health-cmd=curl -f http://localhost:8080/health/ || exit 1"
       "--health-interval=30s"
       "--health-timeout=10s"
@@ -54,6 +59,8 @@
     {
       name = "netbox";
       ensureDBOwnership = true;
+      # For production, prefer hashedPassword = "md5<hash>".
+      password = "netbox123";
     }
   ];
 

@@ -30,6 +30,9 @@
   # Pin system state version
   system.stateVersion = "24.11";
 
+  # PostgreSQL: disable TLS until certs exist (prevents boot failures)
+  services.postgresql.settings.ssl = lib.mkForce false;
+
   # Enable zsh for the user
   programs.zsh.enable = true;
 
