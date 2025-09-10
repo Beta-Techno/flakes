@@ -52,6 +52,11 @@
     # Load virtual graphics modules
     kernelModules = [ "virtio" "virtio_pci" "virtio_net" "virtio_blk" ];
     
+    # Make initrd find disk drivers early (prevents boot races)
+    initrd.availableKernelModules = [
+      "virtio_pci" "virtio_blk" "virtio_scsi" "sd_mod" "sr_mod"
+    ];
+    
     # Kernel parameters for VM optimization
     kernelParams = [
       "console=tty0"   # VGA console (for Proxmox display)
@@ -59,6 +64,7 @@
       "nokaslr"
       "iommu=off"
       "libata.force=noncq"  # Reduce ATA spam from virtual devices
+      "rootdelay=5"    # Small grace period if udev is slow to create by-label nodes
     ];
     
     # Bootloader configuration is handled by uefi-sdboot.nix profile

@@ -143,7 +143,13 @@ else
           ESP = {
             type = "EF00";
             size = "512M";
-            content = { type = "filesystem"; format = "vfat"; mountpoint = "/boot"; };
+            content = {
+              type = "filesystem";
+              format = "vfat";
+              mountpoint = "/boot";
+              # give it the label your host expects
+              extraArgs = [ "-n" "EFI" ];
+            };
           };
           root = {
             size = "100%";
