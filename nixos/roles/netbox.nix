@@ -41,7 +41,14 @@
     
     extraOptions = [
       "--restart=unless-stopped"
+      "--health-cmd=curl -f http://localhost:8080/health/ || exit 1"
+      "--health-interval=30s"
+      "--health-timeout=10s"
+      "--health-retries=3"
     ];
+    
+    # Wait for PostgreSQL to be ready
+    dependsOn = [ "postgresql" ];
   };
 
   # Create Netbox database
@@ -52,6 +59,12 @@
       ensureDBOwnership = true;
     }
   ];
+
+  # Ensure PostgreSQL starts before NetBox container
+  systemd.services.docker-netbox = {
+    after = [ "postgresql.service" ];
+    requires = [ "postgresql.service" ];
+  };
 
   # Nginx reverse proxy for Netbox
   services.nginx.virtualHosts."netbox.local" = {
