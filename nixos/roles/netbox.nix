@@ -59,10 +59,52 @@
     {
       name = "netbox";
       ensureDBOwnership = true;
-      # MD5 hash of "netbox123" + "netbox" (PostgreSQL format)
-      hashedPassword = "md562d6a4924ebc6156a7f567e58f11f15f";
     }
   ];
+
+  # Use SCRAM for passwords and require it on localhost (modern default)
+  services.postgresql.settings = {
+    password_encryption = "scram-sha-256";
+  };
+  services.postgresql.authentication = lib.mkForce ''
+    # TYPE  DATABASE  USER  ADDRESS         METHOD
+    local   all       all                   trust
+    host    all       all   127.0.0.1/32    scram-sha-256
+    host    all       all   ::1/128         scram-sha-256
+  '';
+
+  # 1) First-time init (runs only when the cluster is initially created)
+  services.postgresql.initialScript = pkgs.writeText "netbox-init.sql" ''
+    DO $$
+    BEGIN
+      IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'netbox') THEN
+        CREATE ROLE netbox LOGIN;
+      END IF;
+      -- Set password to match container env
+      ALTER ROLE netbox WITH PASSWORD 'netbox123';
+    END
+    $$;
+    DO $$
+    BEGIN
+      IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'netbox') THEN
+        CREATE DATABASE netbox OWNER netbox;
+      END IF;
+    END
+    $$;
+  '';
+
+  # 2) Every boot, ensure the password matches the env (idempotent)
+  systemd.services.set-netbox-db-password = {
+    description = "Ensure netbox DB user has the expected password";
+    after = [ "postgresql.service" ];
+    requires = [ "postgresql.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      User = "postgres";
+      ExecStart = "${pkgs.postgresql_15}/bin/psql -tAc \"ALTER ROLE netbox WITH PASSWORD 'netbox123';\"";
+    };
+  };
 
   # Ensure PostgreSQL starts before NetBox container
   systemd.services.docker-netbox = {
