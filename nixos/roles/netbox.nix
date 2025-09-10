@@ -59,8 +59,8 @@
     {
       name = "netbox";
       ensureDBOwnership = true;
-      # For production, prefer hashedPassword = "md5<hash>".
-      password = "netbox123";
+      # MD5 hash of "netbox123" + "netbox" (PostgreSQL format)
+      hashedPassword = "md562d6a4924ebc6156a7f567e58f11f15f";
     }
   ];
 
