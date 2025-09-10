@@ -46,9 +46,6 @@
       "--health-timeout=10s"
       "--health-retries=3"
     ];
-    
-    # Wait for PostgreSQL to be ready
-    dependsOn = [ "postgresql" ];
   };
 
   # Create Netbox database
