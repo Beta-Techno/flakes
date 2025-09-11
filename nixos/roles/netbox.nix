@@ -68,7 +68,7 @@
   # Use SCRAM for passwords and require it on localhost (modern default)
   services.postgresql.settings = {
     password_encryption = "scram-sha-256";
-    # do not override listen_addresses; upstream default "localhost" is fine
+    listen_addresses = lib.mkForce "localhost";  # Force localhost to resolve any conflicts
   };
   services.postgresql.authentication = lib.mkForce ''
     # TYPE  DATABASE  USER  ADDRESS         METHOD
