@@ -41,6 +41,9 @@
       REDIS_HOST = "127.0.0.1";
       REDIS_PORT = "6379";
       SECRET_KEY = "netbox-secret-key-change-me";
+      # Django / NetBox requires this. Include every name you'll hit (and 127.0.0.1 for healthcheck).
+      # Comma-separated string is accepted by the container entrypoint.
+      ALLOWED_HOSTS = "127.0.0.1,netbox.local";
     };
     
     extraOptions = [
@@ -65,6 +68,8 @@
   # Use SCRAM for passwords and require it on localhost (modern default)
   services.postgresql.settings = {
     password_encryption = "scram-sha-256";
+    # Optional: make the TCP bind explicit (you already have it, but clarity helps)
+    listen_addresses = "127.0.0.1";
   };
   services.postgresql.authentication = lib.mkForce ''
     # TYPE  DATABASE  USER  ADDRESS         METHOD
@@ -106,13 +111,25 @@
     };
   };
 
-  # Ensure PostgreSQL starts before NetBox container
+  # Ensure DB is ready and password is set BEFORE NetBox starts
   systemd.services.docker-netbox = {
-    after = [ "docker.service" "postgresql.service" "redis.service" ];
-    requires = [ "docker.service" "postgresql.service" "redis.service" ];
+    after = [
+      "docker.service"
+      "postgresql.service"
+      "redis.service"
+      "set-netbox-db-password.service"
+    ];
+    requires = [
+      "docker.service"
+      "postgresql.service"
+      "redis.service"
+      "set-netbox-db-password.service"
+    ];
     serviceConfig = {
       Restart = "always";
       RestartSec = 5;
+      # Gate startup on a successful login using the same creds the container will use.
+      ExecStartPre = "${pkgs.bash}/bin/sh -c 'PGPASSWORD=netbox123 ${pkgs.postgresql_15}/bin/pg_isready -h 127.0.0.1 -p 5432 -U netbox && PGPASSWORD=netbox123 ${pkgs.postgresql_15}/bin/psql -h 127.0.0.1 -U netbox -d netbox -c \"select 1\"'";
     };
   };
 
