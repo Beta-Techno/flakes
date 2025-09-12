@@ -79,8 +79,8 @@
       REDIS_PORT = "6379";
       # REDIS_PASSWORD = "";   # uncomment if you later add a password
 
-      # NetBox/Django
-      ALLOWED_HOSTS = "127.0.0.1,localhost,netbox.local";
+      # NetBox/Django - space-separated (what the image expects)
+      ALLOWED_HOSTS = "127.0.0.1 localhost netbox.local nixos 10.0.0.10";
 
       # Diagnostics
       DB_WAIT_DEBUG = "1";
@@ -89,8 +89,8 @@
     
     extraOptions = [
       "--network=host"
-      # Healthcheck without curl, runs inside the container:
-      "--health-cmd=python -c 'import urllib.request,sys; sys.exit(0 if urllib.request.urlopen(\"http://127.0.0.1:8080/health/\").status==200 else 1)'"
+      # Healthcheck using the correct NetBox endpoint:
+      "--health-cmd=python -c 'import urllib.request,sys; sys.exit(0 if urllib.request.urlopen(\"http://127.0.0.1:8080/api/status/\").status==200 else 1)'"
       "--health-interval=30s"
       "--health-timeout=10s"
       "--health-retries=3"
