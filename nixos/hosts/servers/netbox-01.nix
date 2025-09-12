@@ -48,11 +48,19 @@
     ];
   };
 
-  # Netbox-specific overrides
+  # Netbox-specific overrides - catch-all for any IP/hostname
   services.nginx.virtualHosts."netbox.local" = {
+    default = true;  # catch-all for any Host/IP on :80
     locations."/" = {
       proxyPass = "http://localhost:8080";
       proxyWebsockets = true;
+      extraConfig = ''
+        # Present a consistent Host to Django so ALLOWED_HOSTS is simple
+        proxy_set_header Host netbox.local;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+      '';
     };
   };
 
