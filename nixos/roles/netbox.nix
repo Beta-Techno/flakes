@@ -30,10 +30,10 @@
     "d /var/lib/netbox 0700 root root -"
   ];
 
-  # One-shot unit that creates a stable SECRET_KEY and dynamic ALLOWED_HOSTS
+  # One-shot unit that creates a stable SECRET_KEY once
   systemd.services.netbox-secrets = {
     description = "Generate NetBox SECRET_KEY and env file";
-    after = [ "local-fs.target" "network-online.target" ];
+    after = [ "local-fs.target" ];
     before = [ "docker-netbox.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
@@ -41,28 +41,13 @@
       ExecStart = "${pkgs.writeShellScript "netbox-gen-secret" ''
         set -euo pipefail
         install -d -m 0700 /var/lib/netbox
-        
-        # Generate SECRET_KEY if it doesn't exist
         if [ ! -s /var/lib/netbox/secret-key ]; then
           # 64-char alphanumeric (Django requires >=50 chars)
           head -c 512 /dev/urandom | tr -dc 'A-Za-z0-9' | head -c 64 > /var/lib/netbox/secret-key
           chmod 600 /var/lib/netbox/secret-key
         fi
-        
-        # Get the primary IP address (first non-loopback IPv4)
-        PRIMARY_IP=$(ip -4 route get 8.8.8.8 | grep -oP 'src \K\S+' | head -1)
-        
-        # Build ALLOWED_HOSTS with dynamic IP + static entries
-        ALLOWED_HOSTS="127.0.0.1 localhost netbox.local nixos"
-        if [ -n "$PRIMARY_IP" ]; then
-          ALLOWED_HOSTS="$ALLOWED_HOSTS $PRIMARY_IP"
-        fi
-        
         # Write env-file that oci-containers will read
-        cat > /var/lib/netbox/env << EOF
-SECRET_KEY=$(tr -d '\n' </var/lib/netbox/secret-key)
-ALLOWED_HOSTS=$ALLOWED_HOSTS
-EOF
+        printf "SECRET_KEY=%s\n" "$(tr -d '\n' </var/lib/netbox/secret-key)" > /var/lib/netbox/env
         chmod 600 /var/lib/netbox/env
       ''}";
       RemainAfterExit = true;
@@ -94,7 +79,8 @@ EOF
       REDIS_PORT = "6379";
       # REDIS_PASSWORD = "";   # uncomment if you later add a password
 
-      # NetBox/Django - ALLOWED_HOSTS is now set dynamically in /var/lib/netbox/env
+      # NetBox/Django - allow everything (trusted internal network)
+      ALLOWED_HOSTS = "*";
 
       # Diagnostics
       DB_WAIT_DEBUG = "1";
