@@ -25,12 +25,42 @@
   # Enable Redis for NetBox
   services.redis.enable = true;
 
+  # Create /var/lib/netbox for secrets/env
+  systemd.tmpfiles.rules = [
+    "d /var/lib/netbox 0700 root root -"
+  ];
+
+  # One-shot unit that creates a stable SECRET_KEY once
+  systemd.services.netbox-secrets = {
+    description = "Generate NetBox SECRET_KEY and env file";
+    after = [ "local-fs.target" ];
+    before = [ "docker-netbox.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.writeShellScript "netbox-gen-secret" ''
+        set -euo pipefail
+        install -d -m 0700 /var/lib/netbox
+        if [ ! -s /var/lib/netbox/secret-key ]; then
+          # 64-char alphanumeric (Django requires >=50 chars)
+          head -c 512 /dev/urandom | tr -dc 'A-Za-z0-9' | head -c 64 > /var/lib/netbox/secret-key
+          chmod 600 /var/lib/netbox/secret-key
+        fi
+        # Write env-file that oci-containers will read
+        printf "SECRET_KEY=%s\n" "$(tr -d '\n' </var/lib/netbox/secret-key)" > /var/lib/netbox/env
+        chmod 600 /var/lib/netbox/env
+      ''}";
+      RemainAfterExit = true;
+    };
+  };
+
   # Netbox container
   virtualisation.oci-containers.containers.netbox = {
     image = "netboxcommunity/netbox:v4.3.7";
     # Using host networking; container binds directly to host ports
     # (so no need for explicit port mappings)
     
+    environmentFiles = [ "/var/lib/netbox/env" ];
     environment = {
       TZ = "UTC";
 
@@ -49,14 +79,11 @@
       REDIS_PORT = "6379";
       # REDIS_PASSWORD = "";   # uncomment if you later add a password
 
-      # NetBox settings
-      SECRET_KEY = "netbox-secret-key-change-me";
-      # Include all names you'll hit:
+      # NetBox/Django
       ALLOWED_HOSTS = "127.0.0.1,localhost,netbox.local";
 
-      # Show full Python traceback for the "Waiting on DB…" loop:
+      # Diagnostics
       DB_WAIT_DEBUG = "1";
-      # (optional) extend wait so you can read it:
       DB_WAIT_TIMEOUT = "90";
     };
     
@@ -146,6 +173,7 @@
       "redis.service"
       "set-netbox-db-password.service"
       "netbox-db-extensions.service"
+      "netbox-secrets.service"
     ];
     requires = [
       "docker.service"
@@ -153,6 +181,7 @@
       "redis.service"
       "set-netbox-db-password.service"
       "netbox-db-extensions.service"
+      "netbox-secrets.service"
     ];
     serviceConfig = {
       Restart = "always";
