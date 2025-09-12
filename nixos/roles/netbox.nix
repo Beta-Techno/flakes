@@ -33,17 +33,31 @@
     
     environment = {
       TZ = "UTC";
+
+      # Postgres
       DB_HOST = "127.0.0.1";
       DB_PORT = "5432";
       DB_NAME = "netbox";
       DB_USER = "netbox";
       DB_PASSWORD = "netbox123";
+
+      # Make SSL intent explicit (you disabled server SSL)
+      DB_SSLMODE = "disable";
+
+      # Redis
       REDIS_HOST = "127.0.0.1";
       REDIS_PORT = "6379";
+      # REDIS_PASSWORD = "";   # uncomment if you later add a password
+
+      # NetBox settings
       SECRET_KEY = "netbox-secret-key-change-me";
-      # Django / NetBox requires this. Include every name you'll hit (and 127.0.0.1 for healthcheck).
-      # Comma-separated string is accepted by the container entrypoint.
-      ALLOWED_HOSTS = "127.0.0.1,netbox.local";
+      # Include all names you'll hit:
+      ALLOWED_HOSTS = "127.0.0.1,localhost,netbox.local";
+
+      # Show full Python traceback for the "Waiting on DB…" loop:
+      DB_WAIT_DEBUG = "1";
+      # (optional) extend wait so you can read it:
+      DB_WAIT_TIMEOUT = "90";
     };
     
     extraOptions = [
@@ -110,6 +124,20 @@
     };
   };
 
+  # Ensure NetBox PostgreSQL extensions are created
+  systemd.services.netbox-db-extensions = {
+    description = "Ensure NetBox PostgreSQL extensions";
+    after = [ "postgresql.service" ];
+    requires = [ "postgresql.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = { Type = "oneshot"; User = "postgres"; };
+    script = ''
+      set -e
+      ${pkgs.postgresql_15}/bin/psql -v ON_ERROR_STOP=1 -d netbox -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
+      ${pkgs.postgresql_15}/bin/psql -v ON_ERROR_STOP=1 -d netbox -c "CREATE EXTENSION IF NOT EXISTS citext;"
+    '';
+  };
+
   # Ensure DB is ready and password is set BEFORE NetBox starts
   systemd.services.docker-netbox = {
     after = [
@@ -117,12 +145,14 @@
       "postgresql.service"
       "redis.service"
       "set-netbox-db-password.service"
+      "netbox-db-extensions.service"
     ];
     requires = [
       "docker.service"
       "postgresql.service"
       "redis.service"
       "set-netbox-db-password.service"
+      "netbox-db-extensions.service"
     ];
     serviceConfig = {
       Restart = "always";
