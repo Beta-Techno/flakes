@@ -1,3 +1,4 @@
+# DEPRECATED: Do not use; Jellyfin and MediaMTX are now split into -lite roles.
 # Media role - bundles media services
 { config, pkgs, lib, ... }:
 

@@ -9,13 +9,22 @@
     modules = [ ./../nixos/disko/infrastructure-01.nix ];
   };
 
-  # Staging media host
-  staging-media-01 = {
+  # Staging Jellyfin host (split from combined media role)
+  staging-jellyfin-01 = {
     system = "x86_64-linux";
-    role = "media";
+    role = "jellyfin-lite";
     ip = "10.0.1.12";
-    hostModule = ./../nixos/hosts/servers/media-01.nix;
-    modules = [ ./../nixos/disko/media-01.nix ];
+    hostModule = ./../nixos/hosts/servers/jellyfin-01.nix;
+    modules = [ ];
+  };
+
+  # Staging MediaMTX host (split from combined media role)
+  staging-mediamtx-01 = {
+    system = "x86_64-linux";
+    role = "mediamtx-lite";
+    ip = "10.0.1.13";
+    hostModule = ./../nixos/hosts/servers/mediamtx-01.nix;
+    modules = [ ];
   };
 
   # Staging applications host

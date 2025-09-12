@@ -19,12 +19,12 @@
     modules = [ ];
   };
 
-  # Media services host
-  media-01 = {
+  # MediaMTX host (separate from Jellyfin)
+  mediamtx-01 = {
     system = "x86_64-linux";
-    role = "media";
+    role = "mediamtx-lite";
     ip = "10.0.0.12";
-    hostModule = ./../nixos/hosts/servers/media-01.nix;
+    hostModule = ./../nixos/hosts/servers/mediamtx-01.nix;
     modules = [ ];
   };
 
