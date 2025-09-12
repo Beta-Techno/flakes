@@ -28,6 +28,16 @@
     modules = [ ];
   };
 
+  # Jellyfin-only host (clean, minimal setup)
+  jellyfin-01 = {
+    system = "x86_64-linux";
+    role = "jellyfin-lite";
+    # If you'll run DHCP, you can omit ip; if static, set it here for your notes:
+    # ip = "10.0.0.12";
+    hostModule = ./../nixos/hosts/servers/jellyfin-01.nix;
+    modules = [ ];
+  };
+
   # Database server host
   db-server-01 = {
     system = "x86_64-linux";

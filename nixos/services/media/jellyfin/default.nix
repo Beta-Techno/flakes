@@ -5,7 +5,8 @@
   # Jellyfin OCI container
   virtualisation.oci-containers.containers.jellyfin = {
     image = "jellyfin/jellyfin:latest";
-    ports = [ "8096:8096" ];
+    # Using host networking; container binds directly to host ports
+    # (so no need for explicit port mappings)
     
     volumes = [
       "/var/lib/jellyfin/config:/config:rw"
@@ -19,8 +20,8 @@
     };
     
     extraOptions = [
-      "--restart=unless-stopped"
       "--network=host"
+      # Let systemd handle restarts instead of Docker
     ];
   };
 
@@ -35,4 +36,12 @@
   environment.systemPackages = with pkgs; [
     jellyfin
   ];
+
+  # Ensure Jellyfin starts properly and restarts on failure
+  systemd.services.docker-jellyfin = {
+    serviceConfig = {
+      Restart = "always";
+      RestartSec = 5;
+    };
+  };
 }
