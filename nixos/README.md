@@ -15,11 +15,8 @@ nixos/
 ├── roles/             # Bundles of profiles for specific purposes
 │   ├── server.nix     # General server role (base + docker + nginx + cloudflared)
 │   ├── workstation.nix  # Development workstation role (base + docker + GUI)
-│   └── db-server.nix  # Database server role (server + postgres)
 └── hosts/             # Concrete machine configurations
     ├── servers/       # Production server hosts
-    │   ├── web-01.nix # Web server with nginx and cloudflared
-    │   └── db-01.nix  # Database server with PostgreSQL
     └── workstations/  # Development workstation hosts
         └── nick-laptop.nix  # Personal laptop with Home-Manager embedded
 ```
@@ -29,11 +26,11 @@ nixos/
 ### Deploy to a Server
 
 ```bash
-# Deploy to web-01 server
-nixos-rebuild switch --flake .#web-01
+# Deploy to netbox-01 server
+nixos-rebuild switch --flake .#netbox-01
 
-# Deploy to database server
-nixos-rebuild switch --flake .#db-01
+# Deploy to workstation
+nixos-rebuild switch --flake .#nick-laptop
 ```
 
 ### Deploy to a Workstation
@@ -47,10 +44,10 @@ nixos-rebuild switch --flake .#nick-laptop
 
 ```bash
 # Build configuration without applying
-nixos-rebuild build --flake .#web-01
+nixos-rebuild build --flake .#netbox-01
 
 # Build and test configuration
-nixos-rebuild test --flake .#web-01
+nixos-rebuild test --flake .#netbox-01
 ```
 
 ## Profiles
@@ -101,7 +98,6 @@ Bundles: base + docker-daemon
 - Media support
 - Hardware configuration
 
-### Database Server Role (`roles/db-server.nix`)
 Bundles: server + postgres
 - Database-optimized configuration
 - Performance tuning
@@ -109,17 +105,6 @@ Bundles: server + postgres
 - Replication support
 
 ## Hosts
-
-### Web Server (`hosts/servers/web-01.nix`)
-- Nginx virtual hosts for API and web app
-- Cloudflare tunnel configuration
-- Web development tools
-
-### Database Server (`hosts/servers/db-01.nix`)
-- PostgreSQL with multiple databases
-- Backup configuration
-- Database monitoring
-- Performance optimization
 
 ### Development Laptop (`hosts/workstations/nick-laptop.nix`)
 - Embedded Home-Manager configuration
@@ -140,7 +125,7 @@ This provides a seamless experience between Ubuntu/macOS development and NixOS w
 ## Adding New Hosts
 
 1. **Create a new host file** in `hosts/servers/` or `hosts/workstations/`
-2. **Import appropriate role** (server, workstation, db-server)
+2. **Import appropriate role** (server, workstation, netbox, etc.)
 3. **Add host-specific configuration**
 4. **Add to flake.nix** in `nixosConfigurations`
 5. **Deploy** with `nixos-rebuild switch --flake .#hostname`

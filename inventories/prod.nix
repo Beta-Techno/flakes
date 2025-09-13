@@ -38,23 +38,6 @@
     modules = [ ];
   };
 
-  # Database server host
-  db-server-01 = {
-    system = "x86_64-linux";
-    role = "db-server";
-    ip = "10.0.0.13";
-    hostModule = ./../nixos/hosts/servers/db-server-01.nix;
-    modules = [ ];
-  };
-
-  # Applications host
-  applications-01 = {
-    system = "x86_64-linux";
-    role = "apps";
-    ip = "10.0.0.14";
-    hostModule = ./../nixos/hosts/servers/applications-01.nix;
-    modules = [ ];
-  };
 
   # Development workstations (keep existing)
   nick-laptop = {

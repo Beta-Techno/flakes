@@ -210,13 +210,12 @@ ${BLUE}Next Steps:${NC}
 ${BLUE}Available Commands:${NC}
 - $INSTALL_PATH/scripts/deploy.sh --list-hosts          # Show available configurations
 - $INSTALL_PATH/scripts/deploy.sh nick-vm --dry-run # Test deployment
-- $INSTALL_PATH/scripts/deploy.sh web-01 --verbose      # Deploy with verbose output
-- $INSTALL_PATH/scripts/deploy.sh db-01 --rollback      # Rollback if needed
+- $INSTALL_PATH/scripts/deploy.sh netbox-01 --verbose      # Deploy with verbose output
+- $INSTALL_PATH/scripts/deploy.sh netbox-01 --rollback      # Rollback if needed
 
 ${BLUE}Available Hosts:${NC}
 - nick-laptop    - Development workstation
-- web-01         - Web server  
-- db-01          - Database server
+- netbox-01      - NetBox IPAM/DCIM server
 
 ${BLUE}Useful Aliases (add to your shell config):${NC}
 - alias deploy='$INSTALL_PATH/scripts/deploy.sh'

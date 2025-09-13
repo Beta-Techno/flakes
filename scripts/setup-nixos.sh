@@ -203,8 +203,8 @@ ${BLUE}Next Steps:${NC}
 ${BLUE}Available Commands:${NC}
 - deploy.sh --list-hosts          # Show available configurations
 - deploy.sh nick-laptop --dry-run # Test deployment
-- deploy.sh web-01 --verbose      # Deploy with verbose output
-- deploy.sh db-01 --rollback      # Rollback if needed
+- deploy.sh netbox-01 --verbose      # Deploy with verbose output
+- deploy.sh netbox-01 --rollback      # Rollback if needed
 
 ${BLUE}Useful Aliases:${NC}
 Add these to your shell configuration:

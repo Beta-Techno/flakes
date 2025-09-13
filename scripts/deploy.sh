@@ -7,8 +7,8 @@ set -euo pipefail
 # Usage: ./scripts/deploy.sh [HOST] [OPTIONS]
 # Examples:
 #   ./scripts/deploy.sh nick-laptop
-#   ./scripts/deploy.sh web-01 --dry-run
-#   ./scripts/deploy.sh db-01 --rollback
+#   ./scripts/deploy.sh netbox-01 --dry-run
+#   ./scripts/deploy.sh netbox-01 --rollback
 # =============================================================================
 
 # Colors for output
@@ -70,7 +70,7 @@ NixOS Deployment Script
 Usage: $0 [HOST] [OPTIONS]
 
 Arguments:
-  HOST                    Target host configuration (e.g., nick-laptop, web-01, db-01)
+  HOST                    Target host configuration (e.g., nick-laptop, netbox-01, jellyfin-01)
 
 Options:
   -h, --help             Show this help message
@@ -82,15 +82,13 @@ Options:
 
 Examples:
   $0 nick-laptop         Deploy nick-laptop configuration
-  $0 web-01 --dry-run    Build web-01 configuration without applying
-  $0 db-01 --rollback    Rollback db-01 to previous generation
+  $0 netbox-01 --dry-run    Build netbox-01 configuration without applying
+  $0 netbox-01 --rollback    Rollback netbox-01 to previous generation
   $0 --list-hosts        Show available host configurations
 
 Available Hosts:
   - nick-laptop          Development workstation
   - nick-vm              Development VM (Proxmox)
-  - web-01              Web server
-  - db-01               Database server
 
 Log file: $LOG_FILE
 EOF
@@ -100,8 +98,7 @@ list_hosts() {
     log "INFO" "Available host configurations:"
     echo "  nick-laptop    - Development workstation"
     echo "  nick-vm        - Development VM (Proxmox)"
-    echo "  web-01         - Web server"
-    echo "  db-01          - Database server"
+    echo "  netbox-01      - NetBox IPAM/DCIM server"
     echo ""
     log "INFO" "Use --dry-run to test configurations before deploying"
 }
@@ -109,7 +106,7 @@ list_hosts() {
 validate_host() {
     local host="$1"
     case "$host" in
-        "nick-laptop"|"nick-vm"|"web-01"|"db-01")
+        "nick-laptop"|"nick-vm"|"netbox-01")
             return 0
             ;;
         *)

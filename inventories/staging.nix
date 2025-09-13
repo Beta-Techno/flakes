@@ -27,12 +27,4 @@
     modules = [ ];
   };
 
-  # Staging applications host
-  staging-applications-01 = {
-    system = "x86_64-linux";
-    role = "apps";
-    ip = "10.0.1.14";
-    hostModule = ./../nixos/hosts/servers/applications-01.nix;
-    modules = [ ./../nixos/disko/applications-01.nix ];
-  };
 }

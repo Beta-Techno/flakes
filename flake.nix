@@ -108,16 +108,6 @@
           # Legacy configurations (keep existing ones working)
           legacyConfigs = {
             # Server configurations
-            web-01 = nixpkgs.lib.nixosSystem {
-              system = "x86_64-linux";
-              modules = [ ./nixos/hosts/servers/web-01.nix ];
-              specialArgs = { inherit inputs; };
-            };
-            db-01 = nixpkgs.lib.nixosSystem {
-              system = "x86_64-linux";
-              modules = [ ./nixos/hosts/servers/db-01.nix ];
-              specialArgs = { inherit inputs; };
-            };
             # Test netbox-01 as legacy config
             netbox-01-legacy = nixpkgs.lib.nixosSystem {
               system = "x86_64-linux";
