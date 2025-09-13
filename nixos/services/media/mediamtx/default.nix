@@ -20,11 +20,11 @@
     logLevel: info
     logDestinations: [stdout]
 
-    # Management
+    # Management - listen on all interfaces, no authentication
     api: yes
-    apiAddress: 0.0.0.0:9997
+    apiAddress: :9997
     metrics: yes
-    metricsAddress: 0.0.0.0:9998
+    metricsAddress: :9998
 
     # Protocol listeners
     rtspAddress: :8554
@@ -34,6 +34,9 @@
     webrtcEncryption: no
     webrtcAllowOrigin: "*"
 
+    # Authentication - disable for external access
+    authMethod: none
+    
     # Allow clients to publish any path
     paths:
       all:
