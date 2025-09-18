@@ -70,12 +70,8 @@
 
   # Create backup user and group (referenced by tmpfiles rules above)
   users.groups.backup = { };
-  users.users.backup = {
-    isSystemUser = true;
-    group = "backup";
-    shell = lib.mkDefault pkgs.bash;
-    # Set password manually: sudo passwd backup
-  };
+  # Let NixOS create the backup user automatically from tmpfiles rules
+  # users.users.backup will be created automatically
 
   # Backup management tools
   environment.systemPackages = with pkgs; [
