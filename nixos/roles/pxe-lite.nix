@@ -5,11 +5,12 @@ let
   httpRoot = "/srv/pxe";
 in
 {
-  # Keep base hardening + open 80/443 rules from your existing nginx profile
   imports = [
     ../profiles/base.nix
     ../profiles/nginx.nix
   ];
+
+  system.stateVersion = "24.11";
 
   # Create directories for TFTP and HTTP assets
   systemd.tmpfiles.rules = [
