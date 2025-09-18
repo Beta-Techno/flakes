@@ -46,7 +46,7 @@
     };
   };
 
-  # Create storage directories
+  # Create storage directories and web dashboard
   systemd.tmpfiles.rules = [
     # Application backups
     "d /var/storage/backups/netbox 0755 backup backup -"
@@ -63,6 +63,9 @@
     "d /var/storage/archives 0755 backup backup -"
     "d /var/storage/archives/logs 0755 backup backup -"
     "d /var/storage/archives/configs 0755 backup backup -"
+    
+    # Web dashboard
+    "d /var/www/storage-dashboard 0755 nginx nginx -"
   ];
 
   # Create backup user
@@ -117,10 +120,7 @@
     };
   };
 
-  # Create a simple storage dashboard
-  systemd.tmpfiles.rules = [
-    "d /var/www/storage-dashboard 0755 nginx nginx -"
-  ];
+  # Create a simple storage dashboard (directory created above in tmpfiles.rules)
 
   # Simple storage dashboard HTML
   environment.etc."storage-dashboard/index.html".text = ''
