@@ -82,6 +82,11 @@
       # NetBox/Django - allow everything (trusted internal network)
       ALLOWED_HOSTS = "*";
 
+      # CORS configuration for cross-origin requests
+      CORS_ALLOWED_ORIGINS = "*";
+      CORS_ALLOW_CREDENTIALS = "true";
+      CORS_ALLOW_ALL_ORIGINS = "true";
+
       # Diagnostics
       DB_WAIT_DEBUG = "1";
       DB_WAIT_TIMEOUT = "90";
@@ -201,6 +206,23 @@
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # CORS headers for cross-origin requests
+        add_header Access-Control-Allow-Origin "*" always;
+        add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization" always;
+        add_header Access-Control-Allow-Credentials "true" always;
+        
+        # Handle preflight OPTIONS requests
+        if ($request_method = 'OPTIONS') {
+          add_header Access-Control-Allow-Origin "*";
+          add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS";
+          add_header Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization";
+          add_header Access-Control-Allow-Credentials "true";
+          add_header Content-Length 0;
+          add_header Content-Type text/plain;
+          return 204;
+        }
       '';
     };
   };
