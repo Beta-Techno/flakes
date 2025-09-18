@@ -68,11 +68,12 @@
     "d /var/www/storage-dashboard 0755 nginx nginx -"
   ];
 
-  # Create backup user
+  # Create backup user and group (referenced by tmpfiles rules above)
+  users.groups.backup = { };
   users.users.backup = {
-    isNormalUser = true;
-    extraGroups = [ "wheel" "backup" ];
-    shell = pkgs.bash;
+    isSystemUser = true;
+    group = "backup";
+    shell = lib.mkDefault pkgs.bash;
     # Set password manually: sudo passwd backup
   };
 
