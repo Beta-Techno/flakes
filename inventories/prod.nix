@@ -48,6 +48,16 @@
     modules = [ ];
   };
 
+  # Storage server host (backup and storage services)
+  storage-01 = {
+    system = "x86_64-linux";
+    role = "storage-server";
+    # static IP optional; DHCP is fine for the first pass
+    # ip = "10.0.0.16";
+    hostModule = ./../nixos/hosts/servers/storage-01.nix;
+    modules = [ ];
+  };
+
 
   # Development workstations (keep existing)
   nick-laptop = {
