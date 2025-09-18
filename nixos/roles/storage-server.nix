@@ -64,14 +64,22 @@
     "d /var/storage/archives/logs 0755 backup backup -"
     "d /var/storage/archives/configs 0755 backup backup -"
     
-    # Web dashboard
-    "d /var/www/storage-dashboard 0755 nginx nginx -"
   ];
 
   # Create backup user and group (referenced by tmpfiles rules above)
   users.groups.backup = { };
   # Let NixOS create the backup user automatically from tmpfiles rules
   # users.users.backup will be created automatically
+
+  # Ensure storage directories exist immediately on switch (not just at boot)
+  system.activationScripts.ensureStorageDirs.text = ''
+    set -e
+    mkdir -p /var/storage/backups/{netbox,pxe,infrastructure}
+    mkdir -p /var/storage/vm-snapshots/{daily,weekly,monthly}
+    mkdir -p /var/storage/archives/{logs,configs}
+    chown -R backup:backup /var/storage
+    chmod -R 755 /var/storage
+  '';
 
   # Backup management tools
   environment.systemPackages = with pkgs; [
@@ -109,63 +117,66 @@
     139  # NetBIOS
   ];
 
-  # Web interface for storage management
-  services.nginx.virtualHosts."storage.local" = {
-    root = "/var/www/storage-dashboard";
-    locations."/" = {
-      tryFiles = "$uri $uri/ /index.html";
-    };
-  };
-
-  # Create a simple storage dashboard (directory created above in tmpfiles.rules)
-
-  # Simple storage dashboard HTML
-  environment.etc."storage-dashboard/index.html".text = ''
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Storage Server Dashboard</title>
-        <style>
-            body { font-family: Arial, sans-serif; margin: 40px; }
-            .container { max-width: 800px; margin: 0 auto; }
-            .section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
-            .status { color: green; font-weight: bold; }
-            pre { background: #f5f5f5; padding: 10px; border-radius: 3px; overflow-x: auto; }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>Storage Server Dashboard</h1>
-            
-            <div class="section">
-                <h2>Storage Status</h2>
-                <p class="status">✓ Storage server is running</p>
-                <p>Available shares:</p>
-                <ul>
-                    <li><strong>netbox-backups</strong> - Netbox database and media backups</li>
-                    <li><strong>pxe-backups</strong> - PXE server configurations</li>
-                    <li><strong>vm-snapshots</strong> - Proxmox VM snapshots</li>
-                    <li><strong>archives</strong> - Long-term storage</li>
-                </ul>
-            </div>
-            
-            <div class="section">
-                <h2>Quick Commands</h2>
-                <p>Connect to storage shares:</p>
-                <pre># From Linux/Mac
+  # Create storage dashboard HTML
+  let
+    storageDashboard = pkgs.writeTextDir "index.html" ''
+      <!DOCTYPE html>
+      <html>
+      <head>
+          <title>Storage Server Dashboard</title>
+          <style>
+              body { font-family: Arial, sans-serif; margin: 40px; }
+              .container { max-width: 800px; margin: 0 auto; }
+              .section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+              .status { color: green; font-weight: bold; }
+              pre { background: #f5f5f5; padding: 10px; border-radius: 3px; overflow-x: auto; }
+          </style>
+      </head>
+      <body>
+          <div class="container">
+              <h1>Storage Server Dashboard</h1>
+              
+              <div class="section">
+                  <h2>Storage Status</h2>
+                  <p class="status">✓ Storage server is running</p>
+                  <p>Available shares:</p>
+                  <ul>
+                      <li><strong>netbox-backups</strong> - Netbox database and media backups</li>
+                      <li><strong>pxe-backups</strong> - PXE server configurations</li>
+                      <li><strong>vm-snapshots</strong> - Proxmox VM snapshots</li>
+                      <li><strong>archives</strong> - Long-term storage</li>
+                  </ul>
+              </div>
+              
+              <div class="section">
+                  <h2>Quick Commands</h2>
+                  <p>Connect to storage shares:</p>
+                  <pre># From Linux/Mac
 smbclient //storage.local/netbox-backups -U backup
 
 # From Windows
 \\storage.local\netbox-backups</pre>
-            </div>
-            
-            <div class="section">
-                <h2>Backup Status</h2>
-                <p>Check backup directories:</p>
-                <pre>ls -la /var/storage/backups/</pre>
-            </div>
-        </div>
-    </body>
-    </html>
-  '';
+              </div>
+              
+              <div class="section">
+                  <h2>Backup Status</h2>
+                  <p>Check backup directories:</p>
+                  <pre>ls -la /var/storage/backups/</pre>
+              </div>
+          </div>
+      </body>
+      </html>
+    '';
+  in
+
+  # Web interface for storage management
+  services.nginx.virtualHosts."storage.local" = {
+    # Make this the default so curl to localhost works
+    default = true;
+    # Serve the static content directly from the Nix store
+    root = storageDashboard;
+    locations."/" = {
+      tryFiles = "$uri $uri/ /index.html";
+    };
+  };
 }
