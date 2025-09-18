@@ -31,7 +31,7 @@ in
   environment.etc."pxe/ipxe/test.ipxe".text = ''
     #!ipxe
     dhcp
-    echo iPXE OK: MAC ${net0/mac} IP ${net0/ip}
+    echo iPXE OK: MAC $''${net0/mac} IP $''${net0/ip}
     sleep 2
     echo Booting local disk in 3s... (Ctrl-B for iPXE shell)
     sleep 3
