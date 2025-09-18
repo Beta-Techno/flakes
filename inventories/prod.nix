@@ -38,6 +38,16 @@
     modules = [ ];
   };
 
+  # PXE server host (network boot services)
+  pxe-01 = {
+    system = "x86_64-linux";
+    role = "pxe-lite";
+    # static IP optional; DHCP is fine for the first pass
+    # ip = "10.0.0.15";
+    hostModule = ./../nixos/hosts/servers/pxe-01.nix;
+    modules = [ ];
+  };
+
 
   # Development workstations (keep existing)
   nick-laptop = {
