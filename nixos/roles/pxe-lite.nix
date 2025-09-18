@@ -23,8 +23,6 @@ in
     root = httpRoot;
     # publish the scripts managed by Nix under /etc
     locations."/ipxe/".alias = "/etc/pxe/ipxe/";
-    # Browseable (handy while testing) - moved to locations block to avoid conflicts
-    locations."/ipxe/".extraConfig = ''autoindex on;'';
   };
 
   # Provide a tiny, non-destructive iPXE script (HTTP-served)
