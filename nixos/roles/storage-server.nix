@@ -120,7 +120,7 @@ in
 
   # Create backup user and group (referenced by tmpfiles rules above)
   users.groups.backup = { };
-  users.users.backup = {
+  users.users.backup = lib.mkForce {
     isSystemUser = true;
     group = "backup";
     shell = pkgs.bash;
