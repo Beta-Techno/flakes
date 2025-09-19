@@ -123,15 +123,7 @@ in
   # Let NixOS create the backup user automatically from tmpfiles rules
   # users.users.backup will be created automatically
 
-  # Ensure storage directories exist immediately on switch (not just at boot)
-  system.activationScripts.ensureStorageDirs.text = ''
-    set -e
-    mkdir -p /var/storage/backups/{netbox,pxe,infrastructure}
-    mkdir -p /var/storage/vm-snapshots/{daily,weekly,monthly}
-    mkdir -p /var/storage/archives/{logs,configs}
-    chown -R backup:backup /var/storage
-    chmod -R 755 /var/storage
-  '';
+  # Storage directories will be created by tmpfiles rules after user creation
 
   # Backup management tools
   environment.systemPackages = with pkgs; [
