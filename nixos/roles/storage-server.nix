@@ -120,11 +120,27 @@ in
 
   # Create backup user and group (referenced by tmpfiles rules above)
   users.groups.backup = { };
-  users.users.backup = lib.mkForce {
-    isSystemUser = true;
+  users.users.backup = {
+    isNormalUser = true;
+    createHome = true;
+    home = "/home/backup";
     group = "backup";
-    # Set password manually: sudo passwd backup
+    shell = pkgs.bashInteractive;
+    # Add the NetBox backup public key here after first deploy
+    openssh.authorizedKeys.keys = [
+      # paste from /var/lib/netbox-backup/id_ed25519.pub on netbox-01
+      # "ssh-ed25519 AAAA... netbox-01-backup"
+    ];
   };
+
+  # Optional: further lock down the backup user
+  services.openssh.extraConfig = ''
+    Match User backup
+      PubkeyAuthentication yes
+      PasswordAuthentication no
+      # Uncomment to force SFTP only (no shell):
+      # ForceCommand internal-sftp
+  '';
 
   # Storage directories will be created by tmpfiles rules after user creation
 

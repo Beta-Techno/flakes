@@ -25,9 +25,14 @@
   # Enable Redis for NetBox
   services.redis.enable = true;
 
-  # Create /var/lib/netbox for secrets/env
+  # Host-side directories for mounts + backups
   systemd.tmpfiles.rules = [
     "d /var/lib/netbox 0700 root root -"
+    "d /var/lib/netbox/media 0755 root root -"
+    "d /var/lib/netbox/reports 0755 root root -"
+    "d /var/lib/netbox/scripts 0755 root root -"
+    "d /var/backups/netbox 0750 root root -"
+    "d /var/lib/netbox-backup 0700 root root -"
   ];
 
   # One-shot unit that creates a stable SECRET_KEY once
@@ -57,8 +62,12 @@
   # Netbox container
   virtualisation.oci-containers.containers.netbox = {
     image = "netboxcommunity/netbox:v4.3.7";
-    # Using host networking; container binds directly to host ports
-    # (so no need for explicit port mappings)
+    # Persist files that are NOT in the database
+    volumes = [
+      "/var/lib/netbox/media:/opt/netbox/netbox/media:rw"
+      "/var/lib/netbox/reports:/opt/netbox/netbox/reports:rw"
+      "/var/lib/netbox/scripts:/opt/netbox/netbox/scripts:rw"
+    ];
     
     environmentFiles = [ "/var/lib/netbox/env" ];
     environment = {
@@ -196,6 +205,101 @@
     };
   };
 
+  # ────────────────────────────── Backups ─────────────────────────────────────
+  # One-time: generate SSH keypair used to push backups to storage-01
+  systemd.services.netbox-backup-keygen = {
+    description = "Generate SSH key for NetBox backups";
+    wantedBy = [ "multi-user.target" ];
+    before = [ "netbox-backup.timer" ];
+    serviceConfig = { Type = "oneshot"; };
+    script = ''
+      set -e
+      install -d -m 0700 /var/lib/netbox-backup
+      if [ ! -f /var/lib/netbox-backup/id_ed25519 ]; then
+        ${pkgs.openssh}/bin/ssh-keygen -t ed25519 -N "" -f /var/lib/netbox-backup/id_ed25519
+        echo "=== NetBox backup public key (add this to backup@storage-01) ==="
+        cat /var/lib/netbox-backup/id_ed25519.pub
+      fi
+      chmod 600 /var/lib/netbox-backup/id_ed25519
+    '';
+  };
+
+  systemd.services.netbox-backup = {
+    description = "NetBox daily backup → storage-01";
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+      TimeoutStartSec = "30min";
+    };
+    # Minimal PATH for all tools we call
+    environment.PATH =
+      lib.makeBinPath [ pkgs.coreutils pkgs.util-linux pkgs.bash pkgs.openssh
+                        pkgs.postgresql_15 pkgs.tar pkgs.zstd pkgs.rsync
+                        pkgs.docker pkgs.jq ];
+    script = ''
+      set -euo pipefail
+      BACKUP_ROOT=/var/backups/netbox
+      TS=$(date -u +%Y%m%dT%H%M%SZ)
+      HOST=$(hostname)
+      STAMP_DIR="$BACKUP_ROOT/$TS"
+      mkdir -p "$STAMP_DIR"
+
+      # 1) Database dump (custom format; best for pg_restore)
+      export PGPASSWORD=netbox123
+      pg_dump -h 127.0.0.1 -U netbox -d netbox -Fc -f "$STAMP_DIR/netbox.pgsql.dump"
+      unset PGPASSWORD
+
+      # 2) Media and reports (best effort)
+      if [ -d /var/lib/netbox/media ];   then tar -C /var/lib/netbox -cf "$STAMP_DIR/media.tar"   media; fi
+      if [ -d /var/lib/netbox/reports ]; then tar -C /var/lib/netbox -cf "$STAMP_DIR/reports.tar" reports || true; fi
+      [ -f /var/lib/netbox/secret-key ] && cp /var/lib/netbox/secret-key "$STAMP_DIR/secret-key"
+
+      # 3) Container image tag (traceability)
+      docker inspect netbox 2>/dev/null | jq -r '.[0].Config.Image // empty' > "$STAMP_DIR/image.txt" || true
+
+      # 4) Manifest
+      cat > "$STAMP_DIR/manifest.json" <<JSON
+      { "host":"$HOST","timestamp":"$TS","db_format":"pg_dump -Fc","has_media":$( [ -f "$STAMP_DIR/media.tar" ] && echo true || echo false ) }
+JSON
+
+      # 5) Compress tars (faster transfer)
+      for t in media.tar reports.tar; do
+        [ -f "$STAMP_DIR/$t" ] && zstd -19 --rm "$STAMP_DIR/$t"
+      done
+
+      # 6) Push to storage-01 via rsync+ssh
+      DEST="backup@storage-01:/var/storage/backups/netbox/$HOST/$TS/"
+      SSH="ssh -i /var/lib/netbox-backup/id_ed25519 -o StrictHostKeyChecking=accept-new"
+      rsync -az --chmod=Fu=rw,Fg=r,Do=r --delete -e "$SSH" "$STAMP_DIR/" "$DEST"
+
+      # Convenience: update local "latest" symlink
+      ln -sfn "$STAMP_DIR" "$BACKUP_ROOT/latest"
+    '';
+  };
+
+  systemd.timers.netbox-backup = {
+    description = "Schedule NetBox backups";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "02:30";
+      Persistent = true;
+      RandomizedDelaySec = "15m";
+    };
+  };
+
+  # Prune local copies older than 14 days (remote retention is your policy)
+  systemd.services.netbox-backup-prune = {
+    description = "Prune old local NetBox backups";
+    serviceConfig.Type = "oneshot";
+    script = ''
+      find /var/backups/netbox -maxdepth 1 -type d -name "20????????T??????Z" -mtime +14 -print -exec rm -rf {} +
+    '';
+  };
+  systemd.timers.netbox-backup-prune = {
+    wantedBy = [ "timers.target" ];
+    timerConfig.OnCalendar = "daily";
+  };
+
   # Nginx reverse proxy for Netbox
   services.nginx.virtualHosts."netbox.local" = {
     locations."/" = {
@@ -232,6 +336,11 @@
     # Database tools
     postgresql_15
     pgcli
+    
+    # Backup tools
+    rsync
+    zstd
+    jq
     
     # Monitoring tools
     htop
