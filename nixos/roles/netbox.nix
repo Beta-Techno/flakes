@@ -22,8 +22,8 @@
   virtualisation.docker.enable = true;
   users.users.root.extraGroups = [ "docker" ];
 
-  # Enable Redis for NetBox
-  services.redis.enable = true;
+  # Enable Redis for NetBox (new module path)
+  services.redis.servers."".enable = true;
 
   # Host-side directories for mounts + backups
   systemd.tmpfiles.rules = [
@@ -234,7 +234,7 @@
     # Minimal PATH for all tools we call
     environment.PATH =
       lib.makeBinPath [ pkgs.coreutils pkgs.util-linux pkgs.bash pkgs.openssh
-                        pkgs.postgresql_15 pkgs.tar pkgs.zstd pkgs.rsync
+                        pkgs.postgresql_15 pkgs.gnutar pkgs.zstd pkgs.rsync
                         pkgs.docker pkgs.jq ];
     script = ''
       set -euo pipefail
