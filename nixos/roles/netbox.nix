@@ -310,6 +310,7 @@ JSON
 
   # Nginx reverse proxy for Netbox
   services.nginx.virtualHosts."netbox.local" = {
+    default = true;  # catch-all for any Host/IP on :80
     locations."/" = {
       proxyPass = "http://localhost:8080";
       proxyWebsockets = true;
@@ -318,21 +319,16 @@ JSON
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        
-        # CORS headers for cross-origin requests
+
+        # CORS headers for cross-origin requests (apply to all responses)
         add_header Access-Control-Allow-Origin "*" always;
         add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;
         add_header Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization" always;
         add_header Access-Control-Allow-Credentials "true" always;
-        
+
         # Handle preflight OPTIONS requests
-        if ($request_method = 'OPTIONS') {
-          add_header Access-Control-Allow-Origin "*";
-          add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS";
-          add_header Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization";
-          add_header Access-Control-Allow-Credentials "true";
-          add_header Content-Length 0;
-          add_header Content-Type text/plain;
+        if ($request_method = OPTIONS) {
+          # headers above still apply ('always') to this 204
           return 204;
         }
       '';
