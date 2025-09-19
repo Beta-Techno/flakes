@@ -3,7 +3,6 @@
 {
   imports = [
     ../../profiles/boot/uefi-sdboot.nix    # or bios-grub.nix if this box is legacy BIOS
-    ../../roles/pxe-lite.nix
   ];
 
   system.stateVersion = "24.11";

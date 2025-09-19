@@ -4,7 +4,6 @@
 {
   imports = [
     ../../profiles/boot/uefi-sdboot.nix
-    ../../roles/storage-server.nix
   ];
 
   system.stateVersion = "24.11";
