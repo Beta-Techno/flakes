@@ -26,13 +26,8 @@
 
     # Global configuration
     appendHttpConfig = ''
-      # Rate limiting
+      # Rate limiting zone (use per‑vhost with: limit_req zone=api burst=20 nodelay;)
       limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
-      
-      # Security headers
-      add_header X-Frame-Options DENY;
-      add_header X-Content-Type-Options nosniff;
-      add_header X-XSS-Protection "1; mode=block";
     '';
   };
 

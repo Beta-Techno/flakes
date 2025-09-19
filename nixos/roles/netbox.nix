@@ -310,27 +310,35 @@ JSON
 
   # Nginx reverse proxy for Netbox
   services.nginx.virtualHosts."netbox.local" = {
-    default = true;  # catch-all for any Host/IP on :80
+    default = true;  # catch‑all for any Host/IP on :80
+
+    # ── Server-level headers + preflight (simple & valid) ─────────
+    extraConfig = ''
+      # Security headers (apply to all responses)
+      add_header X-Frame-Options DENY;
+      add_header X-Content-Type-Options nosniff;
+      add_header X-XSS-Protection "1; mode=block";
+
+      # CORS headers (apply to all responses, including 204)
+      add_header Access-Control-Allow-Origin "*" always;
+      add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;
+      add_header Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization" always;
+      add_header Access-Control-Allow-Credentials "true" always;
+
+      # Reply immediately to preflight anywhere on this vhost
+      if ($request_method = OPTIONS) { return 204; }
+    '';
+
+    # ── Only proxying stays in the location ───────────────────────
     locations."/" = {
-      proxyPass = "http://localhost:8080";
+      proxyPass = "http://127.0.0.1:8080";
       proxyWebsockets = true;
       extraConfig = ''
+        proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-
-        # CORS headers for cross-origin requests (apply to all responses)
-        add_header Access-Control-Allow-Origin "*" always;
-        add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;
-        add_header Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization" always;
-        add_header Access-Control-Allow-Credentials "true" always;
-
-        # Handle preflight OPTIONS requests
-        if ($request_method = OPTIONS) {
-          # headers above still apply ('always') to this 204
-          return 204;
-        }
       '';
     };
   };
