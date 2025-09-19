@@ -231,11 +231,19 @@
       User = "root";
       TimeoutStartSec = "30min";
     };
-    # Minimal PATH for all tools we call
-    environment.PATH =
-      lib.makeBinPath [ pkgs.coreutils pkgs.util-linux pkgs.bash pkgs.openssh
-                        pkgs.postgresql_15 pkgs.gnutar pkgs.zstd pkgs.rsync
-                        pkgs.docker pkgs.jq ];
+    # Let NixOS compose PATH correctly for the script
+    path = [
+      pkgs.coreutils
+      pkgs.util-linux
+      pkgs.bash
+      pkgs.openssh
+      pkgs.postgresql_15
+      pkgs.gnutar
+      pkgs.zstd
+      pkgs.rsync
+      pkgs.docker
+      pkgs.jq
+    ];
     script = ''
       set -euo pipefail
       BACKUP_ROOT=/var/backups/netbox
