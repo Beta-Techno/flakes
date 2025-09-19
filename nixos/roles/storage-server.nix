@@ -123,7 +123,6 @@ in
   users.users.backup = lib.mkForce {
     isSystemUser = true;
     group = "backup";
-    shell = pkgs.bash;
     # Set password manually: sudo passwd backup
   };
 
