@@ -128,8 +128,7 @@ in
     shell = pkgs.bashInteractive;
     # Add the NetBox backup public key here after first deploy
     openssh.authorizedKeys.keys = [
-      # paste from /var/lib/netbox-backup/id_ed25519.pub on netbox-01
-      # "ssh-ed25519 AAAA... netbox-01-backup"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGmZwSJ7zgQd6KJbnBDfYdLRvBDJ0eLXzrnEZ1TTciU root@nixos"
     ];
   };
 
