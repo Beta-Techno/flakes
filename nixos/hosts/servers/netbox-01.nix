@@ -5,6 +5,9 @@
   # Network configuration (DHCP for simplicity and reliability)
   networking.useDHCP = true;
 
+  # Reach storage-01 by name even on DHCP
+  networking.hosts."10.1.10.51" = [ "storage-01" ];
+
   # Filesystems (UEFI needs a real ESP mounted at /boot)
   fileSystems."/" = {
     device = "/dev/disk/by-label/nixos";

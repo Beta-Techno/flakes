@@ -224,8 +224,34 @@
     '';
   };
 
+  # Seed and pin known_hosts for the backup user (one‑shot, idempotent)
+  systemd.services.netbox-backup-knownhosts = {
+    description = "Seed known_hosts for NetBox backup SSH";
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = { Type = "oneshot"; };
+    script = ''
+      set -euo pipefail
+      install -d -m 0700 /var/lib/netbox-backup
+      # Seed both name and IP (adjust IP if your DHCP changes later)
+      {
+        ${pkgs.openssh}/bin/ssh-keyscan -t ed25519 storage-01 || true
+        ${pkgs.openssh}/bin/ssh-keyscan -t ed25519 10.1.10.51 || true
+      } | sort -u > /var/lib/netbox-backup/known_hosts.new
+      install -m 0644 /var/lib/netbox-backup/known_hosts.new /var/lib/netbox-backup/known_hosts
+      rm -f /var/lib/netbox-backup/known_hosts.new
+    '';
+  };
+
   systemd.services.netbox-backup = {
     description = "NetBox daily backup → storage-01";
+    after = [
+      "network-online.target"
+      "netbox-backup-keygen.service"
+      "netbox-backup-knownhosts.service"
+    ];
+    wants = [ "network-online.target" "netbox-backup-keygen.service" "netbox-backup-knownhosts.service" ];
     serviceConfig = {
       Type = "oneshot";
       User = "root";
@@ -235,6 +261,7 @@
     path = [
       pkgs.coreutils
       pkgs.util-linux
+      pkgs.inetutils         # <- provides `hostname`
       pkgs.bash
       pkgs.openssh
       pkgs.postgresql_15
@@ -276,9 +303,16 @@ JSON
       done
 
       # 6) Push to storage-01 via rsync+ssh
+      SSH="ssh -i /var/lib/netbox-backup/id_ed25519 \
+           -o IdentitiesOnly=yes \
+           -o UserKnownHostsFile=/var/lib/netbox-backup/known_hosts \
+           -o StrictHostKeyChecking=yes"
+
       DEST="backup@storage-01:/var/storage/backups/netbox/$HOST/$TS/"
-      SSH="ssh -i /var/lib/netbox-backup/id_ed25519 -o StrictHostKeyChecking=accept-new"
-      rsync -az --chmod=Fu=rw,Fg=r,Do=r --delete -e "$SSH" "$STAMP_DIR/" "$DEST"
+
+      # NOTE: --mkpath makes the remote parents automatically
+      rsync -az --mkpath --chmod=Fu=rw,Fg=r,Do=r --delete \
+        -e "$SSH" "$STAMP_DIR/" "$DEST"
 
       # Convenience: update local "latest" symlink
       ln -sfn "$STAMP_DIR" "$BACKUP_ROOT/latest"
