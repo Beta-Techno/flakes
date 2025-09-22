@@ -126,9 +126,9 @@ in
     home = "/home/backup";
     group = "backup";
     shell = pkgs.bashInteractive;
-    # Add the NetBox backup public key from version control
+    # Authorize the NetBox backup public key (committed once, stable)
     openssh.authorizedKeys.keys = [
-      (builtins.readFile ./../services/infrastructure/netbox/backup_key.pub)
+      (builtins.readFile ../keys/service/netbox-backup.pub)
     ];
   };
 
