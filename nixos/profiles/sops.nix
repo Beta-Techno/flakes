@@ -6,7 +6,10 @@
 
   sops = {
     defaultSopsFile = ../../secrets/prod.yaml;
-    age.keyFile = "/var/lib/sops-nix/key.txt";
+    age = {
+      keyFile = "/var/lib/sops-nix/key.txt";
+      generateKey = true;
+    };
     
     # Secrets that will be available to the system
     secrets = {
@@ -41,6 +44,13 @@
         owner = "nginx";
         group = "nginx";
         mode = "0400";
+      };
+      
+      # NetBox backup SSH private key
+      netbox-backup-private-key = {
+        owner = "root";
+        group = "root";
+        mode = "0600";
       };
     };
   };

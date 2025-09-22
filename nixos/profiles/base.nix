@@ -24,6 +24,11 @@
       PermitRootLogin = "no";
       PasswordAuthentication = false;
       PubkeyAuthentication = true;
+      KbdInteractiveAuthentication = false;
+      MaxAuthTries = 3;
+      LoginGraceTime = "30s";
+      X11Forwarding = false;
+      AllowTcpForwarding = "no";
     };
   };
 

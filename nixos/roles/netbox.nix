@@ -7,6 +7,7 @@
     ../profiles/docker-daemon.nix
     ../profiles/nginx.nix
     ../profiles/postgres.nix
+    ../profiles/sops.nix
     # Bootloader is hardware-specific; pick it in the host file
   ];
 
@@ -53,6 +54,10 @@
         fi
         # Write env-file that oci-containers will read
         printf "SECRET_KEY=%s\n" "$(tr -d '\n' </var/lib/netbox/secret-key)" > /var/lib/netbox/env
+        # Inject DB password from SOPS into the same env-file NetBox reads
+        if [ -r ${config.sops.secrets.postgres-password.path} ]; then
+          printf "DB_PASSWORD=%s\n" "$(tr -d '\n' < ${config.sops.secrets.postgres-password.path})" >> /var/lib/netbox/env
+        fi
         chmod 600 /var/lib/netbox/env
       ''}";
       RemainAfterExit = true;
@@ -78,7 +83,7 @@
       DB_PORT = "5432";
       DB_NAME = "netbox";
       DB_USER = "netbox";
-      DB_PASSWORD = "netbox123";
+      # DB_PASSWORD injected via /var/lib/netbox/env (netbox-secrets service)
 
       # Make SSL intent explicit (you disabled server SSL)
       DB_SSLMODE = "disable";
@@ -158,11 +163,13 @@
     after = [ "postgresql.service" ];
     requires = [ "postgresql.service" ];
     wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      User = "postgres";
-      ExecStart = "${pkgs.postgresql_15}/bin/psql -tAc \"ALTER ROLE netbox WITH PASSWORD 'netbox123';\"";
-    };
+    serviceConfig = { Type = "oneshot"; User = "postgres"; };
+    script = ''
+      set -e
+      PW="$(tr -d '\n' < ${config.sops.secrets.postgres-password.path})"
+      ${pkgs.postgresql_15}/bin/psql -v ON_ERROR_STOP=1 -d postgres \
+        -c "ALTER ROLE netbox WITH PASSWORD '${PW}';"
+    '';
   };
 
   # Ensure NetBox PostgreSQL extensions are created
@@ -201,26 +208,26 @@
       Restart = "always";
       RestartSec = 5;
       # Gate startup on a successful login using the same creds the container will use.
-      ExecStartPre = "${pkgs.bash}/bin/sh -c 'PGPASSWORD=netbox123 ${pkgs.postgresql_15}/bin/pg_isready -h 127.0.0.1 -p 5432 -U netbox && PGPASSWORD=netbox123 ${pkgs.postgresql_15}/bin/psql -h 127.0.0.1 -U netbox -d netbox -c \"select 1\"'";
+      ExecStartPre = "${pkgs.bash}/bin/bash -euo pipefail -c 'PW=$(tr -d \\\\n < ${config.sops.secrets.postgres-password.path}); PGPASSWORD=$PW ${pkgs.postgresql_15}/bin/pg_isready -h 127.0.0.1 -p 5432 -U netbox && PGPASSWORD=$PW ${pkgs.postgresql_15}/bin/psql -h 127.0.0.1 -U netbox -d netbox -c \"select 1\"'";
     };
   };
 
   # ────────────────────────────── Backups ─────────────────────────────────────
-  # One-time: generate SSH keypair used to push backups to storage-01
+  # Setup SSH keypair from SOPS for NetBox backups
   systemd.services.netbox-backup-keygen = {
-    description = "Generate SSH key for NetBox backups";
+    description = "Setup SSH key for NetBox backups from SOPS";
     wantedBy = [ "multi-user.target" ];
     before = [ "netbox-backup.timer" ];
     serviceConfig = { Type = "oneshot"; };
     script = ''
       set -e
       install -d -m 0700 /var/lib/netbox-backup
-      if [ ! -f /var/lib/netbox-backup/id_ed25519 ]; then
-        ${pkgs.openssh}/bin/ssh-keygen -t ed25519 -N "" -f /var/lib/netbox-backup/id_ed25519
-        echo "=== NetBox backup public key (add this to backup@storage-01) ==="
-        cat /var/lib/netbox-backup/id_ed25519.pub
-      fi
+      # Copy private key from SOPS to backup location
+      cp ${config.sops.secrets.netbox-backup-private-key.path} /var/lib/netbox-backup/id_ed25519
       chmod 600 /var/lib/netbox-backup/id_ed25519
+      # Generate public key from private key
+      ${pkgs.openssh}/bin/ssh-keygen -y -f /var/lib/netbox-backup/id_ed25519 > /var/lib/netbox-backup/id_ed25519.pub
+      chmod 644 /var/lib/netbox-backup/id_ed25519.pub
     '';
   };
 
