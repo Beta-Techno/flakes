@@ -237,7 +237,7 @@
       # Seed both name and IP (adjust IP if your DHCP changes later)
       {
         ${pkgs.openssh}/bin/ssh-keyscan -t ed25519 storage-01 || true
-        ${pkgs.openssh}/bin/ssh-keyscan -t ed25519 10.1.10.68 || true
+        ${pkgs.openssh}/bin/ssh-keyscan -t ed25519 10.1.10.72 || true
       } | sort -u > /var/lib/netbox-backup/known_hosts.new
       install -m 0644 /var/lib/netbox-backup/known_hosts.new /var/lib/netbox-backup/known_hosts
       rm -f /var/lib/netbox-backup/known_hosts.new
