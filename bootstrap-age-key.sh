@@ -5,23 +5,44 @@ set -euo pipefail
 echo "🔑 Generate NetBox Age Key"
 echo "=========================="
 echo ""
-echo "This script will help you generate a new Age key for your netbox-01 server."
+
+# Check if we're running as root
+if [ "$EUID" -ne 0 ]; then
+    echo "❌ This script must be run as root (use sudo)"
+    exit 1
+fi
+
+# Check if age-keygen is available
+if ! command -v age-keygen &> /dev/null; then
+    echo "📦 Installing age-keygen..."
+    nix shell nixpkgs#age -c age-keygen --version
+fi
+
+echo "🔧 Creating sops-nix directory..."
+install -d -m 0700 /var/lib/sops-nix
+
+echo "🔑 Generating new Age key..."
+if command -v age-keygen &> /dev/null; then
+    age-keygen -o /var/lib/sops-nix/key.txt
+else
+    nix shell nixpkgs#age -c age-keygen -o /var/lib/sops-nix/key.txt
+fi
+
+echo "✅ Age key generated successfully!"
 echo ""
-echo "Run these commands on your netbox-01 server:"
+
+echo "🔍 Public key (copy this for your configuration):"
+if command -v age-keygen &> /dev/null; then
+    age-keygen -y /var/lib/sops-nix/key.txt
+else
+    nix shell nixpkgs#age -c age-keygen -y /var/lib/sops-nix/key.txt
+fi
+
 echo ""
-echo "  # Create the sops-nix directory"
-echo "  install -d -m 0700 /var/lib/sops-nix"
-echo ""
-echo "  # Generate a new Age key for this server"
-echo "  nix shell nixpkgs#age -c age-keygen -o /var/lib/sops-nix/key.txt"
-echo ""
-echo "  # Print the public key (copy this line that starts with age1...)"
-echo "  nix shell nixpkgs#age -c age-keygen -y /var/lib/sops-nix/key.txt"
-echo ""
-echo "After generating the key:"
-echo "  1. Copy the 'age1...' public key from the output"
+echo "📋 Next steps:"
+echo "  1. Copy the 'age1...' public key above"
 echo "  2. Give it to your coding agent to update the configuration"
 echo "  3. The agent will re-encrypt secrets with your new key"
 echo "  4. Rebuild netbox-01 with: sudo nixos-rebuild switch --flake .#netbox-01"
 echo ""
-echo "This ensures each server has its own unique Age key for security."
+echo "✅ Age key setup complete!"
