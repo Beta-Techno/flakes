@@ -171,19 +171,13 @@
     requires = [ "postgresql.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = { Type = "oneshot"; User = "postgres"; };
-    # robust: no psql variable expansion; safe SQL quoting
     script = ''
       set -euo pipefail
-
-      # Read the password (strip trailing newline)
+      # read secret (trim newline)
       PW="$(${pkgs.coreutils}/bin/tr -d '\n' < ${config.sops.secrets.postgres-password.path})"
-
-      # Escape single quotes for SQL string literal
-      ESCAPED_PW="$(${pkgs.coreutils}/bin/printf "%s" "$PW" | ${pkgs.gnused}/bin/sed "s/'/''/g")"
-
-      # Apply the password
-      ${pkgs.postgresql_15}/bin/psql --set=ON_ERROR_STOP=1 -d postgres \
-        -c "ALTER ROLE netbox WITH PASSWORD '$ESCAPED_PW';"
+      # let psql quote it safely via :'PW'
+      ${pkgs.postgresql_15}/bin/psql --set=ON_ERROR_STOP=1 -v PW="$PW" -d postgres \
+        -c "ALTER ROLE netbox WITH PASSWORD :'PW';"
     '';
   };
 
