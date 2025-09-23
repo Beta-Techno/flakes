@@ -27,9 +27,11 @@
         mode = "0400";
       };
       
+      # Make this safe on hosts that don't run Keycloak; real Keycloak hosts
+      # can override owner/group to "keycloak" in their module.
       keycloak-admin-password = {
-        owner = "keycloak";
-        group = "keycloak";
+        owner = lib.mkDefault "root";
+        group = lib.mkDefault "root";
         mode = "0400";
       };
       
