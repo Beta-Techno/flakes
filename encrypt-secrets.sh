@@ -3,7 +3,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+REPO_ROOT="$SCRIPT_DIR"
 SECRETS_DIR="$REPO_ROOT/secrets"
 
 cd "$REPO_ROOT"
@@ -14,23 +14,27 @@ if [ ! -f "$SECRETS_DIR/prod.yaml.plaintext" ]; then
     exit 1
 fi
 
-# Get all Age recipients from existing encrypted file or generate new ones
+# Get all Age recipients from existing encrypted file or from .sops.yaml
 if [ -f "$SECRETS_DIR/prod.yaml" ]; then
     echo "Using existing Age recipients from encrypted file..."
     # Extract recipients from existing encrypted file
     RECIPIENTS=$(sops exec-file "$SECRETS_DIR/prod.yaml" 'echo "$SOPS_AGE_RECIPIENTS"')
+elif [ -f "$REPO_ROOT/.sops.yaml" ]; then
+    echo "Using Age recipients from .sops.yaml..."
+    # Extract recipients from .sops.yaml
+    RECIPIENTS=$(yq '.creation_rules[0].key_groups[0].age[]' "$REPO_ROOT/.sops.yaml" | tr '\n' ',' | sed 's/,$//')
 else
-    echo "No existing encrypted file found. You need to specify Age recipients."
+    echo "No existing encrypted file or .sops.yaml found."
+    echo "You need to specify Age recipients manually:"
     echo "Example: SOPS_AGE_RECIPIENTS='age1...' $0"
+    echo ""
+    echo "Or create a .sops.yaml file with your Age recipients."
     exit 1
 fi
 
 # Encrypt the plaintext file
 echo "Encrypting secrets..."
-SOPS_AGE_RECIPIENTS="$RECIPIENTS" sops -i -e "$SECRETS_DIR/prod.yaml.plaintext"
-
-# Move the encrypted file to the final location
-mv "$SECRETS_DIR/prod.yaml.plaintext" "$SECRETS_DIR/prod.yaml"
+SOPS_AGE_RECIPIENTS="$RECIPIENTS" sops --input-type yaml --output-type yaml -e "$SECRETS_DIR/prod.yaml.plaintext" > "$SECRETS_DIR/prod.yaml"
 
 echo "✅ Secrets encrypted successfully!"
 echo "📁 Encrypted file: $SECRETS_DIR/prod.yaml"
