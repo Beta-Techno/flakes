@@ -182,7 +182,7 @@
 
       # 3) Apply password (ON_ERROR_STOP at psql level)
       ${pkgs.postgresql_15}/bin/psql -v ON_ERROR_STOP=1 -d postgres \
-        -c "ALTER ROLE netbox WITH PASSWORD '${PW_ESC}';"
+        -c "ALTER ROLE netbox WITH PASSWORD '$PW_ESC';"
     '';
   };
 
