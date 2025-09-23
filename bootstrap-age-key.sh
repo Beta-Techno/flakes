@@ -21,14 +21,19 @@ fi
 echo "🔧 Creating sops-nix directory..."
 install -d -m 0700 /var/lib/sops-nix
 
-echo "🔑 Generating new Age key..."
-if command -v age-keygen &> /dev/null; then
-    age-keygen -o /var/lib/sops-nix/key.txt
+# Check if key already exists (created by SOPS during build)
+if [ -f "/var/lib/sops-nix/key.txt" ]; then
+    echo "✅ Age key already exists (created by SOPS during build)"
+    echo "🔍 Using existing Age key..."
 else
-    nix shell nixpkgs#age -c age-keygen -o /var/lib/sops-nix/key.txt
+    echo "🔑 Generating new Age key..."
+    if command -v age-keygen &> /dev/null; then
+        age-keygen -o /var/lib/sops-nix/key.txt
+    else
+        nix shell nixpkgs#age -c age-keygen -o /var/lib/sops-nix/key.txt
+    fi
+    echo "✅ Age key generated successfully!"
 fi
-
-echo "✅ Age key generated successfully!"
 echo ""
 
 echo "🔍 Public key (copy this for your configuration):"
