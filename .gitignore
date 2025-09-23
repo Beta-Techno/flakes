@@ -1,17 +1,4 @@
-# Nix build outputs
-result
-result-*
-
-# Nix garbage collection roots
-/nix/var/nix/gcroots/auto/*
-
-# Home Manager generations
-~/.local/state/home-manager/gcroots
-
-# Editor backup files
-*~
-*.swp
-*.swo
-
-# macOS system files
-.DS_Store 
+# SOPS secrets - ignore plaintext source files
+secrets/prod.yaml.plaintext
+secrets/*.clear.yaml
+secrets/.local/
