@@ -168,7 +168,7 @@
       set -e
       PW="$(tr -d '\n' < ${config.sops.secrets.postgres-password.path})"
       ${pkgs.postgresql_15}/bin/psql -v ON_ERROR_STOP=1 -d postgres \
-        -c "ALTER ROLE netbox WITH PASSWORD '${PW}';"
+        -c "ALTER ROLE netbox WITH PASSWORD '''${PW}';"
     '';
   };
 
