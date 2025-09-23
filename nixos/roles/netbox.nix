@@ -23,8 +23,16 @@
   virtualisation.docker.enable = true;
   users.users.root.extraGroups = [ "docker" ];
 
-  # Enable Redis for NetBox (new module path)
-  services.redis.servers."".enable = true;
+  # Create NetBox system user for SOPS secret ownership
+  users.groups.netbox = { };
+  users.users.netbox = {
+    isSystemUser = true;
+    group = "netbox";
+    home = "/var/lib/netbox";
+  };
+
+  # Enable Redis for NetBox (named instance)
+  services.redis.servers.netbox.enable = true;
 
   # Host-side directories for mounts + backups
   systemd.tmpfiles.rules = [
@@ -168,7 +176,8 @@
       set -e
       PW="$(tr -d '\n' < ${config.sops.secrets.postgres-password.path})"
       ${pkgs.postgresql_15}/bin/psql -v ON_ERROR_STOP=1 -d postgres \
-        -c "ALTER ROLE netbox WITH PASSWORD '''${PW}';"
+        -v pw="''${PW}" \
+        -c "ALTER ROLE netbox WITH PASSWORD :'pw';"
     '';
   };
 
@@ -191,7 +200,7 @@
     after = [
       "docker.service"
       "postgresql.service"
-      "redis.service"
+      "redis@netbox.service"
       "set-netbox-db-password.service"
       "netbox-db-extensions.service"
       "netbox-secrets.service"
@@ -199,7 +208,7 @@
     requires = [
       "docker.service"
       "postgresql.service"
-      "redis.service"
+      "redis@netbox.service"
       "set-netbox-db-password.service"
       "netbox-db-extensions.service"
       "netbox-secrets.service"
@@ -287,9 +296,9 @@
       mkdir -p "$STAMP_DIR"
 
       # 1) Database dump (custom format; best for pg_restore)
-      export PGPASSWORD=netbox123
-      pg_dump -h 127.0.0.1 -U netbox -d netbox -Fc -f "$STAMP_DIR/netbox.pgsql.dump"
-      unset PGPASSWORD
+      PW="$(tr -d '\n' < ${config.sops.secrets.postgres-password.path})"
+      PGPASSWORD="$PW" pg_dump -h 127.0.0.1 -U netbox -d netbox -Fc -f "$STAMP_DIR/netbox.pgsql.dump"
+      unset PW
 
       # 2) Media and reports (best effort)
       if [ -d /var/lib/netbox/media ];   then tar -C /var/lib/netbox -cf "$STAMP_DIR/media.tar"   media; fi
