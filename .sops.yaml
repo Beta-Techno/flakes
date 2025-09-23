@@ -1,10 +1,6 @@
 # SOPS configuration for secrets management
-keys:
-  - &netbox01 age15qrrj7ehlp5dv7l0zjf4z8tq9earwg7ecekseemhe7k6e29vr9hsx09pae  # netbox-01 (bootstrap key)
-
 creation_rules:
   - path_regex: ^secrets/prod\.ya?ml$
-    key_groups:
-      - age:
-          - *netbox01
+    age:
+      - age1ce09dcypnk45npaskswc0x3sngddz0cm34ln009jy54nwpa6ffwsjm5zn9  # netbox-01 (real key)
     # keep everything encrypted; no plaintext fields

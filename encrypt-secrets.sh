@@ -21,8 +21,12 @@ if [ -f "$SECRETS_DIR/prod.yaml" ]; then
     RECIPIENTS=$(sops exec-file "$SECRETS_DIR/prod.yaml" 'echo "$SOPS_AGE_RECIPIENTS"')
 elif [ -f "$REPO_ROOT/.sops.yaml" ]; then
     echo "Using Age recipients from .sops.yaml..."
-    # Extract recipients from .sops.yaml
-    RECIPIENTS=$(yq '.creation_rules[0].key_groups[0].age[]' "$REPO_ROOT/.sops.yaml" | tr '\n' ',' | sed 's/,$//')
+    # Extract recipients from .sops.yaml using grep (more reliable than yq)
+    RECIPIENTS=$(grep -o 'age1[a-zA-Z0-9]*' "$REPO_ROOT/.sops.yaml" | tr '\n' ',' | sed 's/,$//')
+    if [ -z "$RECIPIENTS" ]; then
+        echo "❌ No Age keys found in .sops.yaml"
+        exit 1
+    fi
 else
     echo "No existing encrypted file or .sops.yaml found."
     echo "You need to specify Age recipients manually:"
