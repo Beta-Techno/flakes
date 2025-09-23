@@ -173,11 +173,16 @@
     serviceConfig = { Type = "oneshot"; User = "postgres"; };
     script = ''
       set -euo pipefail
-      # read secret (trim newline)
+
+      # 1) Read secret and strip newline
       PW="$(${pkgs.coreutils}/bin/tr -d '\n' < ${config.sops.secrets.postgres-password.path})"
-      # let psql quote it safely via :'PW'
-      ${pkgs.postgresql_15}/bin/psql --set=ON_ERROR_STOP=1 -v PW="$PW" -d postgres \
-        -c "ALTER ROLE netbox WITH PASSWORD :'PW';"
+
+      # 2) SQL-escape any single quotes by doubling them (using octal escapes to avoid Nix parser issues)
+      PW_ESC="$(${pkgs.coreutils}/bin/printf "%s" "$PW" | ${pkgs.gnused}/bin/sed "s/'/\047\047/g")"
+
+      # 3) Apply password (ON_ERROR_STOP at psql level)
+      ${pkgs.postgresql_15}/bin/psql -v ON_ERROR_STOP=1 -d postgres \
+        -c "ALTER ROLE netbox WITH PASSWORD '${PW_ESC}';"
     '';
   };
 
