@@ -152,8 +152,7 @@
       IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'netbox') THEN
         CREATE ROLE netbox LOGIN;
       END IF;
-      -- Set password to match container env
-      ALTER ROLE netbox WITH PASSWORD 'netbox123';
+      -- Password will be set by set-netbox-db-password service
     END
     $$;
     DO $$
@@ -172,12 +171,19 @@
     requires = [ "postgresql.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = { Type = "oneshot"; User = "postgres"; };
+    # robust: no psql variable expansion; safe SQL quoting
     script = ''
-      set -e
-      PW="$(tr -d '\n' < ${config.sops.secrets.postgres-password.path})"
-      ${pkgs.postgresql_15}/bin/psql -v ON_ERROR_STOP=1 -d postgres \
-        -v pw="''${PW}" \
-        -c "ALTER ROLE netbox WITH PASSWORD :'pw';"
+      set -euo pipefail
+
+      # Read the password (strip trailing newline)
+      PW="$(${pkgs.coreutils}/bin/tr -d '\n' < ${config.sops.secrets.postgres-password.path})"
+
+      # Escape single quotes for SQL string literal
+      ESCAPED_PW="$(${pkgs.coreutils}/bin/printf "%s" "$PW" | ${pkgs.gnused}/bin/sed "s/'/''/g")"
+
+      # Apply the password
+      ${pkgs.postgresql_15}/bin/psql --set=ON_ERROR_STOP=1 -d postgres \
+        -c "ALTER ROLE netbox WITH PASSWORD '$ESCAPED_PW';"
     '';
   };
 
