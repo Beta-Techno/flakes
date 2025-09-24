@@ -61,6 +61,15 @@
         group = "root";
         mode = "0600";
       };
+
+      # Public key that matches the private key above.
+      # We keep it in SOPS so Storage can authorize it without reading repo files.
+      netbox-backup-public-key = {
+        # root owns the decrypted secret; we'll template it into /home/backup/.ssh/authorized_keys
+        owner = "root";
+        group = "root";
+        mode = "0400";
+      };
     };
   };
 

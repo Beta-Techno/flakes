@@ -57,6 +57,8 @@ in
   imports = [
     ../profiles/base.nix
     ../profiles/nginx.nix
+    # Bring SOPS onto Storage so we can consume the netbox backup public key
+    ../profiles/sops.nix
   ];
 
   system.stateVersion = "24.11";
@@ -126,10 +128,8 @@ in
     home = "/home/backup";
     group = "backup";
     shell = pkgs.bashInteractive;
-    # Authorize the NetBox backup public key (committed once, stable)
-    openssh.authorizedKeys.keys = [
-      (builtins.readFile ../keys/service/netbox-backup.pub)
-    ];
+    # We will manage authorized_keys via SOPS template below
+    openssh.authorizedKeys.keys = lib.mkForce [ ];
   };
 
   # Optional: further lock down the backup user
@@ -137,9 +137,32 @@ in
     Match User backup
       PubkeyAuthentication yes
       PasswordAuthentication no
-      # Uncomment to force SFTP only (no shell):
-      # ForceCommand internal-sftp
+      PermitTunnel no
+      X11Forwarding no
+      AllowAgentForwarding no
+      AllowTcpForwarding no
+      ForceCommand /bin/false
   '';
+
+  # Ensure ~/.ssh exists with correct permissions for 'backup'
+  systemd.tmpfiles.rules = lib.mkAfter [
+    "d /home/backup/.ssh 0700 backup backup -"
+  ];
+
+  # Render /home/backup/.ssh/authorized_keys from SOPS public key
+  # This avoids putting the key in the Nix store and guarantees it matches NetBox's private key.
+  sops.templates."authorized_keys.backup" = {
+    # The SOPS engine expands secrets as plain text
+    content = ''
+{{ .secrets.netbox-backup-public-key }}
+    '';
+    owner = "backup";
+    group = "backup";
+    mode = "0600";
+    path = "/home/backup/.ssh/authorized_keys";
+    # If you ever flip keys, you can auto-kick sshd (optional):
+    # restartUnits = [ "sshd.service" ];
+  };
 
   # Storage directories will be created by tmpfiles rules after user creation
 
