@@ -2,5 +2,5 @@
 creation_rules:
   - path_regex: ^secrets/prod\.ya?ml$
     age:
-      - age1ce09dcypnk45npaskswc0x3sngddz0cm34ln009jy54nwpa6ffwsjm5zn9  # netbox-01 (real key)
+      - age1tkw3zel7u2l05szgppd6vc0nzxk9hpqmqfeulgphncja7aqmtups49jsrz  # netbox-01 (new key)
     # keep everything encrypted; no plaintext fields

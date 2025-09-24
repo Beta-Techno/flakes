@@ -72,12 +72,26 @@
           head -c 512 /dev/urandom | tr -dc 'A-Za-z0-9' | head -c 64 > /var/lib/netbox/secret-key
           chmod 600 /var/lib/netbox/secret-key
         fi
-        # Write env-file that oci-containers will read
-        printf "SECRET_KEY=%s\n" "$(tr -d '\n' </var/lib/netbox/secret-key)" > /var/lib/netbox/env
-        # Inject DB password from SOPS into the same env-file NetBox reads
-        if [ -r ${config.sops.secrets.postgres-password.path} ]; then
-          printf "DB_PASSWORD=%s\n" "$(tr -d '\n' < ${config.sops.secrets.postgres-password.path})" >> /var/lib/netbox/env
-        fi
+        
+        # Build /var/lib/netbox/env fresh each boot so it always has the latest secrets
+        {
+          printf "SECRET_KEY=%s\n" "$(tr -d '\n' </var/lib/netbox/secret-key)"
+          
+          # Postgres password from SOPS
+          if [ -r ${config.sops.secrets.postgres-password.path} ]; then
+            printf "DB_PASSWORD=%s\n" "$(tr -d '\n' < ${config.sops.secrets.postgres-password.path})"
+          fi
+          
+          # Wait up to 60s for admin password (first boot ordering can make this arrive a hair late)
+          for i in $(seq 1 60); do
+            if [ -r ${config.sops.secrets.netbox-admin-password.path} ]; then
+              printf "SUPERUSER_PASSWORD=%s\n" "$(tr -d '\n' < ${config.sops.secrets.netbox-admin-password.path})"
+              break
+            fi
+            sleep 1
+          done
+        } > /var/lib/netbox/env
+        
         chmod 600 /var/lib/netbox/env
       ''}";
       RemainAfterExit = true;
@@ -120,6 +134,11 @@
       CORS_ALLOWED_ORIGINS = "*";
       CORS_ALLOW_CREDENTIALS = "true";
       CORS_ALLOW_ALL_ORIGINS = "true";
+
+      # Create a superuser on first boot (NetBox Docker supports these)
+      SUPERUSER_NAME = "admin";
+      SUPERUSER_EMAIL = "admin@example.com";
+      # SUPERUSER_PASSWORD will be appended to the env file by netbox-secrets
 
       # Diagnostics
       DB_WAIT_DEBUG = "1";

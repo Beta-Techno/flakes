@@ -27,6 +27,13 @@
         mode = "0400";
       };
       
+      # NetBox admin password (for deterministic first boot)
+      netbox-admin-password = {
+        owner = "root";
+        group = "root";
+        mode = "0400";
+      };
+      
       # Make this safe on hosts that don't run Keycloak; real Keycloak hosts
       # can override owner/group to "keycloak" in their module.
       keycloak-admin-password = {
