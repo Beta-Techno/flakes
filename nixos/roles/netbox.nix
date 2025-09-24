@@ -23,34 +23,6 @@
   virtualisation.docker.enable = true;
   users.users.root.extraGroups = [ "docker" ];
 
-  # NetBox Docker container
-  virtualisation.docker.containers.netbox = {
-    image = "netboxcommunity/netbox:v4.1.6";
-    ports = [ "8080:8080" ];
-    volumes = [
-      "/var/lib/netbox/static:/opt/netbox/netbox/static"
-      "/var/lib/netbox/media:/opt/netbox/netbox/media"
-      "/var/lib/netbox/env:/opt/netbox/netbox/netbox.env"
-    ];
-    environment = {
-      DB_HOST = "127.0.0.1";
-      DB_PORT = "5432";
-      DB_NAME = "netbox";
-      DB_USER = "netbox";
-      DB_PASSWORD_FILE = "/opt/netbox/netbox/netbox.env";
-      REDIS_HOST = "127.0.0.1";
-      REDIS_PORT = "6379";
-      REDIS_DB = "1";
-      SECRET_KEY_FILE = "/opt/netbox/netbox/netbox.env";
-    };
-    dependsOn = [ "postgresql.service" "redis@netbox.service" ];
-    extraDockerOptions = [
-      "--name=netbox"
-      "--restart=always"
-      "--network=host"
-    ];
-  };
-
   # Create NetBox system user for SOPS secret ownership
   users.groups.netbox = { };
   users.users.netbox = {
@@ -233,7 +205,7 @@
     after = [
       "docker.service"
       "postgresql.service"
-      "redis@netbox.service"
+      "redis-netbox.service"
       "set-netbox-db-password.service"
       "netbox-db-extensions.service"
       "netbox-secrets.service"
@@ -241,11 +213,12 @@
     requires = [
       "docker.service"
       "postgresql.service"
-      "redis@netbox.service"
+      "redis-netbox.service"
       "set-netbox-db-password.service"
       "netbox-db-extensions.service"
       "netbox-secrets.service"
     ];
+    wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Restart = "always";
       RestartSec = 5;
