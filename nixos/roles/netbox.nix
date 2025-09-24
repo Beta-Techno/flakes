@@ -222,9 +222,23 @@
     serviceConfig = {
       Restart = "always";
       RestartSec = 5;
-      # Gate startup on a successful login using the same creds the container will use.
-      ExecStartPre = "${pkgs.bash}/bin/bash -euo pipefail -c 'PW=$(tr -d \\\\n < ${config.sops.secrets.postgres-password.path}); PGPASSWORD=$PW ${pkgs.postgresql_15}/bin/pg_isready -h 127.0.0.1 -p 5432 -U netbox && PGPASSWORD=$PW ${pkgs.postgresql_15}/bin/psql -h 127.0.0.1 -U netbox -d netbox -c \"select 1\"'";
     };
+    # Gate startup on a successful login using the same creds the container will use.
+    # Use proper quoting to handle passwords with spaces/special characters
+    ExecStartPre = let
+      bash = "${pkgs.bash}/bin/bash";
+      psql = "${pkgs.postgresql_15}/bin/psql";
+      pg_isready = "${pkgs.postgresql_15}/bin/pg_isready";
+      tr = "${pkgs.coreutils}/bin/tr";
+      pwfile = config.sops.secrets.postgres-password.path;
+    in ''
+      ${bash} -euo pipefail -c '
+        PW="$(${tr} -d "\n" < ${pwfile})"
+        export PGPASSWORD="$PW"
+        ${pg_isready} -h 127.0.0.1 -p 5432 -U netbox
+        ${psql} -h 127.0.0.1 -U netbox -d netbox -c "select 1"
+      '
+    '';
   };
 
   # ────────────────────────────── Backups ─────────────────────────────────────
