@@ -219,25 +219,27 @@
       "netbox-secrets.service"
     ];
     wantedBy = [ "multi-user.target" ];
+    # Make the unit see DB_PASSWORD and SECRET_KEY from the same env-file
     serviceConfig = {
       Restart = "always";
       RestartSec = 5;
+      EnvironmentFile = "/var/lib/netbox/env";
     };
-    # Gate startup on a successful login using the same creds the container will use.
-    # Use proper quoting to handle passwords with spaces/special characters
-    ExecStartPre = let
-      bash = "${pkgs.bash}/bin/bash";
-      psql = "${pkgs.postgresql_15}/bin/psql";
+
+    # High-level hook that systemd turns into ExecStartPre=
+    preStart = let
       pg_isready = "${pkgs.postgresql_15}/bin/pg_isready";
-      tr = "${pkgs.coreutils}/bin/tr";
-      pwfile = config.sops.secrets.postgres-password.path;
+      psql      = "${pkgs.postgresql_15}/bin/psql";
     in ''
-      ${bash} -euo pipefail -c '
-        PW="$(${tr} -d "\n" < ${pwfile})"
-        export PGPASSWORD="$PW"
-        ${pg_isready} -h 127.0.0.1 -p 5432 -U netbox
-        ${psql} -h 127.0.0.1 -U netbox -d netbox -c "select 1"
-      '
+      set -euo pipefail
+      # Ensure the env file exists (netbox-secrets.service writes it)
+      test -r /var/lib/netbox/env
+      # Use the same password the container will use
+      export PGPASSWORD="$DB_PASSWORD"
+      # Wait until Postgres is accepting connections for netbox
+      ${pg_isready} -h 127.0.0.1 -p 5432 -U netbox
+      # Prove credentials work
+      ${psql} -h 127.0.0.1 -U netbox -d netbox -c 'select 1'
     '';
   };
 
