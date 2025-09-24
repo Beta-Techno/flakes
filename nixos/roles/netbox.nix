@@ -31,8 +31,16 @@
     home = "/var/lib/netbox";
   };
 
-  # Enable Redis for NetBox (named instance)
-  services.redis.servers.netbox.enable = true;
+  # Enable Redis for NetBox (named instance) – expose TCP on localhost:6379
+  services.redis.servers.netbox = {
+    enable = true;
+    settings = {
+      bind = "127.0.0.1";
+      port = 6379;
+      # optional hardening:
+      # "protected-mode" = "yes";
+    };
+  };
 
   # Host-side directories for mounts + backups
   systemd.tmpfiles.rules = [
