@@ -34,12 +34,16 @@
   # Enable Redis for NetBox (named instance) – expose TCP on localhost:6379
   services.redis.servers.netbox = {
     enable = true;
+    # use first-class option to avoid conflicts with the module's computed settings
+    port = 6379;
+    # keep bind local-only; either keep it in settings or use the top-level option.
     settings = {
       bind = "127.0.0.1";
-      port = 6379;
       # optional hardening:
       # "protected-mode" = "yes";
     };
+    # Alternatively (equivalent), you can write:
+    # bind = [ "127.0.0.1" ];
   };
 
   # Host-side directories for mounts + backups
