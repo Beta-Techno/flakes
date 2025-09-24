@@ -6,7 +6,7 @@
   networking.useDHCP = true;
 
   # Reach storage-01 by name even on DHCP
-  networking.hosts."10.1.10.72" = [ "storage-01" ];
+  networking.hosts."10.1.10.73" = [ "storage-01" ];
 
   # Filesystems (UEFI needs a real ESP mounted at /boot)
   fileSystems."/" = {
