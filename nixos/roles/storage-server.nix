@@ -100,7 +100,7 @@ in
     };
   };
 
-  # Create storage directories and web dashboard
+  # Create storage directories, web dashboard, and backup user's .ssh
   systemd.tmpfiles.rules = [
     # Application backups
     "d /var/storage/backups/netbox 0755 backup backup -"
@@ -118,6 +118,8 @@ in
     "d /var/storage/archives/logs 0755 backup backup -"
     "d /var/storage/archives/configs 0755 backup backup -"
     
+    # Ensure ~/.ssh exists with correct perms for 'backup'
+    "d /home/backup/.ssh 0700 backup backup -"
   ];
 
   # Create backup user and group (referenced by tmpfiles rules above)
@@ -141,13 +143,8 @@ in
       X11Forwarding no
       AllowAgentForwarding no
       AllowTcpForwarding no
-      ForceCommand /bin/false
+      # Note: No ForceCommand to allow rsync over SSH for backups
   '';
-
-  # Ensure ~/.ssh exists with correct permissions for 'backup'
-  systemd.tmpfiles.rules = lib.mkAfter [
-    "d /home/backup/.ssh 0700 backup backup -"
-  ];
 
   # Render /home/backup/.ssh/authorized_keys from SOPS public key
   # This avoids putting the key in the Nix store and guarantees it matches NetBox's private key.
