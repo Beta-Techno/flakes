@@ -11,64 +11,57 @@
       generateKey = true;
     };
     
-    # Secrets that will be available to the system
+    # Secrets, gated so they only exist where the owner exists
     secrets = {
-      # Database passwords
-      postgres-password = {
+      # Only if Postgres is actually enabled on the host
+      postgres-password = lib.mkIf config.services.postgresql.enable {
         owner = "postgres";
         group = "postgres";
-        mode = "0400";
+        mode  = "0400";
       };
-      
-      # API keys
-      netbox-api-key = {
+
+      # Only on hosts that define the 'netbox' system user
+      netbox-api-key = lib.mkIf (config.users.users ? netbox) {
         owner = "netbox";
         group = "netbox";
-        mode = "0400";
+        mode  = "0400";
       };
-      
-      # NetBox admin password (for deterministic first boot)
-      netbox-admin-password = {
+      netbox-admin-password = lib.mkIf (config.users.users ? netbox) {
         owner = "root";
         group = "root";
-        mode = "0400";
+        mode  = "0400";
       };
-      
-      # Make this safe on hosts that don't run Keycloak; real Keycloak hosts
-      # can override owner/group to "keycloak" in their module.
+
+      # Safe default; override in a Keycloak role when you add one
       keycloak-admin-password = {
         owner = lib.mkDefault "root";
         group = lib.mkDefault "root";
-        mode = "0400";
-      };
-      
-      # SSL certificates
-      ssl-cert = {
-        owner = "nginx";
-        group = "nginx";
-        mode = "0444";
-      };
-      
-      ssl-key = {
-        owner = "nginx";
-        group = "nginx";
-        mode = "0400";
-      };
-      
-      # NetBox backup SSH private key
-      netbox-backup-private-key = {
-        owner = "root";
-        group = "root";
-        mode = "0600";
+        mode  = "0400";
       };
 
-      # Public key that matches the private key above.
-      # We keep it in SOPS so Storage can authorize it without reading repo files.
-      netbox-backup-public-key = {
-        # root owns the decrypted secret; we'll template it into /home/backup/.ssh/authorized_keys
+      # Only when nginx is enabled on the host
+      ssl-cert = lib.mkIf config.services.nginx.enable {
+        owner = "nginx";
+        group = "nginx";
+        mode  = "0444";
+      };
+      ssl-key = lib.mkIf config.services.nginx.enable {
+        owner = "nginx";
+        group = "nginx";
+        mode  = "0400";
+      };
+
+      # Private key only on the NetBox host (push backups out)
+      netbox-backup-private-key = lib.mkIf (config.users.users ? netbox) {
         owner = "root";
         group = "root";
-        mode = "0400";
+        mode  = "0600";
+      };
+      # Public key is needed on storage to authorize NetBox
+      netbox-backup-public-key = {
+        owner = "root";
+        group = "root";
+        mode  = "0400";
       };
     };
   };
