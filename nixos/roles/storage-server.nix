@@ -153,9 +153,6 @@ in
     content = ''
 {{ index .secrets "netbox-backup-public-key" | trim }}
     '';
-    # (Optional but recommended) declare which secrets this template uses
-    secrets = [ "netbox-backup-public-key" ];
-
     owner = "backup";
     group = "backup";
     mode = "0600";
