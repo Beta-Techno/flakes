@@ -408,18 +408,24 @@ JSON
   };
 
   # Nginx reverse proxy for Netbox
-  services.nginx.virtualHosts."netbox.local" = {
-    default = true;  # catch‑all for any Host/IP on :80
+  services.nginx.virtualHosts."_" = {
+    # Catch every Host header, including raw IPs
+    default = true;
+    serverAliases = [ "netbox.local" "10.1.10.55" "localhost" ];
 
-    # ── Server-level headers + preflight (simple & valid) ─────────
+    # Be explicit about being the default on IPv4 & IPv6
+    listen = [
+      { addr = "0.0.0.0"; port = 80; default = true; }
+      { addr = "[::]";   port = 80; default = true; }
+    ];
+
+    # Security headers (keep CORS at the app layer)
     extraConfig = ''
-      # Security headers only; let NetBox set CORS so we don't duplicate it
       add_header X-Frame-Options DENY;
       add_header X-Content-Type-Options nosniff;
       add_header X-XSS-Protection "1; mode=block";
     '';
 
-    # ── Only proxying stays in the location ───────────────────────
     locations."/" = {
       proxyPass = "http://127.0.0.1:8080";
       proxyWebsockets = true;
