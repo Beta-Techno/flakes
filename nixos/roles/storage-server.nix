@@ -149,10 +149,8 @@ in
   # Render /home/backup/.ssh/authorized_keys from SOPS public key
   # This avoids putting the key in the Nix store and guarantees it matches NetBox's private key.
   sops.templates."authorized_keys.backup" = {
-    # Use index() so hyphens in the secret name are valid
-    content = ''
-{{ index .secrets "netbox-backup-public-key" | trim }}
-    '';
+    # Inject the secret at activation time (keeps it out of the Nix store)
+    content = config.sops.placeholder."netbox-backup-public-key";
     owner = "backup";
     group = "backup";
     mode = "0600";
