@@ -127,13 +127,12 @@
       REDIS_PORT = "6379";
       # REDIS_PASSWORD = "";   # uncomment if you later add a password
 
-      # NetBox/Django - allow everything (trusted internal network)
+      # NetBox/Django
       ALLOWED_HOSTS = "*";
-
-      # CORS configuration for cross-origin requests
-      CORS_ALLOWED_ORIGINS = "*";
-      CORS_ALLOW_CREDENTIALS = "true";
+      # Allow any origin, but DO NOT advertise credentials
       CORS_ALLOW_ALL_ORIGINS = "true";
+      CORS_ALLOW_CREDENTIALS = "false";
+      # Let django-cors-headers compute headers; don't set a literal "*" list
 
       # Create a superuser on first boot (NetBox Docker supports these)
       SUPERUSER_NAME = "admin";
@@ -414,19 +413,10 @@ JSON
 
     # ── Server-level headers + preflight (simple & valid) ─────────
     extraConfig = ''
-      # Security headers (apply to all responses)
+      # Security headers only; let NetBox set CORS so we don't duplicate it
       add_header X-Frame-Options DENY;
       add_header X-Content-Type-Options nosniff;
       add_header X-XSS-Protection "1; mode=block";
-
-      # CORS headers (apply to all responses, including 204)
-      add_header Access-Control-Allow-Origin "*" always;
-      add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;
-      add_header Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization" always;
-      add_header Access-Control-Allow-Credentials "true" always;
-
-      # Reply immediately to preflight anywhere on this vhost
-      if ($request_method = OPTIONS) { return 204; }
     '';
 
     # ── Only proxying stays in the location ───────────────────────
