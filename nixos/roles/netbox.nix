@@ -415,8 +415,8 @@ JSON
 
     # Be explicit about being the default on IPv4 & IPv6
     listen = [
-      { addr = "0.0.0.0"; port = 80; default = true; }
-      { addr = "[::]";   port = 80; default = true; }
+      { addr = "0.0.0.0"; port = 80; }
+      { addr = "[::]";   port = 80; }
     ];
 
     # Security headers (keep CORS at the app layer)
