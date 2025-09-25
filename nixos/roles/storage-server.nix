@@ -149,15 +149,18 @@ in
   # Render /home/backup/.ssh/authorized_keys from SOPS public key
   # This avoids putting the key in the Nix store and guarantees it matches NetBox's private key.
   sops.templates."authorized_keys.backup" = {
-    # The SOPS engine expands secrets as plain text
+    # Use index() so hyphens in the secret name are valid
     content = ''
-{{ .secrets.netbox-backup-public-key }}
+{{ index .secrets "netbox-backup-public-key" | trim }}
     '';
+    # (Optional but recommended) declare which secrets this template uses
+    secrets = [ "netbox-backup-public-key" ];
+
     owner = "backup";
     group = "backup";
     mode = "0600";
     path = "/home/backup/.ssh/authorized_keys";
-    # If you ever flip keys, you can auto-kick sshd (optional):
+    # Not required for authorized_keys, but harmless if you want it:
     # restartUnits = [ "sshd.service" ];
   };
 
