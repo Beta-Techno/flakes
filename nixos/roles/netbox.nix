@@ -128,11 +128,13 @@
       # REDIS_PASSWORD = "";   # uncomment if you later add a password
 
       # NetBox/Django
-      ALLOWED_HOSTS = "*";
-      # Allow any origin, but DO NOT advertise credentials
-      CORS_ALLOW_ALL_ORIGINS = "true";
-      CORS_ALLOW_CREDENTIALS = "false";
-      # Let django-cors-headers compute headers; don't set a literal "*" list
+      ALLOWED_HOSTS = "*";                 # dev only; set real hostnames in prod
+      # CORS (NetBox reads the *ORIGIN* names)
+      CORS_ORIGIN_ALLOW_ALL = "true";      # dev: allow any Origin
+      CORS_ALLOW_CREDENTIALS = "false";    # keep false if you use token auth
+      # For production, prefer an explicit allow‑list instead of the line above:
+      # CORS_ORIGIN_WHITELIST = "https://build.example.com,https://tele.example.com"
+      # (comma‑separated list of scheme+host(+port))
 
       # Create a superuser on first boot (NetBox Docker supports these)
       SUPERUSER_NAME = "admin";
