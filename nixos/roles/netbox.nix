@@ -426,6 +426,7 @@ JSON
     path = [
       pkgs.coreutils pkgs.util-linux pkgs.openssh pkgs.rsync
       pkgs.postgresql_15 pkgs.gnutar pkgs.zstd pkgs.jq pkgs.bash pkgs.docker
+      pkgs.curl
     ];
     script = ''
       set -euo pipefail
@@ -442,7 +443,7 @@ JSON
             -o StrictHostKeyChecking=yes"
 
       # Pull the selected snapshot locally
-      rsync -az -e "$SSH" "backup@storage-01:${BACKUP_ROOT_REMOTE}/" "$TMP/"
+      rsync -az -e "$SSH" "backup@storage-01:$BACKUP_ROOT_REMOTE/" "$TMP/"
 
       test -s "$TMP/netbox.pgsql.dump" || { echo "Missing DB dump"; exit 1; }
 
@@ -495,7 +496,7 @@ JSON
   systemd.services.netbox-restore-latest = {
     description = "Restore NetBox from the latest snapshot on storage-01";
     serviceConfig = { Type = "oneshot"; };
-    path = [ pkgs.coreutils pkgs.openssh pkgs.gnugrep pkgs.sort pkgs.bash ];
+    path = [ pkgs.coreutils pkgs.openssh pkgs.gnugrep pkgs.bash ];
     script = ''
       set -euo pipefail
       HOST="$(hostname)"
