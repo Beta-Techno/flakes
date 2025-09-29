@@ -430,11 +430,11 @@ JSON
     script = ''
       set -euo pipefail
       
-      # Get timestamp from environment variable or first argument
-      TS="''${1:-''${NETBOX_RESTORE_TIMESTAMP}}"
+      # Get timestamp from first argument
+      TS="''${1:-}"
       if [ -z "$TS" ]; then
-        echo "Usage: $0 <timestamp> or set NETBOX_RESTORE_TIMESTAMP environment variable"
-        echo "Example: $0 20250928T023538Z"
+        echo "Usage: systemctl start netbox-restore -- <timestamp>"
+        echo "Example: systemctl start netbox-restore -- 20250928T023538Z"
         exit 1
       fi
       
@@ -514,7 +514,7 @@ JSON
       TS="$($SSH backup@storage-01 "ls -1 /var/storage/backups/netbox/$HOST/" | grep -E '^[0-9]{8}T[0-9]{6}Z$' | sort | tail -n1)"
       test -n "$TS" || { echo "No snapshots found for host $HOST"; exit 1; }
       echo "→ Latest snapshot: $TS"
-      NETBOX_RESTORE_TIMESTAMP="$TS" /run/current-system/sw/bin/systemctl start netbox-restore
+      /run/current-system/sw/bin/systemctl start netbox-restore -- "$TS"
     '';
   };
 
