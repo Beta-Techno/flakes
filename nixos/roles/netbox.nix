@@ -492,8 +492,9 @@ SQL
       Type = "oneshot";
       User = "root";
       TimeoutStartSec = "60min";
-      # Pass the instance (%i) to the script via env TS=...
-      ExecStart = lib.mkForce [ "${pkgs.bash}/bin/bash" "-c" "export TS=%i; exec ${restoreScript}" ];
+      # Pass the instance (%i) to the script via the unit environment
+      Environment = [ "TS=%i" ];
+      ExecStart = "${restoreScript}";
     };
     # Make sure all tools used in the script are on PATH for logging/child procs
     path = [
