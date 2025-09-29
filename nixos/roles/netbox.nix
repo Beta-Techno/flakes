@@ -410,72 +410,55 @@ JSON
   };
 
   # ────────────────────────────── Restore ─────────────────────────────────────
-  # Create a wrapper script for restore that properly handles the timestamp parameter
-  systemd.services.netbox-restore = {
-    description = "Restore NetBox from backup timestamp (use with timestamp argument)";
-    after       = [ "network-online.target" "postgresql.service" ];
-    wants       = [ "network-online.target" "postgresql.service"
-                    "netbox-backup-keygen.service" "netbox-backup-knownhosts.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      User = "root";
-      TimeoutStartSec = "60min";
-    };
-    # Tools needed by the script
-    path = [
-      pkgs.coreutils pkgs.util-linux pkgs.openssh pkgs.rsync
-      pkgs.postgresql_15 pkgs.gnutar pkgs.zstd pkgs.jq pkgs.bash pkgs.docker
-      pkgs.curl
-    ];
-    script = ''
+  # Instance unit: call with `systemctl start 'netbox-restore@<TIMESTAMP>'`
+  #
+  # Why instance?
+  # - systemd does not pass "service arguments" via `--`.
+  # - `%i` (instance) is the standard pattern for dynamic parameters.
+  let
+    restoreScript = pkgs.writeShellScript "netbox-restore" ''
       set -euo pipefail
-      
-      # Get timestamp from first argument
-      TS="''${1:-}"
-      if [ -z "$TS" ]; then
-        echo "Usage: systemctl start netbox-restore -- <timestamp>"
-        echo "Example: systemctl start netbox-restore -- 20250928T023538Z"
-        exit 1
-      fi
-      
-      HOST="$(hostname)"              # NOTE: backup paths are keyed by $(hostname)
+
+      # Timestamp comes from systemd instance: netbox-restore@<TS>
+      TS="''${TS?missing TS}"
+
+      # Use explicit tool paths to avoid PATH surprises
+      HOST="$(${pkgs.inetutils}/bin/hostname)"
       BACKUP_ROOT_REMOTE="/var/storage/backups/netbox/$HOST/$TS"
-      TMP="$(mktemp -d)"
+      TMP="$(${pkgs.coreutils}/bin/mktemp -d)"
       trap 'rm -rf "$TMP"' EXIT
 
       echo "→ Fetching backup set $BACKUP_ROOT_REMOTE from storage-01"
-      SSH="ssh -i /var/lib/netbox-backup/id_ed25519 \
-            -o IdentitiesOnly=yes \
-            -o UserKnownHostsFile=/var/lib/netbox-backup/known_hosts \
-            -o StrictHostKeyChecking=yes"
+      SSH="${pkgs.openssh}/bin/ssh -i /var/lib/netbox-backup/id_ed25519 \
+           -o IdentitiesOnly=yes \
+           -o UserKnownHostsFile=/var/lib/netbox-backup/known_hosts \
+           -o StrictHostKeyChecking=yes"
 
-      # Pull the selected snapshot locally
-      rsync -az -e "$SSH" "backup@storage-01:$BACKUP_ROOT_REMOTE/" "$TMP/"
-
+      ${pkgs.rsync}/bin/rsync -az -e "$SSH" "backup@storage-01:$BACKUP_ROOT_REMOTE/" "$TMP/"
       test -s "$TMP/netbox.pgsql.dump" || { echo "Missing DB dump"; exit 1; }
 
       echo "→ Stopping NetBox container"
-      systemctl stop docker-netbox.service || true
+      ${pkgs.systemd}/bin/systemctl stop docker-netbox.service || true
 
       echo "→ Ensuring PostgreSQL is running"
-      systemctl start postgresql.service
+      ${pkgs.systemd}/bin/systemctl start postgresql.service
 
       echo "→ Dropping and recreating database"
       sudo -u postgres ${pkgs.postgresql_15}/bin/psql -v ON_ERROR_STOP=1 -d postgres <<'SQL'
       SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'netbox';
       DROP DATABASE IF EXISTS netbox;
       CREATE DATABASE netbox OWNER netbox;
-      SQL
+SQL
 
       echo "→ Restoring database (pg_restore -Fc)"
-      export PGPASSWORD="$(tr -d '\n' < ${config.sops.secrets.postgres-password.path})"
+      export PGPASSWORD="$(${pkgs.coreutils}/bin/tr -d '\n' < ${config.sops.secrets.postgres-password.path})"
       ${pkgs.postgresql_15}/bin/pg_restore \
         -h 127.0.0.1 -U netbox -d netbox \
         --no-owner --no-privileges "$TMP/netbox.pgsql.dump"
 
       echo "→ Restoring media and reports (if present)"
-      [ -f "$TMP/media.tar.zst" ]   && zstd -d -c "$TMP/media.tar.zst"   | tar -C /var/lib/netbox -xf -
-      [ -f "$TMP/reports.tar.zst" ] && zstd -d -c "$TMP/reports.tar.zst" | tar -C /var/lib/netbox -xf -
+      [ -f "$TMP/media.tar.zst" ]   && ${pkgs.zstd}/bin/zstd -d -c "$TMP/media.tar.zst"   | ${pkgs.gnutar}/bin/tar -C /var/lib/netbox -xf -
+      [ -f "$TMP/reports.tar.zst" ] && ${pkgs.zstd}/bin/zstd -d -c "$TMP/reports.tar.zst" | ${pkgs.gnutar}/bin/tar -C /var/lib/netbox -xf -
       chown -R root:root /var/lib/netbox/media /var/lib/netbox/reports 2>/dev/null || true
 
       echo "→ Restoring SECRET_KEY (if present)"
@@ -483,38 +466,68 @@ JSON
         install -m 0600 "$TMP/secret-key" /var/lib/netbox/secret-key
       fi
 
-      echo "→ (Optional) Image tag info:"
       if [ -s "$TMP/image.txt" ]; then
-        IMG="$(cat "$TMP/image.txt")"
-        echo "   Backup was taken from image: $IMG"
-        # Container image in Nix is declarative; if you need to match exactly, change
-        # virtualisation.oci-containers.containers.netbox.image accordingly and rebuild.
+        echo "→ Backup was taken from image: $(cat "$TMP/image.txt")"
       fi
 
       echo "→ Starting NetBox container"
-      systemctl start docker-netbox.service
+      ${pkgs.systemd}/bin/systemctl start docker-netbox.service
 
       echo "→ Restore complete. Health probe:"
-      curl -fsS http://127.0.0.1:8080/api/status/ >/dev/null && echo "✓ API healthy"
+      ${pkgs.curl}/bin/curl -fsS http://127.0.0.1:8080/api/status/ >/dev/null && echo "✓ API healthy"
     '';
+  in
+  systemd.services."netbox-restore@" = {
+    description = "Restore NetBox from backup timestamp %I";
+    after = [
+      "network-online.target"
+      "postgresql.service"
+    ];
+    wants = [
+      "network-online.target"
+      "postgresql.service"
+      "netbox-backup-keygen.service"
+      "netbox-backup-knownhosts.service"
+    ];
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+      TimeoutStartSec = "60min";
+      # Pass the instance (%i) to the script via env TS=...
+      ExecStart = lib.mkForce [ "${pkgs.bash}/bin/bash" "-c" "TS=%i exec ${restoreScript}" ];
+    };
+    # Make sure all tools used in the script are on PATH for logging/child procs
+    path = [
+      pkgs.coreutils pkgs.util-linux pkgs.openssh pkgs.rsync
+      pkgs.postgresql_15 pkgs.gnutar pkgs.zstd pkgs.jq pkgs.bash
+      pkgs.docker pkgs.curl pkgs.inetutils pkgs.systemd
+    ];
   };
 
-  # Convenience wrapper: restore the most recent remote snapshot
+  # Convenience: restore the most recent snapshot by starting the instance
   systemd.services.netbox-restore-latest = {
     description = "Restore NetBox from the latest snapshot on storage-01";
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" "netbox-backup-keygen.service" "netbox-backup-knownhosts.service" ];
     serviceConfig = { Type = "oneshot"; };
-    path = [ pkgs.coreutils pkgs.openssh pkgs.gnugrep pkgs.bash ];
+    path = [ pkgs.coreutils pkgs.openssh pkgs.gnugrep pkgs.bash pkgs.inetutils pkgs.systemd ];
     script = ''
       set -euo pipefail
-      HOST="$(hostname)"
-      SSH="ssh -i /var/lib/netbox-backup/id_ed25519 \
-            -o IdentitiesOnly=yes \
-            -o UserKnownHostsFile=/var/lib/netbox-backup/known_hosts \
-            -o StrictHostKeyChecking=yes"
-      TS="$($SSH backup@storage-01 "ls -1 /var/storage/backups/netbox/$HOST/" | grep -E '^[0-9]{8}T[0-9]{6}Z$' | sort | tail -n1)"
+      HOST="$(${pkgs.inetutils}/bin/hostname)"
+      SSH="${pkgs.openssh}/bin/ssh -i /var/lib/netbox-backup/id_ed25519 \
+           -o IdentitiesOnly=yes \
+           -o UserKnownHostsFile=/var/lib/netbox-backup/known_hosts \
+           -o StrictHostKeyChecking=yes"
+
+      TS="$($SSH backup@storage-01 "ls -1 /var/storage/backups/netbox/$HOST/" \
+           | ${pkgs.gnugrep}/bin/grep -E '^[0-9]{8}T[0-9]{6}Z$' \
+           | ${pkgs.coreutils}/bin/sort | ${pkgs.coreutils}/bin/tail -n1)"
+
       test -n "$TS" || { echo "No snapshots found for host $HOST"; exit 1; }
       echo "→ Latest snapshot: $TS"
-      /run/current-system/sw/bin/systemctl start netbox-restore -- "$TS"
+
+      # Start the instance unit with the timestamp
+      ${pkgs.systemd}/bin/systemctl start "netbox-restore@$TS"
     '';
   };
 
