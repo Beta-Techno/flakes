@@ -473,8 +473,39 @@ SQL
       echo "→ Starting NetBox container"
       ${pkgs.systemd}/bin/systemctl start docker-netbox.service
 
-      echo "→ Restore complete. Health probe:"
-      ${pkgs.curl}/bin/curl -fsS http://127.0.0.1:8080/api/status/ >/dev/null && echo "✓ API healthy"
+      echo "→ Restore complete. Waiting for NetBox to become healthy (max 5m)…"
+      deadline=$(( $(date +%s) + 300 ))
+      while [ "$(date +%s)" -lt "$deadline" ]; do
+        # If the service died, surface logs and fail
+        if ! ${pkgs.systemd}/bin/systemctl is-active --quiet docker-netbox.service; then
+          echo "✗ docker-netbox.service is not active"
+          ${pkgs.systemd}/bin/journalctl -u docker-netbox.service -n 200 --no-pager || true
+          ${pkgs.docker}/bin/docker logs --tail=200 netbox || true
+          exit 7
+        fi
+        
+        # Check Docker health status first (more reliable)
+        health="$(${pkgs.docker}/bin/docker inspect -f '{{.State.Health.Status}}' netbox 2>/dev/null || echo starting)"
+        if [ "$health" = "healthy" ]; then
+          if ${pkgs.curl}/bin/curl -fsS http://127.0.0.1:8080/api/status/ >/dev/null; then
+            echo "✓ NetBox API is healthy and ready"
+            exit 0
+          fi
+        elif [ "$health" = "unhealthy" ]; then
+          echo "✗ Container reports unhealthy"
+          ${pkgs.docker}/bin/docker logs --tail=200 netbox || true
+          exit 7
+        fi
+        
+        echo "  Container health: $health, waiting..."
+        sleep 5
+      done
+      
+      echo "✗ Timed out waiting for NetBox to become healthy"
+      ${pkgs.docker}/bin/docker ps --filter name=netbox || true
+      ${pkgs.docker}/bin/docker logs --tail=200 netbox || true
+      echo "⚠ Restore completed but NetBox may still be starting up"
+      exit 0
     '';
   in {
     description = "Restore NetBox from backup timestamp %I";
