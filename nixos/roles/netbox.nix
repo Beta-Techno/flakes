@@ -444,7 +444,7 @@ JSON
       ${pkgs.systemd}/bin/systemctl start postgresql.service
 
       echo "→ Dropping and recreating database"
-      sudo -u postgres ${pkgs.postgresql_15}/bin/psql -v ON_ERROR_STOP=1 -d postgres <<'SQL'
+      ${pkgs.sudo}/bin/sudo -u postgres ${pkgs.postgresql_15}/bin/psql -v ON_ERROR_STOP=1 -d postgres <<'SQL'
       SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'netbox';
       DROP DATABASE IF EXISTS netbox;
       CREATE DATABASE netbox OWNER netbox;
@@ -500,7 +500,7 @@ SQL
     path = [
       pkgs.coreutils pkgs.util-linux pkgs.openssh pkgs.rsync
       pkgs.postgresql_15 pkgs.gnutar pkgs.zstd pkgs.jq pkgs.bash
-      pkgs.docker pkgs.curl pkgs.inetutils pkgs.systemd
+      pkgs.docker pkgs.curl pkgs.inetutils pkgs.systemd pkgs.sudo
     ];
   };
 
