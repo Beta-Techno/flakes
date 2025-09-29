@@ -410,10 +410,9 @@ JSON
   };
 
   # ────────────────────────────── Restore ─────────────────────────────────────
-  # systemd instance unit: start with a timestamp, e.g.
-  #   sudo systemctl start netbox-restore@20250728T023015Z
-  systemd.services."netbox-restore@" = {
-    description = "Restore NetBox from backup timestamp %i on storage-01";
+  # Create a wrapper script for restore that properly handles the timestamp parameter
+  systemd.services.netbox-restore = {
+    description = "Restore NetBox from backup timestamp (use with timestamp argument)";
     after       = [ "network-online.target" "postgresql.service" ];
     wants       = [ "network-online.target" "postgresql.service"
                     "netbox-backup-keygen.service" "netbox-backup-knownhosts.service" ];
@@ -430,7 +429,15 @@ JSON
     ];
     script = ''
       set -euo pipefail
-      TS="%i"
+      
+      # Get timestamp from environment variable or first argument
+      TS="''${1:-''${NETBOX_RESTORE_TIMESTAMP}}"
+      if [ -z "$TS" ]; then
+        echo "Usage: $0 <timestamp> or set NETBOX_RESTORE_TIMESTAMP environment variable"
+        echo "Example: $0 20250928T023538Z"
+        exit 1
+      fi
+      
       HOST="$(hostname)"              # NOTE: backup paths are keyed by $(hostname)
       BACKUP_ROOT_REMOTE="/var/storage/backups/netbox/$HOST/$TS"
       TMP="$(mktemp -d)"
@@ -507,7 +514,7 @@ JSON
       TS="$($SSH backup@storage-01 "ls -1 /var/storage/backups/netbox/$HOST/" | grep -E '^[0-9]{8}T[0-9]{6}Z$' | sort | tail -n1)"
       test -n "$TS" || { echo "No snapshots found for host $HOST"; exit 1; }
       echo "→ Latest snapshot: $TS"
-      /run/current-system/sw/bin/systemctl start "netbox-restore@$TS"
+      NETBOX_RESTORE_TIMESTAMP="$TS" /run/current-system/sw/bin/systemctl start netbox-restore
     '';
   };
 
