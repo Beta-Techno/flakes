@@ -1,6 +1,3 @@
-# SOPS configuration for secrets management
 creation_rules:
-  - path_regex: ^secrets/prod\.ya?ml$
-    age:
-      - age1vj48m38ek353qclcrgyfyk0t4exqgg7vd0wt2jpr9sv3yxzy4a4sz52hua
-      - age1cmtq83wha4mw4002kejlyd6h6cehdp2mqlvqeu3y2jhgpyufqdmqs4yydn
+- path_regex: ^secrets/prod\.ya?ml$
+  age: age1dlzvswat5fsx87uxj5lryszlst7snwyzxnvlgrjpr2jq85ucau4q29antl,age1cmtq83wha4mw4002kejlyd6h6cehdp2mqlvqeu3y2jhgpyufqdmqs4yydn
