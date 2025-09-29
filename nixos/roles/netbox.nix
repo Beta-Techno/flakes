@@ -415,7 +415,7 @@ JSON
   # Why instance?
   # - systemd does not pass "service arguments" via `--`.
   # - `%i` (instance) is the standard pattern for dynamic parameters.
-  let
+  systemd.services."netbox-restore@" = let
     restoreScript = pkgs.writeShellScript "netbox-restore" ''
       set -euo pipefail
 
@@ -476,8 +476,7 @@ SQL
       echo "→ Restore complete. Health probe:"
       ${pkgs.curl}/bin/curl -fsS http://127.0.0.1:8080/api/status/ >/dev/null && echo "✓ API healthy"
     '';
-  in
-  systemd.services."netbox-restore@" = {
+  in {
     description = "Restore NetBox from backup timestamp %I";
     after = [
       "network-online.target"
