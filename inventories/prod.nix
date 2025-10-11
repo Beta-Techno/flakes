@@ -61,7 +61,7 @@
   storage-backup-01 = {
     system = "x86_64-linux";
     role = "storage-backup";
-    ip = "10.0.0.17";
+    ip = "10.0.2.118";
     hostModule = ./../nixos/hosts/servers/storage-backup-01.nix;
     modules = [ ];
   };
