@@ -129,6 +129,10 @@
 
       # NetBox/Django
       ALLOWED_HOSTS = "*";                 # dev only; set real hostnames in prod
+      
+      # CSRF protection for Cloudflare tunnel
+      CSRF_TRUSTED_ORIGINS = "https://netbox.betatechnology.org";
+      
       # CORS (NetBox reads the *ORIGIN* names)
       CORS_ORIGIN_ALLOW_ALL = "true";      # dev: allow any Origin
       CORS_ALLOW_CREDENTIALS = "false";    # keep false if you use token auth
