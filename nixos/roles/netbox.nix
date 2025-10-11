@@ -305,14 +305,14 @@
       set -euo pipefail
       install -d -m 0700 /var/lib/netbox-backup
       # Seed by hostname only; avoids IP drift after VM changes
-      ${pkgs.openssh}/bin/ssh-keyscan -T 5 -t ed25519 storage-01 2>/dev/null | sort -u > /var/lib/netbox-backup/known_hosts.new
+      ${pkgs.openssh}/bin/ssh-keyscan -T 5 -t ed25519 storage-backup-01 2>/dev/null | sort -u > /var/lib/netbox-backup/known_hosts.new
       install -m 0644 /var/lib/netbox-backup/known_hosts.new /var/lib/netbox-backup/known_hosts
       rm -f /var/lib/netbox-backup/known_hosts.new
     '';
   };
 
   systemd.services.netbox-backup = {
-    description = "NetBox daily backup → storage-01";
+    description = "NetBox daily backup → storage-backup-01";
     after = [
       "network-online.target"
       "netbox-backup-keygen.service"
@@ -369,13 +369,13 @@ JSON
         [ -f "$STAMP_DIR/$t" ] && zstd -19 --rm "$STAMP_DIR/$t"
       done
 
-      # 6) Push to storage-01 via rsync+ssh
+      # 6) Push to storage-backup-01 via rsync+ssh
       SSH="ssh -i /var/lib/netbox-backup/id_ed25519 \
            -o IdentitiesOnly=yes \
            -o UserKnownHostsFile=/var/lib/netbox-backup/known_hosts \
            -o StrictHostKeyChecking=yes"
 
-      DEST="backup@storage-01:/var/storage/backups/netbox/$HOST/$TS/"
+      DEST="backup@storage-backup-01:/var/storage/backups/netbox/$HOST/$TS/"
 
       # NOTE: --mkpath makes the remote parents automatically
       rsync -az --mkpath --chmod=Fu=rw,Fg=r,Do=r --delete \
@@ -428,13 +428,13 @@ JSON
       TMP="$(${pkgs.coreutils}/bin/mktemp -d)"
       trap 'rm -rf "$TMP"' EXIT
 
-      echo "→ Fetching backup set $BACKUP_ROOT_REMOTE from storage-01"
+      echo "→ Fetching backup set $BACKUP_ROOT_REMOTE from storage-backup-01"
       SSH="${pkgs.openssh}/bin/ssh -i /var/lib/netbox-backup/id_ed25519 \
            -o IdentitiesOnly=yes \
            -o UserKnownHostsFile=/var/lib/netbox-backup/known_hosts \
            -o StrictHostKeyChecking=yes"
 
-      ${pkgs.rsync}/bin/rsync -az -e "$SSH" "backup@storage-01:$BACKUP_ROOT_REMOTE/" "$TMP/"
+      ${pkgs.rsync}/bin/rsync -az -e "$SSH" "backup@storage-backup-01:$BACKUP_ROOT_REMOTE/" "$TMP/"
       test -s "$TMP/netbox.pgsql.dump" || { echo "Missing DB dump"; exit 1; }
 
       echo "→ Stopping NetBox container"
@@ -537,7 +537,7 @@ SQL
 
   # Convenience: restore the most recent snapshot by starting the instance
   systemd.services.netbox-restore-latest = {
-    description = "Restore NetBox from the latest snapshot on storage-01";
+    description = "Restore NetBox from the latest snapshot on storage-backup-01";
     after = [ "network-online.target" ];
     wants = [ "network-online.target" "netbox-backup-keygen.service" "netbox-backup-knownhosts.service" ];
     serviceConfig = { Type = "oneshot"; };
@@ -550,7 +550,7 @@ SQL
            -o UserKnownHostsFile=/var/lib/netbox-backup/known_hosts \
            -o StrictHostKeyChecking=yes"
 
-      TS="$($SSH backup@storage-01 "ls -1 /var/storage/backups/netbox/$HOST/" \
+      TS="$($SSH backup@storage-backup-01 "ls -1 /var/storage/backups/netbox/$HOST/" \
            | ${pkgs.gnugrep}/bin/grep -E '^[0-9]{8}T[0-9]{6}Z$' \
            | ${pkgs.coreutils}/bin/sort | ${pkgs.coreutils}/bin/tail -n1)"
 

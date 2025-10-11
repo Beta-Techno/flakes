@@ -48,13 +48,21 @@
     modules = [ ];
   };
 
-  # Storage server host (backup and storage services)
-  storage-01 = {
+  # Media storage (NFS/SMB for Jellyfin/MediaMTX)
+  storage-media-01 = {
     system = "x86_64-linux";
-    role = "storage-server";
-    # static IP optional; DHCP is fine for the first pass
-    # ip = "10.0.0.16";
-    hostModule = ./../nixos/hosts/servers/storage-01.nix;
+    role = "storage-media";
+    ip = "10.0.0.16";
+    hostModule = ./../nixos/hosts/servers/storage-media-01.nix;
+    modules = [ ];
+  };
+
+  # Isolated backup target (push-only)
+  storage-backup-01 = {
+    system = "x86_64-linux";
+    role = "storage-backup";
+    ip = "10.0.0.17";
+    hostModule = ./../nixos/hosts/servers/storage-backup-01.nix;
     modules = [ ];
   };
 
