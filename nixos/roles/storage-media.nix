@@ -30,6 +30,7 @@
   services.nfs.server.enable = true;
   services.nfs.server.exports = ''
     /srv/media 10.0.0.0/24(rw,sync,no_subtree_check,root_squash)
+    /srv/media 10.0.2.0/24(rw,sync,no_subtree_check,root_squash)
   '';
   networking.firewall.allowedTCPPorts = lib.mkAfter [ 2049 80 443 ];
   networking.firewall.allowedUDPPorts = lib.mkAfter [ 2049 ];
