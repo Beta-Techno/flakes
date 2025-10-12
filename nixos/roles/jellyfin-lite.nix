@@ -26,7 +26,7 @@
   };
 
   # Network resolution for storage-media-01
-  networking.hosts."10.0.0.16" = [ "storage-media-01" ];
+  networking.hosts."10.0.2.131" = [ "storage-media-01" ];
 
   systemd.tmpfiles.rules = [
     "d /var/lib/jellyfin 0755 jellyfin jellyfin"
