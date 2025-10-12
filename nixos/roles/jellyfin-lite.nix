@@ -15,11 +15,20 @@
     isSystemUser = true;
     group = "jellyfin";
     home  = "/var/lib/jellyfin";
+    extraGroups = [ "media" ];
   };
 
-  # Make a local media folder now; replace with an NFS/SMB mount later.
+  # NFS mount for media storage
+  fileSystems."/mnt/media" = {
+    device = "storage-media-01:/srv/media";
+    fsType = "nfs";
+    options = [ "rw" "hard" "intr" "rsize=8192" "wsize=8192" ];
+  };
+
+  # Network resolution for storage-media-01
+  networking.hosts."10.0.0.16" = [ "storage-media-01" ];
+
   systemd.tmpfiles.rules = [
-    "d /mnt/media 0755 root root -"
     "d /var/lib/jellyfin 0755 jellyfin jellyfin"
     "d /var/lib/jellyfin/config 0755 jellyfin jellyfin"
     "d /var/lib/jellyfin/cache 0755 jellyfin jellyfin"
@@ -58,10 +67,13 @@
   # System packages
   environment.systemPackages = with pkgs; [
     jellyfin
+    nfs-utils
   ];
 
   # Ensure Jellyfin starts properly and restarts on failure
   systemd.services.docker-jellyfin = {
+    after = [ "mnt-media.mount" ];
+    requires = [ "mnt-media.mount" ];
     serviceConfig = {
       Restart = "always";
       RestartSec = 5;
