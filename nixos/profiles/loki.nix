@@ -65,7 +65,7 @@
       };
       
       chunk_store_config = {
-        max_look_back_period = "0s";
+        # max_look_back_period is deprecated in newer Loki versions
       };
       
       table_manager = {
