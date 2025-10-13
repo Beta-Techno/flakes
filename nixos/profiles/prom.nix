@@ -46,10 +46,10 @@
       })
     ];
 
-    # Alerting rules
-    ruleFiles = [
-      ./prometheus-alerts.yml
-    ];
+    # Alerting rules (disabled for now - can be added later)
+    # ruleFiles = [
+    #   ./prometheus-alerts.yml
+    # ];
   };
 
   # Node exporter for system metrics
