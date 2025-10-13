@@ -4,7 +4,6 @@
 {
   services.grafana = {
     enable = true;
-    port = 3000;
     
     # Basic configuration
     settings = {
