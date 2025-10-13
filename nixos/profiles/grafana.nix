@@ -24,41 +24,49 @@
         type = "sqlite3";
         path = "/var/lib/grafana/grafana.db";
       };
-      
-      # Data sources
-      "datasources.yaml" = {
-        datasources = [
-          {
-            name = "Prometheus";
-            type = "prometheus";
-            url = "http://localhost:9090";
-            access = "proxy";
-            isDefault = true;
-          }
-          {
-            name = "Loki";
-            type = "loki";
-            url = "http://localhost:3100";
-            access = "proxy";
-          }
-        ];
+    };
+    
+    # Data sources configuration
+    declarativePlugins = [ ];
+    
+    # Provisioning configuration
+    provision = {
+      datasources = {
+        settings = {
+          datasources = [
+            {
+              name = "Prometheus";
+              type = "prometheus";
+              url = "http://localhost:9090";
+              access = "proxy";
+              isDefault = true;
+            }
+            {
+              name = "Loki";
+              type = "loki";
+              url = "http://localhost:3100";
+              access = "proxy";
+            }
+          ];
+        };
       };
       
-      # Dashboard providers
-      "dashboard.yaml" = {
-        providers = [
-          {
-            name = "default";
-            orgId = 1;
-            folder = "";
-            type = "file";
-            disableDeletion = false;
-            editable = true;
-            options = {
-              path = "/var/lib/grafana/dashboards";
-            };
-          }
-        ];
+      dashboards = {
+        settings = {
+          providers = [
+            {
+              name = "default";
+              orgId = 1;
+              folder = "";
+              type = "file";
+              disableDeletion = false;
+              editable = true;
+              options = {
+                path = "/var/lib/grafana/dashboards";
+              };
+            }
+          ];
+        };
       };
     };
   };
