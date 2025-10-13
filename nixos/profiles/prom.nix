@@ -72,7 +72,7 @@
   services.prometheus.exporters.nginx = {
     enable = true;
     port = 9113;
-    nginxScrapeUri = "http://localhost/nginx_status";
+    scrapeUri = "http://localhost/nginx_status";
   };
 
   # PostgreSQL exporter for database metrics
