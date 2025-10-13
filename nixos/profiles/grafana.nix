@@ -9,6 +9,7 @@
     settings = {
       server = {
         http_port = 3000;
+        http_addr = "0.0.0.0";  # Bind to all interfaces for external access
         domain = "grafana.local";
         root_url = "https://grafana.local/";
       };
