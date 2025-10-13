@@ -28,9 +28,9 @@
       schema_config = {
         configs = [{
           from = "2020-10-24";
-          store = "boltdb-shipper";
+          store = "tsdb";
           object_store = "filesystem";
-          schema = "v11";
+          schema = "v13";
           index = {
             prefix = "index_";
             period = "24h";
@@ -39,9 +39,9 @@
       };
       
       storage_config = {
-        boltdb_shipper = {
-          active_index_directory = "/var/lib/loki/boltdb-shipper-active";
-          cache_location = "/var/lib/loki/boltdb-shipper-cache";
+        tsdb_shipper = {
+          active_index_directory = "/var/lib/loki/tsdb-shipper-active";
+          cache_location = "/var/lib/loki/tsdb-shipper-cache";
           cache_ttl = "24h";
         };
         filesystem = {
@@ -79,6 +79,7 @@
         retention_enabled = true;
         retention_delete_delay = "2h";
         retention_delete_worker_count = 150;
+        delete_request_store = "filesystem";
       };
     };
   };
