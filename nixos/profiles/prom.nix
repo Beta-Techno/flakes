@@ -57,10 +57,11 @@
     enable = true;
     port = 9100;
     listenAddress = "127.0.0.1";
+    # node_exporter doesn't have a "disk" collector; the correct name is "diskstats".
     enabledCollectors = [
       "systemd"
       "cpu"
-      "disk"
+      "diskstats"
       "filesystem"
       "loadavg"
       "meminfo"
