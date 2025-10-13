@@ -62,7 +62,6 @@
         max_query_lookback = "1h";
         max_entries_limit_per_query = 5000;
         max_query_length = "721h";
-        max_query_parallelism = 32;
         cardinality_limit = 100000;
         max_streams_per_user = 10000;
         max_line_size = 256000;
