@@ -14,9 +14,18 @@ if [ ! -f "$SECRETS_DIR/prod.yaml.plaintext" ]; then
     exit 1
 fi
 
-# Get all Age recipients from .sops.yaml or existing encrypted file
-if [ -f "$REPO_ROOT/.sops.yaml" ]; then
-    echo "Using Age recipients from .sops.yaml..."
+# Get all Age recipients from nixos/keys/age/*.txt files
+if [ -d "$REPO_ROOT/nixos/keys/age" ] && [ "$(ls -A "$REPO_ROOT/nixos/keys/age"/*.txt 2>/dev/null)" ]; then
+    echo "Using Age recipients from nixos/keys/age/*.txt files..."
+    # Read all public keys from the age key files
+    RECIPIENTS=$(cat "$REPO_ROOT/nixos/keys/age"/*.txt | grep -v '^$' | tr '\n' ',' | sed 's/,$//')
+    if [ -z "$RECIPIENTS" ]; then
+        echo "❌ No Age keys found in nixos/keys/age/*.txt files"
+        exit 1
+    fi
+    echo "Found keys for: $(ls "$REPO_ROOT/nixos/keys/age"/*.txt | xargs -n1 basename | sed 's/\.txt$//' | tr '\n' ' ')"
+elif [ -f "$REPO_ROOT/.sops.yaml" ]; then
+    echo "Using Age recipients from .sops.yaml (fallback)..."
     # Extract recipients from .sops.yaml using grep (more reliable than yq)
     RECIPIENTS=$(grep -o 'age1[a-zA-Z0-9]*' "$REPO_ROOT/.sops.yaml" | tr '\n' ',' | sed 's/,$//')
     if [ -z "$RECIPIENTS" ]; then
@@ -28,11 +37,12 @@ elif [ -f "$SECRETS_DIR/prod.yaml" ]; then
     # Extract recipients from existing encrypted file
     RECIPIENTS=$(sops exec-file "$SECRETS_DIR/prod.yaml" 'echo "$SOPS_AGE_RECIPIENTS"')
 else
-    echo "No existing encrypted file or .sops.yaml found."
-    echo "You need to specify Age recipients manually:"
-    echo "Example: SOPS_AGE_RECIPIENTS='age1...' $0"
-    echo ""
-    echo "Or create a .sops.yaml file with your Age recipients."
+    echo "No age key files, .sops.yaml, or existing encrypted file found."
+    echo "You need to either:"
+    echo "1. Add public keys to nixos/keys/age/*.txt files, or"
+    echo "2. Create a .sops.yaml file with your Age recipients, or"
+    echo "3. Specify Age recipients manually:"
+    echo "   Example: SOPS_AGE_RECIPIENTS='age1...' $0"
     exit 1
 fi
 
