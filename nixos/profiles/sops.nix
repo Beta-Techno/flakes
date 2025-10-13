@@ -63,6 +63,17 @@
         group = "root";
         mode  = "0400";
       };
+
+      # ── Grafana ─────────────────────────────────────────────────
+      grafana-admin-password = lib.mkIf config.services.grafana.enable {
+        # Write exactly where Grafana profile reads from
+        path  = "/var/lib/grafana/admin-password";
+        owner = "grafana"; group = "grafana"; mode = "0400";
+      };
+      grafana-secret-key = lib.mkIf config.services.grafana.enable {
+        path  = "/var/lib/grafana/secret-key";
+        owner = "grafana"; group = "grafana"; mode = "0400";
+      };
     };
   };
 

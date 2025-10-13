@@ -66,6 +66,16 @@
     modules = [ ];
   };
 
+  # New: dedicated observability node
+  observability-01 = {
+    system = "x86_64-linux";
+    role = "infra";
+    # IP optional; we'll use DHCP to start. Keep a note if you want a fixed address later:
+    # ip = "10.0.0.30";
+    hostModule = ./../nixos/hosts/servers/observability-01.nix;
+    modules = [ ];
+  };
+
 
   # Development workstations (keep existing)
   nick-laptop = {

@@ -9,6 +9,7 @@
     ../profiles/prom.nix
     ../profiles/loki.nix
     ../profiles/grafana.nix
+    ../profiles/sops.nix
   ];
 
   # Infrastructure-specific configuration
@@ -34,6 +35,12 @@
       proxyPass = "http://localhost:9090/";
       proxyWebsockets = true;
     };
+    # If the host didn't define a stub_status, provide one here
+    locations."/nginx_status".extraConfig = lib.mkDefault ''
+      stub_status;
+      allow 127.0.0.1;
+      deny all;
+    '';
   };
 
   # System packages for infrastructure management
