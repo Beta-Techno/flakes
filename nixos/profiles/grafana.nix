@@ -5,6 +5,22 @@
   services.grafana = {
     enable = true;
     
+    # Let Grafana install plugins itself on boot
+    # (uses GF_INSTALL_PLUGINS behind the scenes)
+    provision.enable = true;
+    
+    # Environment variables for plugin installation
+    environment = {
+      GF_INSTALL_PLUGINS = lib.concatStringsSep "," [
+        # Official BigQuery plugin id from grafana.com
+        # Keep pinned to a version you've tested
+        "grafana-bigquery-datasource 4.1.2"
+      ];
+      
+      # Allow loading unsigned plugins (BigQuery plugin is unsigned)
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS = "";
+    };
+    
     # Basic configuration
     settings = {
       server = {
@@ -30,11 +46,6 @@
       };
     };
     
-    # Install BigQuery plugin
-    extraPlugins = with pkgs; [
-      grafana-bigquery-datasource
-    ];
-    
     # Provisioning configuration
     provision = {
       datasources = {
@@ -57,11 +68,16 @@
               name = "BigQuery";
               type = "grafana-bigquery-datasource";
               access = "proxy";
-              # You'll need to configure authentication via service account JSON
-              # This can be done through the web UI or by adding JSON credentials here
               jsonData = {
                 authenticationType = "jwt";
-                # Add your service account JSON here or configure via UI
+                tokenUri = "https://oauth2.googleapis.com/token";
+                # Optional: project override; plugin can infer from key
+                # defaultProject = "my-gcp-project";
+              };
+              secureJsonData = {
+                # Service account JSON will be provided via SOPS
+                # privateKey = "$__file{${config.sops.secrets."gcp-bq-sa.json".path}}";
+                # For now, configure via UI until SOPS secret is added
               };
             }
           ];
@@ -83,23 +99,18 @@
               };
             }
           ];
-        };
       };
     };
   };
 
-  # Create dashboard directory
+  # Ensure plugin dir exists and is writable by grafana
   systemd.tmpfiles.rules = [
-    "d /var/lib/grafana/dashboards 0755 grafana grafana"
+    "d /var/lib/grafana/plugins 0755 grafana grafana -"
+    "d /var/lib/grafana/dashboards 0755 grafana grafana -"
   ];
 
   # Firewall rules
   networking.firewall.allowedTCPPorts = [
     3000  # Grafana
-  ];
-
-  # System packages
-  environment.systemPackages = with pkgs; [
-    grafana
   ];
 }
