@@ -62,12 +62,14 @@
               jsonData = {
                 authenticationType = "jwt";
                 tokenUri = "https://oauth2.googleapis.com/token";
-                # Optional: project override; plugin can infer from key
-                # defaultProject = "my-gcp-project";
+                # Be explicit; use your project id:
+                defaultProject = "bigquery-475119";
+                # Optional if you want to pin a region:
+                # processingLocation = "US";
               };
+              # Provide the ENTIRE service-account JSON via $__file{...}
               secureJsonData = {
-                # Service account JSON provided via SOPS
-                privateKey = "$__file{${config.sops.secrets."gcp-bq-sa.json".path}}";
+                jwt = "$__file{${config.sops.secrets."gcp-bq-sa.json".path}}";
               };
             }
           ];
