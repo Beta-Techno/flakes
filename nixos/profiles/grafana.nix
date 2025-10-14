@@ -27,7 +27,9 @@
     };
     
     # Data sources configuration
-    declarativePlugins = [ ];
+    declarativePlugins = [ 
+      "grafana-bigquery-datasource"  # BigQuery data source plugin
+    ];
     
     # Provisioning configuration
     provision = {
@@ -46,6 +48,17 @@
               type = "loki";
               url = "http://localhost:3100";
               access = "proxy";
+            }
+            {
+              name = "BigQuery";
+              type = "grafana-bigquery-datasource";
+              access = "proxy";
+              # You'll need to configure authentication via service account JSON
+              # This can be done through the web UI or by adding JSON credentials here
+              jsonData = {
+                authenticationType = "jwt";
+                # Add your service account JSON here or configure via UI
+              };
             }
           ];
         };
