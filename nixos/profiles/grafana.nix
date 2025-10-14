@@ -24,11 +24,15 @@
         type = "sqlite3";
         path = "/var/lib/grafana/grafana.db";
       };
+      
+      paths = {
+        plugins = "/var/lib/grafana/plugins";
+      };
     };
     
-    # Data sources configuration
-    declarativePlugins = [ 
-      "grafana-bigquery-datasource"  # BigQuery data source plugin
+    # Install BigQuery plugin
+    extraPlugins = with pkgs; [
+      grafana-bigquery-datasource
     ];
     
     # Provisioning configuration
