@@ -18,7 +18,7 @@
       ];
       
       # Allow loading unsigned plugins (BigQuery plugin is unsigned)
-      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS = "";
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS = "grafana-bigquery-datasource";
     };
     
     # Basic configuration
@@ -99,6 +99,7 @@
               };
             }
           ];
+        };
       };
     };
   };
