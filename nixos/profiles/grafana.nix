@@ -97,8 +97,8 @@
 
   # Put GF_* variables on the systemd unit so Grafana downloads the plugin
   systemd.services.grafana.environment = {
-    # Pin the version you trust; Grafana will fetch it on start
-    GF_INSTALL_PLUGINS = "grafana-bigquery-datasource 4.1.2";
+    # Let Grafana use the latest available version
+    GF_INSTALL_PLUGINS = "grafana-bigquery-datasource";
     # (no need to set GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS here since
     #  we configured it in grafana.ini above via settings.plugins.allow_loading_unsigned_plugins)
   };
