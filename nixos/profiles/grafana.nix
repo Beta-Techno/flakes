@@ -66,9 +66,8 @@
                 # defaultProject = "my-gcp-project";
               };
               secureJsonData = {
-                # Service account JSON will be provided via SOPS
-                # privateKey = "$__file{${config.sops.secrets."gcp-bq-sa.json".path}}";
-                # For now, configure via UI until SOPS secret is added
+                # Service account JSON provided via SOPS
+                privateKey = "$__file{${config.sops.secrets."gcp-bq-sa.json".path}}";
               };
             }
           ];

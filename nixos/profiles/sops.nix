@@ -74,6 +74,10 @@
         path  = "/var/lib/grafana/secret-key";
         owner = "grafana"; group = "grafana"; mode = "0400";
       };
+      "gcp-bq-sa.json" = lib.mkIf config.services.grafana.enable {
+        path  = "/var/lib/grafana/gcp-bq-sa.json";
+        owner = "grafana"; group = "grafana"; mode = "0400";
+      };
     };
   };
 
