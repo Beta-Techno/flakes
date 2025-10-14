@@ -4,22 +4,7 @@
 {
   services.grafana = {
     enable = true;
-    
-    # Let Grafana install plugins itself on boot
-    # (uses GF_INSTALL_PLUGINS behind the scenes)
     provision.enable = true;
-    
-    # Environment variables for plugin installation
-    environment = {
-      GF_INSTALL_PLUGINS = lib.concatStringsSep "," [
-        # Official BigQuery plugin id from grafana.com
-        # Keep pinned to a version you've tested
-        "grafana-bigquery-datasource 4.1.2"
-      ];
-      
-      # Allow loading unsigned plugins (BigQuery plugin is unsigned)
-      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS = "grafana-bigquery-datasource";
-    };
     
     # Basic configuration
     settings = {
@@ -43,6 +28,12 @@
       
       paths = {
         plugins = "/var/lib/grafana/plugins";
+      };
+      
+      # Allow unsigned plugin via grafana.ini (preferred over env var)
+      plugins = {
+        # Comma-separated list if you add more later
+        allow_loading_unsigned_plugins = "grafana-bigquery-datasource";
       };
     };
     
@@ -102,6 +93,14 @@
         };
       };
     };
+  };
+
+  # Put GF_* variables on the systemd unit so Grafana downloads the plugin
+  systemd.services.grafana.environment = {
+    # Pin the version you trust; Grafana will fetch it on start
+    GF_INSTALL_PLUGINS = "grafana-bigquery-datasource 4.1.2";
+    # (no need to set GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS here since
+    #  we configured it in grafana.ini above via settings.plugins.allow_loading_unsigned_plugins)
   };
 
   # Ensure plugin dir exists and is writable by grafana
