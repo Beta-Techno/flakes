@@ -61,9 +61,8 @@
               access = "proxy";
               jsonData = {
                 authenticationType = "jwt";
-                tokenUri = "https://oauth2.googleapis.com/token";
-                # Be explicit; use your project id:
-                defaultProject = "bigquery-475119";
+                defaultProject = "bigquery-475119";  # adjust to your project id
+                # tokenUri not required; present in the SA JSON and inferred
                 # Optional if you want to pin a region:
                 # processingLocation = "US";
               };
