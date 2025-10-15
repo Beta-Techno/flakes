@@ -61,14 +61,11 @@
               access = "proxy";
               jsonData = {
                 authenticationType = "jwt";
-                defaultProject = "bigquery-475119";  # adjust to your project id
-                # tokenUri not required; present in the SA JSON and inferred
-                # Optional if you want to pin a region:
-                # processingLocation = "US";
-              };
-              # Provide the ENTIRE service-account JSON via $__file{...}
-              secureJsonData = {
-                credentialsJson = "$__file{${config.sops.secrets."gcp-bq-sa.json".path}}";
+                defaultProject = "bigquery-475119";
+                clientEmail = "bigquery-drive-audit@bigquery-475119.iam.gserviceaccount.com";
+                tokenUri = "https://oauth2.googleapis.com/token";
+                processingLocation = "US";
+                privateKeyPath = "${config.sops.secrets."gcp-bq-sa.pem".path}";
               };
             }
           ];
