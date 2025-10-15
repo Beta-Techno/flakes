@@ -97,8 +97,11 @@
 
   # Put GF_* variables on the systemd unit so Grafana downloads the plugin
   systemd.services.grafana = {
-    after = [ "sops-nix.service" ];
-    requires = [ "sops-nix.service" ];
+    # Bring up networking first (Grafana calls out to fetch plugins, etc.)
+    wants = [ "network-online.target" ];
+    after = [ "network-online.target" ];
+    # Start only if the SA JSON secret exists (written by sops-nix)
+    unitConfig.ConditionPathExists = "/var/lib/grafana/gcp-bq-sa.json";
     environment = {
       # Let Grafana use the latest available version
       GF_INSTALL_PLUGINS = "grafana-bigquery-datasource";
