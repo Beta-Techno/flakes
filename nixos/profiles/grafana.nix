@@ -69,7 +69,7 @@
               };
               # Provide the ENTIRE service-account JSON via $__file{...}
               secureJsonData = {
-                token = "$__file{${config.sops.secrets."gcp-bq-sa.json".path}}";
+                jwt = "$__file{${config.sops.secrets."gcp-bq-sa.json".path}}";
               };
             }
           ];
