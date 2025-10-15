@@ -69,14 +69,17 @@
         # Write exactly where Grafana profile reads from
         path  = "/var/lib/grafana/admin-password";
         owner = "grafana"; group = "grafana"; mode = "0400";
+        restartUnits = [ "grafana.service" ];
       };
       grafana-secret-key = lib.mkIf config.services.grafana.enable {
         path  = "/var/lib/grafana/secret-key";
         owner = "grafana"; group = "grafana"; mode = "0400";
+        restartUnits = [ "grafana.service" ];
       };
       "gcp-bq-sa.json" = lib.mkIf config.services.grafana.enable {
         path  = "/var/lib/grafana/gcp-bq-sa.json";
         owner = "grafana"; group = "grafana"; mode = "0400";
+        restartUnits = [ "grafana.service" ];
       };
     };
   };

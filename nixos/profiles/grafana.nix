@@ -97,11 +97,15 @@
   };
 
   # Put GF_* variables on the systemd unit so Grafana downloads the plugin
-  systemd.services.grafana.environment = {
-    # Let Grafana use the latest available version
-    GF_INSTALL_PLUGINS = "grafana-bigquery-datasource";
-    # (no need to set GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS here since
-    #  we configured it in grafana.ini above via settings.plugins.allow_loading_unsigned_plugins)
+  systemd.services.grafana = {
+    after = [ "sops-nix.service" ];
+    requires = [ "sops-nix.service" ];
+    environment = {
+      # Let Grafana use the latest available version
+      GF_INSTALL_PLUGINS = "grafana-bigquery-datasource";
+      # (no need to set GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS here since
+      #  we configured it in grafana.ini above via settings.plugins.allow_loading_unsigned_plugins)
+    };
   };
 
   # Ensure plugin dir exists and is writable by grafana
