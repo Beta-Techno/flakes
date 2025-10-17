@@ -74,7 +74,7 @@
 
     # pass args to editor modules
     _module.args = {
-      inherit (inputs) lazyvimStarter lazyvimConfig doomConfig;
+      inherit (inputs) lazyvimStarter lazyvimConfig doomConfig nix-doom;
       username = "nbg";
     };
   };
