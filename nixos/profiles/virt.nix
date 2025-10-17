@@ -62,8 +62,9 @@
   # System optimizations for VM environment
   systemd = {
     # Optimize NetworkManager for VM environment
+    # Reduce timeout for faster boot in VMs
     services.NetworkManager-wait-online.serviceConfig = {
-      ExecStart = [ "" "${pkgs.systemd}/lib/systemd/systemd-networkd-wait-online --any" ];
+      TimeoutStartSec = "30s";  # Reduce from default 120s to 30s for VMs
     };
   };
 }
