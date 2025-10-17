@@ -1,6 +1,14 @@
 { config, pkgs, lib, inputs, ... }:
 
 {
+  # ── Nick VM Workstation Configuration ─────────────────────────────────────
+  # This configuration provides a clean VM workstation setup with:
+  # - Proper module import layering (no Home Manager modules at system level)
+  # - VM-appropriate video drivers (overrides workstation role's Intel drivers)
+  # - Chrome sandbox support via security.chromiumSuidSandbox.enable
+  # - Consistent Home Manager state versioning (24.11)
+  # - Common VM optimizations via profiles/virt.nix (QEMU guest, fstrim, etc.)
+  # - General workstation role that can be overridden as needed
   imports = [
     # Base system configuration
     ../../profiles/base.nix
@@ -11,11 +19,11 @@
     # UEFI systemd-boot for Proxmox VMs
     ../../profiles/boot/uefi-sdboot.nix
     
+    # Virtualization profile (QEMU guest, fstrim, VM optimizations)
+    ../../profiles/virt.nix
+    
     # Home-Manager NixOS module (required for home-manager.users)
     inputs.home-manager.nixosModules.home-manager
-    
-    # Platform-specific modules (system-level only)
-    ../../../modules/platform/linux/desktop/gnome.nix
   ];
 
   # System configuration
@@ -35,44 +43,16 @@
     options = [ "fmask=0077" "dmask=0077" ];
   };
 
-  # VM-specific hardware configuration
-  hardware = {
-    # Enable redistributable firmware for virtual devices
-    enableRedistributableFirmware = true;
-    
-    # Virtual graphics support
-    graphics = {
-      enable = true;
-      enable32Bit = true;
-    };
-  };
+  # VM-specific configurations are now handled by ../../profiles/virt.nix
 
-  # Boot configuration for VM
-  boot = {
-    # Load virtual graphics modules
-    kernelModules = [ "virtio" "virtio_pci" "virtio_net" "virtio_blk" ];
-    
-    # Make initrd find disk drivers early (prevents boot races)
-    initrd.availableKernelModules = [
-      "virtio_pci" "virtio_blk" "virtio_scsi" "sd_mod" "sr_mod"
-    ];
-    
-    # Kernel parameters for VM optimization
-    kernelParams = [
-      "console=tty0"   # VGA console (for Proxmox display)
-      "console=ttyS0"  # Serial console (for debugging)
-      "nokaslr"
-      "iommu=off"
-      "libata.force=noncq"  # Reduce ATA spam from virtual devices
-      "rootdelay=5"    # Small grace period if udev is slow to create by-label nodes
-    ];
-    
-    # Bootloader configuration is handled by uefi-sdboot.nix profile
-  };
+  # Chrome sandbox (fix "chrome won't start" on NixOS with google-chrome)
+  # Covers chromium/google-chrome setuid sandbox in a supported way.
+  security.chromiumSuidSandbox.enable = true;
 
-  # Guest/trim niceties
-  services.qemuGuest.enable = true;
-  services.fstrim.enable = true;
+  # (Optional) keep NixOS docs off on a slim VM; comment out if you rely on them
+  # documentation.nixos.enable = lib.mkDefault false;
+
+  # Guest/trim niceties are now handled by ../../profiles/virt.nix
 
   # Network configuration for VM
   networking = {
@@ -99,9 +79,9 @@
     # Enable X server
     xserver = {
       enable = true;
-      
-      # Virtual graphics configuration
-      videoDrivers = [ "modesetting" "vmware" "virtio" ];
+      # VM‑centric stack — overrides role's mkDefault "intel" driver
+      # Works well on Proxmox/QEMU with virtio‑gpu; vmware covers ESXi guests.
+      videoDrivers = [ "modesetting" "virtio" "vmware" ];
     };
     
     # Enable PipeWire for audio
@@ -193,6 +173,7 @@
     (import ../../../pkgs/cli/doctor.nix { inherit pkgs; }).program
   ];
 
+
   # Home-Manager configuration
   home-manager.users.nbg = { pkgs, ... }: {
     imports = [
@@ -212,8 +193,8 @@
       ../../../modules/platform/linux/default.nix
     ];
     
-    # Home-Manager version
-    home.stateVersion = "25.11";
+    # Home-Manager version (use a real/current HM release tag)
+    home.stateVersion = "24.11";
     
     # Home directory packages (development environment)
     # Use toolsets for clean, DRY package management (same as nick-laptop)
@@ -242,12 +223,7 @@
   virtualisation = {
     # Enable Docker
     docker.enable = true;
-    
-    # VM guest tools (if using VMware)
-    vmware.guest.enable = lib.mkDefault false;
-    
-    # VirtualBox guest tools (if using VirtualBox)
-    virtualbox.guest.enable = lib.mkDefault false;
+    # Guest tools (vmware/virtualbox) are handled by ../../profiles/virt.nix
   };
 
   # Security and performance
@@ -259,11 +235,5 @@
     sudo.wheelNeedsPassword = false;
   };
 
-  # System optimizations for VM
-  systemd = {
-    # Optimize for VM environment
-    services.NetworkManager-wait-online.serviceConfig = {
-      ExecStart = [ "" "${pkgs.systemd}/lib/systemd/systemd-networkd-wait-online --any" ];
-    };
-  };
+  # System optimizations for VM are now handled by ../../profiles/virt.nix
 }

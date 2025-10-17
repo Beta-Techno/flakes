@@ -1,6 +1,9 @@
 { config, pkgs, lib, ... }:
 
 {
+  # ── General workstation role ──────────────────────────────────────────────
+  # This role provides common workstation functionality that can be overridden
+  # by specific host configurations (e.g., nick-vm for VM-specific settings)
   imports = [
     ../profiles/base.nix
     ../profiles/docker-daemon.nix
@@ -19,7 +22,7 @@
   services.displayManager.gdm.enable = true;
   
   # Video drivers
-  services.xserver.videoDrivers = [ "intel" ]; # Intel driver for MacBook Pro 2015
+  services.xserver.videoDrivers = lib.mkDefault [ "intel" ]; # hosts can override
 
   # Enable sound (PipeWire is configured in the host file)
   # Disable PulseAudio to avoid conflicts with PipeWire
