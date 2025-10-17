@@ -70,7 +70,27 @@
 
       # GUI (phase 3) – use the aggregator
       ../../../modules/gui
+      
+      # Nix-Doom Emacs module
+      inputs.nix-doom.homeModule
     ];
+
+    # Doom Emacs configuration
+    programs.doom-emacs = {
+      enable = true;
+      doomDir = inputs.doomConfig;  # Points to ./home/editors/doom
+      doomLocalDir = "~/.local/share/nix-doom";  # Writable runtime dirs
+      emacs = pkgs.emacs30-pgtk;
+      extraPackages = epkgs: [
+        epkgs.treesit-grammars.with-all-grammars
+        epkgs.vterm
+      ];
+      # experimentalFetchTree = true;  # Enable if you hit "Cannot find Git revision" on newer Nix
+      provideEmacs = true;  # Set false if you also want a separate vanilla Emacs
+    };
+
+    # Optional: Run Emacs as a user-level daemon
+    services.emacs.enable = true;
 
     # pass args to editor modules
     _module.args = {

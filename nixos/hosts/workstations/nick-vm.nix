@@ -191,6 +191,9 @@
       
       # Platform-specific modules (contains user-specific platform configs)
       ../../../modules/platform/linux/default.nix
+      
+      # Nix-Doom Emacs module
+      inputs.nix-doom.homeModule
     ];
     
     # Home-Manager version (use a real/current HM release tag)
@@ -210,6 +213,23 @@
       gp = "git pull";
       gc = "git commit -m";
     };
+
+    # Doom Emacs configuration
+    programs.doom-emacs = {
+      enable = true;
+      doomDir = inputs.doomConfig;  # Points to ./home/editors/doom
+      doomLocalDir = "~/.local/share/nix-doom";  # Writable runtime dirs
+      emacs = pkgs.emacs30-pgtk;
+      extraPackages = epkgs: [
+        epkgs.treesit-grammars.with-all-grammars
+        epkgs.vterm
+      ];
+      # experimentalFetchTree = true;  # Enable if you hit "Cannot find Git revision" on newer Nix
+      provideEmacs = true;  # Set false if you also want a separate vanilla Emacs
+    };
+
+    # Optional: Run Emacs as a user-level daemon
+    services.emacs.enable = true;
 
     # Pass required arguments to modules
     _module.args = {
