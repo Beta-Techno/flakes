@@ -206,6 +206,12 @@
           sync-repos = (import ./pkgs/cli/sync-repos.nix { inherit pkgs; }).program;
           doctor = (import ./pkgs/cli/doctor.nix { inherit pkgs; }).program;
           activate = (import ./pkgs/cli/activate.nix { inherit pkgs; }).program;
+          # NixOS deployment tool
+          nixos-deploy = pkgs.writeShellApplication {
+            name = "nixos-deploy";
+            runtimeInputs = [ pkgs.util-linux pkgs.coreutils pkgs.bash ];
+            text = builtins.readFile ./scripts/nixos-deploy;
+          };
         }
       );
       

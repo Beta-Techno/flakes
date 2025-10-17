@@ -8,8 +8,9 @@
 
   programs.git = {
     enable = true;
-    userName = "Rob";
-    userEmail = "rob@example.com";
+    # Let auth tool set these initially, then they persist via NixOS
+    userName = lib.mkDefault "Rob";
+    userEmail = lib.mkDefault "rob@example.com";
     lfs.enable = true;
   };
 } 

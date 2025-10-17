@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+IFS=$'\n\t'
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Libraries
+# shellcheck source=lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
+# shellcheck source=lib/detection.sh
+source "$SCRIPT_DIR/lib/detection.sh"
+# shellcheck source=lib/hosts.sh
+source "$SCRIPT_DIR/lib/hosts.sh"
+# shellcheck source=lib/interactive.sh
+source "$SCRIPT_DIR/lib/interactive.sh"
+# shellcheck source=lib/actions.sh
+source "$SCRIPT_DIR/lib/actions.sh"
+
+show_help() {
+  cat <<'EOF'
+nixos-deploy — single entrypoint for install/deploy/update/status/rollback
+
+Usage:
+  nixos-deploy                         # interactive mode
+  nixos-deploy <host> [opts]           # deploy syntactic sugar
+  nixos-deploy install [opts]
+  nixos-deploy deploy <host> [opts]
+  nixos-deploy update [--commit]
+  nixos-deploy status
+  nixos-deploy rollback [--target-host USER@HOST]
+  nixos-deploy list-hosts
+  nixos-deploy doctor
+  nixos-deploy -h|--help
+
+Common options:
+  -H, --target-host USER@HOST    Deploy/rollback to remote host via SSH
+  -n, --dry-run                  Build but do not switch (deploy only)
+  -v, --verbose                  Verbose nix output
+
+Examples:
+  nixos-deploy netbox-01
+  nixos-deploy deploy netbox-01 -H root@10.0.0.8
+  nixos-deploy update --commit
+EOF
+}
+
+main() {
+  ensure_flake_root "$REPO_ROOT" || {
+    err "Not a flake root: $REPO_ROOT"
+    die "Run this from your repository (flake) root."
+  }
+
+  if [[ $# -eq 0 ]]; then
+    interactive_main "$REPO_ROOT"
+    exit 0
+  fi
+
+  case "${1:-}" in
+    -h|--help|help) show_help; exit 0 ;;
+    list-hosts) shift; list_hosts_cmd "$REPO_ROOT" "$@" ;;
+    doctor) shift; action_doctor ;;
+    install) shift; action_install "$REPO_ROOT" "$@" ;;
+    deploy) shift; action_deploy "$REPO_ROOT" "$@" ;;
+    update) shift; action_update "$REPO_ROOT" "$@" ;;
+    status) shift; action_status "$REPO_ROOT" "$@" ;;
+    rollback) shift; action_rollback "$REPO_ROOT" "$@" ;;
+    *)
+      # Sugar: host-first form → deploy
+      if host_exists "$REPO_ROOT" "$1"; then
+        local host="$1"; shift || true
+        action_deploy "$REPO_ROOT" "$host" "$@"
+      else
+        err "Unknown command or host: $1"
+        echo
+        show_help
+        exit 2
+      fi
+      ;;
+  esac
+}
+
+main "$@"

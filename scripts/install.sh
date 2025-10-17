@@ -1,85 +1,82 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
 
-# ── Allow unfree packages ───────────────────────────────────
-export NIXPKGS_ALLOW_UNFREE=1   # allow google-chrome derivation
+# Bootstrap script for one-liner installation
+# Usage: bash -c "$(curl -fsSL https://raw.githubusercontent.com/Beta-Techno/flakes/main/scripts/install)"
 
-# ── Helper functions ─────────────────────────────────────────
-die() {
-  echo "Error: $1" >&2
-  exit 1
-}
+REPO_URL="https://github.com/Beta-Techno/flakes.git"
+INSTALL_PATH="/etc/nixos/flakes"
 
-check_command() {
-  if ! command -v "$1" >/dev/null 2>&1; then
-    die "$1 is not installed. Please install it first."
-  fi
-}
+echo "╔══════════════════════════════════════════════════════════════╗"
+echo "║                    NixOS Deployment Tool                     ║"
+echo "║                                                              ║"
+echo "║  Installing your development environment on NixOS           ║"
+echo "║  with professional deployment tools and configurations.     ║"
+echo "╚══════════════════════════════════════════════════════════════╝"
+echo
 
-# ── Install curl if not present ───────────────────────────────
-if ! command -v curl >/dev/null 2>&1; then
-  echo "+ installing curl..."
-  sudo apt-get update
-  sudo apt-get install -y curl
+# Detect environment
+if [[ -f /etc/NIXOS ]]; then
+    echo "[INFO] Detected NixOS system"
+    ENV="nixos"
+elif [[ -f /etc/debian_version ]]; then
+    echo "[INFO] Detected Debian/Ubuntu system"
+    ENV="debian"
+else
+    echo "[ERROR] Unsupported system. This installer requires NixOS or Debian/Ubuntu."
+    exit 1
 fi
 
-# ── Install Nix if not present ───────────────────────────────
-if ! command -v nix >/dev/null 2>&1; then
-  echo "+ installing Nix..."
-  sh <(curl -L https://nixos.org/nix/install) --daemon
-  . /etc/profile.d/nix.sh
-fi
-
-# ── Install git if not present ───────────────────────────────
+# Install git if needed
 if ! command -v git >/dev/null 2>&1; then
-  echo "+ installing git..."
-  sudo apt-get update
-  sudo apt-get install -y git
+    echo "[INFO] Installing git..."
+    if [[ "$ENV" == "nixos" ]]; then
+        nix-env -i git
+    else
+        sudo apt-get update && sudo apt-get install -y git
+    fi
 fi
 
-# ── Enable flakes and experimental features ─────────────────
-echo "+ enabling flakes and nix-command..."
-mkdir -p ~/.config/nix
-if ! grep -q 'experimental-features =.*flakes' ~/.config/nix/nix.conf 2>/dev/null; then
-  echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+# Clone repository
+echo "[INFO] Cloning repository to $INSTALL_PATH..."
+sudo mkdir -p "$(dirname "$INSTALL_PATH")"
+
+if [[ -d "$INSTALL_PATH" ]]; then
+    echo "[INFO] Removing existing installation..."
+    sudo rm -rf "$INSTALL_PATH"
 fi
 
-# ── Clone the repository if not present ─────────────────────
-REPO_DIR="$HOME/flakes"
-if [ ! -d "$REPO_DIR" ]; then
-  echo "+ cloning repository..."
-  git clone https://github.com/Beta-Techno/flakes.git "$REPO_DIR"
+if sudo git clone "$REPO_URL" "$INSTALL_PATH"; then
+    echo "[SUCCESS] Repository cloned successfully"
+else
+    echo "[ERROR] Failed to clone repository"
+    exit 1
 fi
-cd "$REPO_DIR"
 
+# Set permissions
+sudo chown -R "$(whoami)" "$INSTALL_PATH"
+echo "[SUCCESS] Repository permissions set"
 
+# Make nixos-deploy executable
+chmod +x "$INSTALL_PATH/scripts/nixos-deploy"
 
-# ── Run the bootstrap process ───────────────────────────────
-echo "+ running bootstrap process..."
+# Create symlink for easy access
+if sudo mkdir -p /usr/local/bin 2>/dev/null; then
+    sudo ln -sf "$INSTALL_PATH/scripts/nixos-deploy" /usr/local/bin/nixos-deploy
+    echo "[SUCCESS] nixos-deploy symlinked to /usr/local/bin/nixos-deploy"
+fi
 
-# Detect system architecture
-SYSTEM=$(nix eval --impure --expr 'builtins.currentSystem')
-echo "▶ Detected system: $SYSTEM"
-
-# 1. Authenticate with GitHub
-echo "▶ Authenticating with GitHub..."
-nix run .#auth
-
-# 2. Set up development environment
-echo "▶ Setting up development environment..."
-nix run .#setup
-
-# 3. Activate the configuration
-echo "▶ Activating configuration..."
-nix run .#activate
-
-# 4. Sync repositories
-echo "▶ Syncing repositories..."
-nix run .#sync-repos
-
-# After Home Manager activation
-echo "Setting up Chrome sandbox..."
-export NIXPKGS_ALLOW_UNFREE=1
-sudo chmod 4755 "$(nix build --impure --no-link --print-out-paths nixpkgs#google-chrome)/share/google/chrome/chrome-sandbox"
-
-echo "✅  Installation complete! Your development environment is ready." 
+echo
+echo "✅ Installation complete!"
+echo
+echo "Next steps:"
+echo "1. Run the interactive setup:"
+echo "   nixos-deploy"
+echo
+echo "2. Or deploy directly:"
+echo "   nixos-deploy nick-vm --dry-run"
+echo
+echo "3. Available commands:"
+echo "   nixos-deploy --help"
+echo
+echo "Your NixOS development environment is ready! 🚀"

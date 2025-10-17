@@ -88,12 +88,11 @@
       fi
 
       # ── Git identity ─────────────────────────────────────────────
-      if [ -z "''${GH_USER}" ]; then
-        read -rp "Git user.name  : " git_name
-        read -rp "Git user.email : " git_email
-        git config --global user.name  "$git_name"
-        git config --global user.email "$git_email"
-      fi
+      # Always prompt for git identity (override NixOS defaults)
+      read -rp "Git user.name  : " git_name
+      read -rp "Git user.email : " git_email
+      git config --global user.name  "$git_name"
+      git config --global user.email "$git_email"
 
       echo "✅  Authentication complete"
     '';
