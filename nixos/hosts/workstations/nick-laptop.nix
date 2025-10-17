@@ -79,7 +79,7 @@
     programs.doom-emacs = {
       enable = true;
       doomDir = inputs.doomConfig;  # Points to ./home/editors/doom
-      doomLocalDir = "~/.local/share/nix-doom";  # Writable runtime dirs
+      doomLocalDir = "/home/nbg/.local/share/nix-doom";  # Writable runtime dirs (absolute path)
       emacs = pkgs.emacs30-pgtk;
       extraPackages = epkgs: [
         epkgs.treesit-grammars.with-all-grammars
