@@ -17,7 +17,6 @@
 
       # ── Configuration ────────────────────────────────────────────
       KEY_PATH="$HOME/.ssh/id_ed25519"
-      GH_USER="$(git config --global --get user.email || true)"
 
       # ── Helper functions ─────────────────────────────────────────
       die() {
