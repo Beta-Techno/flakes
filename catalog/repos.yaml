@@ -75,6 +75,16 @@
   kind: web
   lang: svelte
 
+- name: wiki
+  url:  git@github.com:Beta-Techno/wiki.git
+  kind: web
+  lang: react
+
+- name: btech
+  url:  git@github.com:Beta-Techno/btech.git
+  kind: web
+  lang: solid
+
 - name: beta-pack
   url:  git@github.com:Beta-Techno/beta-pack.git
   kind: web
