@@ -76,6 +76,23 @@
     modules = [ ];
   };
 
+  # K3s Kubernetes cluster control plane
+  k3s-01 = {
+    system = "x86_64-linux";
+    role = "k3s";
+    ip = "10.0.0.31";
+    hostname = "k3s-01";
+    hostModule = ./../nixos/hosts/servers/k3s-01.nix;
+    modules = [ ./../nixos/disko/k3s-vm.nix ];
+
+    # K3s-specific configuration (consumed by roles/k3s.nix)
+    k3s = {
+      role = "server";
+      clusterInit = true;          # first/only server
+      disableServiceLB = false;    # keep k3s' built-in for day 1
+      disableTraefik = true;       # disable since we have dedicated ingress-01
+    };
+  };
 
   # Development workstations (keep existing)
   nick-laptop = {

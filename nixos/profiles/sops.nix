@@ -86,6 +86,13 @@
         owner = "grafana"; group = "grafana"; mode = "0400";
         restartUnits = [ "grafana.service" ];
       };
+
+      # ── K3s ──────────────────────────────────────────────────────
+      k3s-token = lib.mkIf config.services.k3s.enable {
+        owner = "root";
+        group = "root";
+        mode  = "0400";
+      };
     };
   };
 
