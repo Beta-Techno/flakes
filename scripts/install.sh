@@ -53,6 +53,16 @@ else
     exit 1
 fi
 
+# Ensure remote URL is correct (fixes sudo clone issues)
+echo "[INFO] Verifying and fixing remote URL..."
+if ! sudo git -C "$INSTALL_PATH" remote get-url origin | grep -q "github.com"; then
+    echo "[INFO] Fixing remote URL..."
+    sudo git -C "$INSTALL_PATH" remote set-url origin "$REPO_URL"
+    echo "[SUCCESS] Remote URL corrected"
+else
+    echo "[SUCCESS] Remote URL is correct"
+fi
+
 # Set permissions
 sudo chown -R "$(whoami)" "$INSTALL_PATH"
 echo "[SUCCESS] Repository permissions set"
