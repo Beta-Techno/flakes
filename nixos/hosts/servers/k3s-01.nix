@@ -37,9 +37,9 @@
   ];
 
   # Increase file descriptor limits for Kubernetes
-  systemd.extraConfig = ''
-    DefaultLimitNOFILE=65536
-  '';
+  systemd.settings.Manager = {
+    DefaultLimitNOFILE = 65536;
+  };
 
   # Optional: add swap if needed (uncomment if you want swap)
   # swapDevices = [ { device = "/swapfile"; size = 2048; } ];

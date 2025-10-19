@@ -56,9 +56,13 @@
   };
 
   # Authorize workstation keys everywhere that imports base.nix
-  users.users.nbg.openssh.authorizedKeys.keys = lib.mkIf
-    (builtins.pathExists ../keys/users/nbg.pub)
-    [ (builtins.readFile ../keys/users/nbg.pub) ];
+  users.groups.nbg = lib.mkIf (builtins.pathExists ../keys/users/nbg.pub) {};
+  users.users.nbg = lib.mkIf (builtins.pathExists ../keys/users/nbg.pub) {
+    isNormalUser = true;
+    group = "nbg";
+    extraGroups = [ "wheel" ];
+    openssh.authorizedKeys.keys = [ (builtins.readFile ../keys/users/nbg.pub) ];
+  };
 
   # Firewall
   networking.firewall = {
