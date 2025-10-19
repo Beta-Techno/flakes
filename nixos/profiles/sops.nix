@@ -89,6 +89,7 @@
 
       # ── K3s ──────────────────────────────────────────────────────
       k3s-token = lib.mkIf config.services.k3s.enable {
+        path = "/run/secrets/k3s-token";
         owner = "root";
         group = "root";
         mode  = "0400";
