@@ -16,7 +16,7 @@
             format = "vfat";
             mountpoint = "/boot";
             mountOptions = [ "fmask=0077" "dmask=0077" ];
-            label = "EFI";
+            extraArgs = [ "-n" "EFI" ];
           };
         };
         root = {
@@ -25,7 +25,7 @@
             format = "ext4";
             mountpoint = "/"; 
             mountOptions = [ "noatime" ];
-            label = "nixos";
+            extraArgs = [ "-L" "nixos" ];
           };
         };
       };
