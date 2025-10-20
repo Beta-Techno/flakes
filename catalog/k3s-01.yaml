@@ -15,6 +15,12 @@ spec:
       value: "http://localhost:8080"
     - name: MONGO_URL
       value: "mongodb://127.0.0.1:27017/wekan"
+    - name: MAIL_URL
+      value: ""
+    - name: MAIL_FROM
+      value: "wekan@localhost"
+    - name: ACCOUNTS_VERIFY_EMAIL
+      value: "false"
   - name: mongodb
     image: mongo:4.4
     ports:
