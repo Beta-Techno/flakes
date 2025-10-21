@@ -18,19 +18,21 @@ in
     description = "Tailscale tag to advertise; defaults from cfg.role.";
   };
 
-  services.tailscale = {
-    enable = true;
-    openFirewall = true;  # opens UDP 41641 etc.
-    # Headless join if you add the secret (optional on day 1):
-    authKeyFile = lib.mkIf haveTsKey config.sops.secrets."tailscale-authkey".path;
-    extraUpFlags = [
-      "--hostname=${config.networking.hostName}"
-      "--advertise-tags=${config.nbg.tailscale.advertisedTag}"
-      # Not enabling --ssh in Sprint 1; we stick to OpenSSH.
-    ];
-  };
+  config = {
+    services.tailscale = {
+      enable = true;
+      openFirewall = true;  # opens UDP 41641 etc.
+      # Headless join if you add the secret (optional on day 1):
+      authKeyFile = lib.mkIf haveTsKey config.sops.secrets."tailscale-authkey".path;
+      extraUpFlags = [
+        "--hostname=${config.networking.hostName}"
+        "--advertise-tags=${config.nbg.tailscale.advertisedTag}"
+        # Not enabling --ssh in Sprint 1; we stick to OpenSSH.
+      ];
+    };
 
-  # Allow SSH only on the Tailscale interface.
-  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [ 22 ];
-  networking.firewall.checkReversePath = "loose"; # common with TS to avoid rpfilter issues
+    # Allow SSH only on the Tailscale interface.
+    networking.firewall.interfaces.tailscale0.allowedTCPPorts = [ 22 ];
+    networking.firewall.checkReversePath = "loose"; # common with TS to avoid rpfilter issues
+  };
 }
