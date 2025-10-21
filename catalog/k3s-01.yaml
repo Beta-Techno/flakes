@@ -4,7 +4,7 @@ metadata:
   name: snipeit-secrets
 type: Opaque
 data:
-  APP_KEY: "YmFzZTY0OkFCR0VGR0hJSktMTU5PUFFSU1RVVldYWVphYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5eg=="
+  APP_KEY: "YmFzZTY0Okh1OUJLanF1aStTMHM1Y2x1WFM3cGcxZTBiRDFRdGlDV2NqekdwUDdoOD0="
   DB_PASSWORD: "c25pcGVpdF9wdw=="  # snipeit_pw
   MYSQL_ROOT_PASSWORD: "cm9vdF9wdw=="  # root_pw
 ---
