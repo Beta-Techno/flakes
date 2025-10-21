@@ -13,19 +13,19 @@
     withRuby    = false;
 
     # small, safe defaults – no plugins here
-    extraLuaConfig = ''
-      vim.g.mapleader = " "
-      vim.opt.number = true
-      vim.opt.relativenumber = true
-      vim.opt.mouse = "a"
-      vim.opt.termguicolors = true
-      vim.opt.ignorecase = true
-      vim.opt.smartcase = true
-      vim.opt.expandtab = true
-      vim.opt.shiftwidth = 2
-      vim.opt.tabstop = 2
-      vim.keymap.set("n", "<leader>w", ":write<CR>", { silent = true })
-      vim.keymap.set("n", "<leader>q", ":quit<CR>",  { silent = true })
+    extraConfig = ''
+      let g:mapleader = " "
+      set number
+      set relativenumber
+      set mouse=a
+      set termguicolors
+      set ignorecase
+      set smartcase
+      set expandtab
+      set shiftwidth=2
+      set tabstop=2
+      nnoremap <leader>w :write<CR>
+      nnoremap <leader>q :quit<CR>
     '';
   };
 }
