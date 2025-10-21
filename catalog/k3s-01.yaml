@@ -1,4 +1,26 @@
 apiVersion: v1
+kind: Secret
+metadata:
+  name: snipeit-secrets
+type: Opaque
+data:
+  APP_KEY: "YmFzZTY0OkFCR0VGR0hJSktMTU5PUFFSU1RVVldYWVphYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5eg=="
+  DB_PASSWORD: "c25pcGVpdF9wdw=="  # snipeit_pw
+  MYSQL_ROOT_PASSWORD: "cm9vdF9wdw=="  # root_pw
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-nonstrict
+data:
+  zz-nonstrict.cnf: |
+    [mysqld]
+    sql_mode=
+    innodb_strict_mode=0
+    character-set-server = utf8mb4
+    collation-server     = utf8mb4_unicode_ci
+---
+apiVersion: v1
 kind: Pod
 metadata:
   name: wekan
@@ -16,7 +38,7 @@ spec:
     - name: MONGO_URL
       value: "mongodb://127.0.0.1:27017/wekan"
     - name: MAIL_URL
-      value: ""
+      value: "smtp://localhost:25"
     - name: MAIL_FROM
       value: "wekan@localhost"
     - name: ACCOUNTS_VERIFY_EMAIL
@@ -25,6 +47,65 @@ spec:
     image: mongo:4.4
     ports:
     - containerPort: 27017
+  - name: snipeit
+    image: snipe/snipe-it:latest
+    ports:
+    - containerPort: 80
+    env:
+    - name: APP_ENV
+      value: "production"
+    - name: APP_DEBUG
+      value: "false"
+    - name: APP_URL
+      value: "http://10.0.2.144:31580"
+    - name: APP_KEY
+      valueFrom:
+        secretKeyRef: { name: snipeit-secrets, key: APP_KEY }
+    - name: DB_CONNECTION
+      value: "mysql"
+    - name: DB_HOST
+      value: "127.0.0.1"
+    - name: DB_PORT
+      value: "3306"
+    - name: DB_DATABASE
+      value: "snipeit"
+    - name: DB_USERNAME
+      value: "snipeit"
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef: { name: snipeit-secrets, key: DB_PASSWORD }
+    - name: MAIL_MAILER
+      value: "log"
+    - name: MAIL_FROM_ADDR
+      value: "snipeit@example.local"
+    - name: MAIL_FROM_NAME
+      value: "Snipe-IT"
+  - name: mariadb
+    image: mariadb:10.6
+    ports:
+    - containerPort: 3306
+    env:
+    - name: MYSQL_ROOT_PASSWORD
+      valueFrom:
+        secretKeyRef: { name: snipeit-secrets, key: MYSQL_ROOT_PASSWORD }
+    - name: MYSQL_DATABASE
+      value: "snipeit"
+    - name: MYSQL_USER
+      value: "snipeit"
+    - name: MYSQL_PASSWORD
+      valueFrom:
+        secretKeyRef: { name: snipeit-secrets, key: DB_PASSWORD }
+    volumeMounts:
+    - name: mariadb-config
+      mountPath: /etc/mysql/conf.d/zz-nonstrict.cnf
+      subPath: zz-nonstrict.cnf
+  volumes:
+  - name: mariadb-config
+    configMap:
+      name: mariadb-nonstrict
+      items:
+      - key: zz-nonstrict.cnf
+        path: zz-nonstrict.cnf
 ---
 apiVersion: v1
 kind: Service
@@ -37,3 +118,17 @@ spec:
   - port: 8080
     targetPort: 8080
   type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: snipeit
+spec:
+  selector:
+    app: wekan
+  type: NodePort
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    nodePort: 31580
