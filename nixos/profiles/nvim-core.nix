@@ -25,6 +25,16 @@
         set expandtab
         set shiftwidth=2
         set tabstop=2
+        
+        " Terminal transparency support
+        highlight Normal ctermbg=NONE guibg=NONE
+        highlight NonText ctermbg=NONE guibg=NONE
+        highlight LineNr ctermbg=NONE guibg=NONE
+        highlight CursorLine ctermbg=NONE guibg=NONE
+        highlight CursorLineNr ctermbg=NONE guibg=NONE
+        highlight SignColumn ctermbg=NONE guibg=NONE
+        highlight EndOfBuffer ctermbg=NONE guibg=NONE
+        
         nnoremap <leader>w :write<CR>
         nnoremap <leader>q :quit<CR>
       '';

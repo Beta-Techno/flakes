@@ -2,6 +2,11 @@
 { pkgs, ... }:
 {
   programs.neovim.configure = {
+    customRC = ''
+      " Ensure line numbers are set (in case core config is overridden)
+      set number
+      set relativenumber
+    '';
     packages.myVimPackage = {
       start = with pkgs.vimPlugins; [
         vim-sensible      # sane defaults
