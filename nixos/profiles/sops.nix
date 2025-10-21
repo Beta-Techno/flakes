@@ -94,6 +94,14 @@
         group = "root";
         mode  = "0400";
       };
+
+      # ── Tailscale ────────────────────────────────────────────────
+      tailscale-authkey = lib.mkIf config.services.tailscale.enable {
+        path = "/run/secrets/tailscale-authkey";
+        owner = "root";
+        group = "root";
+        mode  = "0400";
+      };
     };
   };
 
