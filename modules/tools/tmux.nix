@@ -9,7 +9,7 @@
   # ── Tmux configuration ─────────────────────────────────────────
   programs.tmux = {
     enable = true;
-    terminal = "screen-256color";
+    terminal = "tmux-256color";
     historyLimit = 10000;
     shell = "${pkgs.zsh}/bin/zsh";
     shortcut = "C-b";
@@ -27,7 +27,8 @@
     ];
 
     extraConfig = ''
-      # Improve color support
+      # Improve color support (Ghostty + fallback)
+      set -as terminal-features "xterm-ghostty:RGB"
       set -ga terminal-overrides ",xterm-256color:Tc"
 
       # Set the pane border style

@@ -1,6 +1,9 @@
 { config, pkgs, lib, ... }:
 
 {
+  imports = [
+    ./terminfo-ghostty.nix
+  ];
   # Enable flakes
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
