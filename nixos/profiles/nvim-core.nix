@@ -13,19 +13,25 @@
     withRuby    = false;
 
     # small, safe defaults – no plugins here
-    extraConfig = ''
-      let g:mapleader = " "
-      set number
-      set relativenumber
-      set mouse=a
-      set termguicolors
-      set ignorecase
-      set smartcase
-      set expandtab
-      set shiftwidth=2
-      set tabstop=2
-      nnoremap <leader>w :write<CR>
-      nnoremap <leader>q :quit<CR>
-    '';
+    configure = {
+      customRC = ''
+        let g:mapleader = " "
+        set number
+        set relativenumber
+        set mouse=a
+        set termguicolors
+        set ignorecase
+        set smartcase
+        set expandtab
+        set shiftwidth=2
+        set tabstop=2
+        nnoremap <leader>w :write<CR>
+        nnoremap <leader>q :quit<CR>
+      '';
+      packages.myVimPackage = {
+        start = [ ];
+        opt = [ ];
+      };
+    };
   };
 }
