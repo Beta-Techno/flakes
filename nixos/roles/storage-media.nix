@@ -4,6 +4,7 @@
     ../profiles/base.nix
     ../profiles/nginx.nix
     ../profiles/sops.nix
+    ../profiles/nvim-tiny-plugins.nix
   ];
 
   system.stateVersion = "24.11";

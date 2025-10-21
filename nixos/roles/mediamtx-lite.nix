@@ -7,6 +7,7 @@
     ../profiles/nginx.nix
     ../services/media/mediamtx/default.nix
     ../profiles/sops.nix
+    ../profiles/nvim-tiny-plugins.nix
   ];
 
   system.stateVersion = "24.11";

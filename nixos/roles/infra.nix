@@ -10,6 +10,7 @@
     ../profiles/loki.nix
     ../profiles/grafana.nix
     ../profiles/sops.nix
+    ../profiles/nvim-tiny-plugins.nix
   ];
 
   # Infrastructure-specific configuration

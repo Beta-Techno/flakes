@@ -27,6 +27,9 @@ nixpkgs.lib.nixosSystem {
     # Tailscale + SSH-on-tailnet for every inventory-managed host
     (import ./../../nixos/profiles/tailscale-ssh.nix)
     
+    # Universal Neovim baseline for all inventory hosts
+    (import ./../../nixos/profiles/nvim-core.nix)
+    
     # Late bindings - set hostname from inventory (configurable)
     ({ lib, ... }: { networking.hostName = lib.mkDefault (cfg.hostname or name); })
     

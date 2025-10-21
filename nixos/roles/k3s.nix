@@ -14,6 +14,7 @@ in {
     ../profiles/base.nix
     ../profiles/virt.nix
     ../profiles/sops.nix
+    ../profiles/nvim-tiny-plugins.nix
   ];
 
   assertions = [

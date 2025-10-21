@@ -6,6 +6,7 @@
     ../profiles/docker-daemon.nix
     ../profiles/nginx.nix            # keep; useful if/when you add a vhost
     ../profiles/sops.nix
+    ../profiles/nvim-tiny-plugins.nix
   ];
 
   system.stateVersion = "24.11";
