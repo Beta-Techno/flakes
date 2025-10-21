@@ -3,9 +3,9 @@
 {
   programs.neovim = {
     enable = true;                  # <— ensure the config is actually used
-    defaultEditor = lib.mkDefault true;
-    viAlias       = lib.mkDefault true;
-    vimAlias      = lib.mkDefault true;
+    defaultEditor = true;
+    viAlias       = true;
+    vimAlias      = true;
 
     configure = {
       customRC = ''

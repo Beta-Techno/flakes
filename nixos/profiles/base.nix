@@ -40,10 +40,8 @@
 
   # System packages
   environment.systemPackages = with pkgs; [
-    # Essential text editors
-    vim
-    neovim
-    
+    # Essential text editors come from the Neovim module wrapper
+
     # Basic system tools
     htop
     tree
@@ -53,10 +51,10 @@
     curl
     wget
     git
-    
+
     # Terminal multiplexer
     tmux
-    
+
     # File management
     ranger
     ncdu
