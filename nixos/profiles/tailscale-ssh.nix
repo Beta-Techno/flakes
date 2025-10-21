@@ -31,8 +31,6 @@ in
   };
 
   # Allow SSH only on the Tailscale interface.
-  networking.firewall = {
-    interfaces.tailscale0.allowedTCPPorts = [ 22 ];
-    checkReversePath = "loose"; # common with TS to avoid rpfilter issues
-  };
+  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [ 22 ];
+  networking.firewall.checkReversePath = "loose"; # common with TS to avoid rpfilter issues
 }
