@@ -57,11 +57,5 @@
         opt = [ ];
       };
     };
-    # Belt-and-suspenders: also assert key options via Lua
-    extraLuaConfig = lib.mkAfter ''
-      vim.o.number = true
-      vim.o.relativenumber = true
-      vim.o.termguicolors = true
-    '';
   };
 }
