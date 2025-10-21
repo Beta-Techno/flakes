@@ -40,12 +40,26 @@
 
   # System packages
   environment.systemPackages = with pkgs; [
+    # Essential text editors
     vim
-    wget
-    curl
-    git
+    neovim
+    
+    # Basic system tools
     htop
+    tree
+    ripgrep
+    fzf
+    jq
+    curl
+    wget
+    git
+    
+    # Terminal multiplexer
     tmux
+    
+    # File management
+    ranger
+    ncdu
   ];
 
   # Users
@@ -72,29 +86,5 @@
     enable = true;
     allowedTCPPorts = [ 80 443 ];
   };
-
-  # Basic system packages for all servers
-  environment.systemPackages = with pkgs; [
-    # Essential text editors
-    vim
-    neovim
-    
-    # Basic system tools
-    htop
-    tree
-    ripgrep
-    fzf
-    jq
-    curl
-    wget
-    git
-    
-    # Terminal multiplexer
-    tmux
-    
-    # File management
-    ranger
-    ncdu
-  ];
 }
 
