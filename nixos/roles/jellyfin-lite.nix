@@ -5,6 +5,7 @@
     ../profiles/base.nix
     ../profiles/docker-daemon.nix
     ../profiles/nginx.nix            # keep; useful if/when you add a vhost
+    ../profiles/sops.nix
   ];
 
   system.stateVersion = "24.11";
@@ -35,7 +36,7 @@
   ];
 
   # Open the web UI and optional reverse-proxy ports.
-  networking.firewall.allowedTCPPorts = [ 22 8096 80 443 ];
+  networking.firewall.allowedTCPPorts = [ 8096 80 443 ];
 
   # OPTIONAL: enable hw transcode (safe even if /dev/dri isn't present)
   hardware.graphics.enable = true;

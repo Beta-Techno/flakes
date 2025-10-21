@@ -6,12 +6,13 @@
     ../profiles/docker-daemon.nix
     ../profiles/nginx.nix
     ../services/media/mediamtx/default.nix
+    ../profiles/sops.nix
   ];
 
   system.stateVersion = "24.11";
 
   # Open service ports (HTTP added for HLS/API/metrics; RTSP/RTMP aren't HTTP)
-  networking.firewall.allowedTCPPorts = [ 22 80 443 8554 1935 8888 8889 9997 9998 ];
+  networking.firewall.allowedTCPPorts = [ 80 443 8554 1935 8888 8889 9997 9998 ];
 
   # Optional: serve only the HTTP endpoints via nginx (HLS / API / metrics).
   services.nginx.virtualHosts."stream.local" = {

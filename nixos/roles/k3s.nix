@@ -51,7 +51,7 @@ in {
 
   # Open only what k3s/flannel typically needs
   # Note: 80/443 not opened since we have dedicated ingress-01
-  networking.firewall.allowedTCPPorts = [ 22 6443 ];
+  networking.firewall.allowedTCPPorts = [ 6443 ];
   networking.firewall.allowedUDPPorts = [ 8472 ];  # flannel VXLAN
 
   # Do not enable Docker on k3s nodes (k3s uses containerd)

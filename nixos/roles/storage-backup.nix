@@ -76,7 +76,7 @@ in
     "d /home/backup/.ssh 0700 backup backup -"
   ];
 
-  networking.firewall.allowedTCPPorts = [ 22 80 443 ];
+  networking.firewall.allowedTCPPorts = [ 80 443 ];
 
   # Tiny static page (nice for smoke tests)
   services.nginx.virtualHosts."storage.local" = {

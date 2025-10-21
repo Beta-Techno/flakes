@@ -61,5 +61,5 @@
   programs.zsh.enable = true;
 
   # Open the right ports at the host level as well (8096 + HTTP/S)
-  networking.firewall.allowedTCPPorts = [ 22 8096 80 443 ];
+  networking.firewall.allowedTCPPorts = [ 8096 80 443 ];
 }

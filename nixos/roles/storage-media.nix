@@ -3,6 +3,7 @@
   imports = [
     ../profiles/base.nix
     ../profiles/nginx.nix
+    ../profiles/sops.nix
   ];
 
   system.stateVersion = "24.11";

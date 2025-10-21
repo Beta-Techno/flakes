@@ -34,7 +34,7 @@
   programs.zsh.enable = true;
 
   # Keep 22, 80, 443, plus Prom/Grafana/Loki
-  networking.firewall.allowedTCPPorts = [ 22 80 443 9090 3000 3100 ];
+  networking.firewall.allowedTCPPorts = [ 80 443 9090 3000 3100 ];
 
   # Two simple vhosts for friendliness
   services.nginx.virtualHosts."observability.local" = {

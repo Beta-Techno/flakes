@@ -23,6 +23,9 @@ nixpkgs.lib.nixosSystem {
     
     # Host-specific module from inventory (explicit path)
     hostModule
+
+    # Tailscale + SSH-on-tailnet for every inventory-managed host
+    (import ./../../nixos/profiles/tailscale-ssh.nix)
     
     # Late bindings - set hostname from inventory (configurable)
     ({ lib, ... }: { networking.hostName = lib.mkDefault (cfg.hostname or name); })
