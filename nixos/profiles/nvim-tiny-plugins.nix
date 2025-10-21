@@ -8,7 +8,7 @@
     vimAlias      = lib.mkDefault true;
 
     configure = {
-      customRC = lib.mkAfter ''
+      customRC = ''
         " --- Numbers / UI -------------------------------------------------
         set number
         set relativenumber

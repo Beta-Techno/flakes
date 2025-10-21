@@ -8,7 +8,6 @@
     ../profiles/nginx.nix
     ../profiles/postgres.nix
     ../profiles/sops.nix
-    ../profiles/nvim-core.nix
     ../profiles/nvim-tiny-plugins.nix
     # Bootloader is hardware-specific; pick it in the host file
   ];
