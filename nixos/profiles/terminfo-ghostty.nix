@@ -1,22 +1,19 @@
 { lib, pkgs, ... }:
-let
-  # Minimal, safe alias: xterm-ghostty → xterm-256color
-  # (tmux truecolor is enabled separately below; this prevents the "missing or unsuitable terminal" error.)
-  ghosttyTerminfo = pkgs.runCommand "ghostty-terminfo"
-    { nativeBuildInputs = [ pkgs.ncurses ]; }
-    ''
-      mkdir -p $out/share/terminfo
-      cat > ghostty.ti <<'EOF'
+{
+  # Add terminfo to system packages (simpler approach)
+  environment.systemPackages = with pkgs; [
+    # Create a simple terminfo entry for xterm-ghostty
+    (runCommand "ghostty-terminfo"
+      { nativeBuildInputs = [ ncurses ]; }
+      ''
+        mkdir -p $out/share/terminfo
+        cat > ghostty.ti <<'EOF'
 xterm-ghostty|Ghostty terminal emulator (alias of xterm-256color),
   use=xterm-256color,
 EOF
-      tic -x -o $out/share/terminfo ghostty.ti
-    '';
-in
-{
-  # Make the entry visible to ncurses system-wide (sudo, services, every user)
-  environment.etc."terminfo/x/xterm-ghostty".source =
-    "${ghosttyTerminfo}/share/terminfo/x/xterm-ghostty";
+        tic -x -o $out/share/terminfo ghostty.ti
+      '')
+  ];
 
   # (Optional but nice) Give tmux good defaults everywhere.
   programs.tmux = {
