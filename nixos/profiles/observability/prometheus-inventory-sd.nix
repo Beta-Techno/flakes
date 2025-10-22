@@ -3,7 +3,7 @@
 { lib, ... }:
 
 let
-  inventory = import ../../inventories/prod.nix;
+  inventory = import ../../../inventories/prod.nix;
   hosts = builtins.attrNames inventory;
 
   mkNode = host: {
