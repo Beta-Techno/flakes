@@ -15,8 +15,7 @@ in
   };
 
   # Open exporter ports only on Tailscale, not the world
-  networking.firewall.interfaces.tailscale0.allowedTCPPorts =
-    (config.networking.firewall.interfaces.tailscale0.allowedTCPPorts or []) ++ [ 9100 ];
+  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [ 9100 ];
 
   # Logs
   services.promtail = {
