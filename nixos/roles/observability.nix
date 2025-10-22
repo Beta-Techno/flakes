@@ -36,7 +36,7 @@
     enable = true;
     listenAddress = "127.0.0.1";
     port = 9115;
-    configFile = {
+    config = {
       modules = {
         http_2xx = { prober = "http"; timeout = "5s"; http.preferred_ip_protocol = "ip4"; };
         icmp     = { prober = "icmp"; };
