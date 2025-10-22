@@ -36,24 +36,7 @@
   # Keep 22, 80, 443, plus Prom/Grafana/Loki
   networking.firewall.allowedTCPPorts = [ 80 443 9090 3000 3100 ];
 
-  # Two simple vhosts for friendliness
-  services.nginx.virtualHosts."observability.local" = {
-    default = true;
-    locations."/" = {
-      proxyPass = "http://127.0.0.1:3000"; # Grafana
-      proxyWebsockets = true;
-    };
-    locations."/prometheus/" = {
-      proxyPass = "http://127.0.0.1:9090/";
-      proxyWebsockets = true;
-    };
-    # exporter needs this:
-    locations."/nginx_status".extraConfig = ''
-      stub_status;
-      allow 127.0.0.1;
-      deny all;
-    '';
-  };
+  # Nginx virtual host configuration is handled by the observability role
 
   environment.systemPackages = with pkgs; [
     curl jq htop

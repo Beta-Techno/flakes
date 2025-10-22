@@ -13,26 +13,23 @@
     ../profiles/observability/prometheus-inventory-sd.nix
   ];
 
-  # One friendly vhost; merges with what's already in hosts/servers/observability-01.nix
-  services.nginx.virtualHosts."observability.local" = lib.mkMerge [
-    (config.services.nginx.virtualHosts."observability.local" or {})
-    {
-      default = lib.mkDefault true;
-      locations."/" = { 
-        proxyPass = "http://127.0.0.1:3000"; 
-        proxyWebsockets = true; 
-      };
-      locations."/prometheus/" = { 
-        proxyPass = "http://127.0.0.1:9090/"; 
-        proxyWebsockets = true; 
-      };
-      locations."/nginx_status".extraConfig = ''
-        stub_status;
-        allow 127.0.0.1;
-        deny all;
-      '';
-    }
-  ];
+  # One friendly vhost for observability services
+  services.nginx.virtualHosts."observability.local" = {
+    default = true;
+    locations."/" = { 
+      proxyPass = "http://127.0.0.1:3000"; 
+      proxyWebsockets = true; 
+    };
+    locations."/prometheus/" = { 
+      proxyPass = "http://127.0.0.1:9090/"; 
+      proxyWebsockets = true; 
+    };
+    locations."/nginx_status".extraConfig = ''
+      stub_status;
+      allow 127.0.0.1;
+      deny all;
+    '';
+  };
 
   # Blackbox exporter for synthetic monitoring
   services.prometheus.exporters.blackbox = {
