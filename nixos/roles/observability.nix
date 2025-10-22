@@ -13,6 +13,14 @@
     ../profiles/observability/prometheus-inventory-sd.nix
   ];
 
+  # Make Grafana self-identify as the host we reverse-proxy on.
+  services.grafana.settings.server = {
+    http_port = 3000;         # already true by default
+    http_addr = "0.0.0.0";
+    domain    = "observability.local";
+    root_url  = "http://observability.local/";
+  };
+
   # One friendly vhost for observability services
   services.nginx.virtualHosts."observability.local" = {
     default = true;
