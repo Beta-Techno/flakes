@@ -7,6 +7,7 @@
   imports = [
     ../profiles/base.nix
     ../profiles/docker-daemon.nix
+    ../profiles/observability/client.nix
   ];
 
   # Workstation-specific settings

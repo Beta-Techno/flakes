@@ -59,6 +59,7 @@ in
     ../profiles/nginx.nix
     # Bring SOPS onto Storage so we can consume the netbox backup public key
     ../profiles/sops.nix
+    ../profiles/observability/client.nix
   ];
 
   system.stateVersion = "24.11";

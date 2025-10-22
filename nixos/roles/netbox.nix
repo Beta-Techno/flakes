@@ -9,6 +9,7 @@
     ../profiles/postgres.nix
     ../profiles/sops.nix
     ../profiles/nvim-tiny-plugins.nix
+    ../profiles/observability/client.nix
     # Bootloader is hardware-specific; pick it in the host file
   ];
 

@@ -1,13 +1,5 @@
 # Staging inventory - defines all staging hosts
 {
-  # Staging infrastructure host
-  staging-infrastructure-01 = {
-    system = "x86_64-linux";
-    role = "infra";
-    ip = "10.0.1.11";
-    hostModule = ./../nixos/hosts/servers/infrastructure-01.nix;
-    modules = [ ./../nixos/disko/infrastructure-01.nix ];
-  };
 
   # Staging Jellyfin host (split from combined media role)
   staging-jellyfin-01 = {
