@@ -1,6 +1,10 @@
 # Grafana monitoring dashboard profile
 { config, pkgs, lib, ... }:
 
+let
+  # Keep dashboards as plain JSON under version control; Nix will copy to the store.
+  dashboardsDir = ../../observability/dashboards;
+in
 {
   services.grafana = {
     enable = true;
@@ -41,34 +45,37 @@
     provision = {
       datasources = {
         settings = {
-          datasources = [
-            {
-              name = "Prometheus";
-              type = "prometheus";
-              url = "http://localhost:9090";
-              access = "proxy";
-              isDefault = true;
-            }
-            {
-              name = "Loki";
-              type = "loki";
-              url = "http://localhost:3100";
-              access = "proxy";
-            }
-            {
-              name = "BigQuery";
-              type = "grafana-bigquery-datasource";
-              access = "proxy";
-              jsonData = {
-                authenticationType = "jwt";
-                defaultProject = "bigquery-475119";
-                clientEmail = "bigquery-drive-audit@bigquery-475119.iam.gserviceaccount.com";
-                tokenUri = "https://oauth2.googleapis.com/token";
-                processingLocation = "US";
-                privateKeyPath = "${config.sops.secrets."gcp-bq-sa.pem".path}";
-              };
-            }
-          ];
+      datasources = [
+        {
+          uid = "PROM";
+          name = "Prometheus";
+          type = "prometheus";
+          url = "http://localhost:9090";
+          access = "proxy";
+          isDefault = true;
+        }
+        {
+          uid = "LOKI";
+          name = "Loki";
+          type = "loki";
+          url = "http://localhost:3100";
+          access = "proxy";
+        }
+        {
+          uid = "BQ";
+          name = "BigQuery";
+          type = "grafana-bigquery-datasource";
+          access = "proxy";
+          jsonData = {
+            authenticationType = "jwt";
+            defaultProject = "bigquery-475119";
+            clientEmail = "bigquery-drive-audit@bigquery-475119.iam.gserviceaccount.com";
+            tokenUri = "https://oauth2.googleapis.com/token";
+            processingLocation = "US";
+            privateKeyPath = "${config.sops.secrets."gcp-bq-sa.pem".path}";
+          };
+        }
+      ];
         };
       };
       
@@ -82,8 +89,9 @@
               type = "file";
               disableDeletion = false;
               editable = true;
+              # Point straight at the Nix store path for your JSON files
               options = {
-                path = "/var/lib/grafana/dashboards";
+                path = "${dashboardsDir}";
               };
             }
           ];
@@ -112,6 +120,9 @@
     "d /var/lib/grafana/plugins 0755 grafana grafana -"
     "d /var/lib/grafana/dashboards 0755 grafana grafana -"
   ];
+
+  # Restart Grafana only when dashboard content changes
+  systemd.services.grafana.restartTriggers = [ dashboardsDir ];
 
   # Firewall rules
   networking.firewall.allowedTCPPorts = [

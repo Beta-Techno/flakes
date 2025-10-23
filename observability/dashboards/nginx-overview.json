@@ -1,0 +1,43 @@
+{
+  "uid": "nginx-overview",
+  "title": "Nginx Overview",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-6h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Active Connections",
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0},
+      "datasource": { "type": "prometheus", "uid": "PROM" },
+      "targets": [
+        { "refId": "A", "expr": "nginx_connections_active" }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Reading / Writing / Waiting",
+      "gridPos": {"h": 8, "w": 16, "x": 8, "y": 0},
+      "datasource": { "type": "prometheus", "uid": "PROM" },
+      "targets": [
+        { "refId": "R", "expr": "nginx_connections_reading" },
+        { "refId": "W", "expr": "nginx_connections_writing" },
+        { "refId": "Q", "expr": "nginx_connections_waiting" }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Requests / s",
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8},
+      "datasource": { "type": "prometheus", "uid": "PROM" },
+      "targets": [
+        { "refId": "A", "expr": "sum(rate(nginx_http_requests_total[1m]))" }
+      ]
+    }
+  ],
+  "templating": { "list": [] }
+}
