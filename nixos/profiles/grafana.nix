@@ -9,10 +9,10 @@
     # Basic configuration
     settings = {
       server = {
-        http_port = 3000;
-        http_addr = "0.0.0.0";  # Bind to all interfaces for external access
-        domain = "grafana.local";
-        root_url = "https://grafana.local/";
+        http_port = lib.mkDefault 3000;
+        http_addr = lib.mkDefault "0.0.0.0";  # Bind to all interfaces for external access
+        domain    = lib.mkDefault "grafana.local";
+        root_url  = lib.mkDefault "http://grafana.local/";
       };
       
       security = {
