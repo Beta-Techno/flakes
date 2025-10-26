@@ -66,10 +66,12 @@
     # Disable global wireless service (use NetworkManager instead)
     wireless.enable = false;
     
-    # Firewall configuration
+    # Firewall configuration - Open all web ports (1000-9900)
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 80 443 8080 3000 5000 ];
+      allowedTCPPortRanges = [
+        { from = 1000; to = 9900; }
+      ];
       allowedUDPPorts = [ 53 67 68 ];
     };
   };
