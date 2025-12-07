@@ -1,5 +1,22 @@
 # Production inventory - defines all production hosts
 {
+  # ============================================================================
+  # EDGE & INGRESS
+  # ============================================================================
+
+  # Ingress - Single front door for all HTTP(S) traffic
+  ingress-01 = {
+    system = "x86_64-linux";
+    role = "ingress";
+    ip = "10.0.0.11";
+    hostModule = ./../nixos/hosts/servers/ingress-01.nix;
+    modules = [ ];
+  };
+
+  # ============================================================================
+  # INFRASTRUCTURE SERVICES
+  # ============================================================================
+
   # Netbox host (isolated)
   netbox-01 = {
     system = "x86_64-linux";
